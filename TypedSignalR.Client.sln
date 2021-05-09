@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Client", "sandbox\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypedSignalR.Client", "src\TypedSignalR.Client\TypedSignalR.Client.csproj", "{EDC5E6DA-4645-4464-B14E-CCC6F6479441}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "sandbox\ConsoleApp\ConsoleApp.csproj", "{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{EDC5E6DA-4645-4464-B14E-CCC6F6479441}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDC5E6DA-4645-4464-B14E-CCC6F6479441}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDC5E6DA-4645-4464-B14E-CCC6F6479441}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +52,7 @@ Global
 		{ADD65A45-652A-4D27-A218-CD599FE45C28} = {36823042-8A13-4AA5-BEEC-112F8DCF6FA9}
 		{22892B6B-365A-4B41-8BB1-EFE08C08DC67} = {36823042-8A13-4AA5-BEEC-112F8DCF6FA9}
 		{EDC5E6DA-4645-4464-B14E-CCC6F6479441} = {196DB73F-4D3E-4A90-AE48-40925CB33560}
+		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3} = {36823042-8A13-4AA5-BEEC-112F8DCF6FA9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C64E712-2479-4BF8-9169-B21DC3E787EC}

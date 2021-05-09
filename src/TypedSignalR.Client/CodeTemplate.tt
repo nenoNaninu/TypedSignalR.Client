@@ -47,7 +47,7 @@ namespace <#= NameSpace #>
 <# foreach(var method in ClientMethods) { #>
         public virtual <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
         {
-            return default;
+            <#= method.ReturnStatement() #>
         }
 
 <# } #>

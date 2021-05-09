@@ -79,7 +79,9 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
-            this.Write(")\r\n        {\r\n            return default;\r\n        }\r\n\r\n");
+            this.Write(")\r\n        {\r\n            ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnStatement()));
+            this.Write("\r\n        }\r\n\r\n");
  } 
             this.Write(@"        public void Dispose()
         {

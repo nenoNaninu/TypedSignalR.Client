@@ -90,6 +90,18 @@ namespace TypedSignalR.Client
             return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
         }
 
+        public string ReturnStatement()
+        {
+            if(ReturnValueType == "void")
+            {
+                return "return;";
+            }
+            else
+            {
+                return "return default;";
+            }
+        }
+
         /// <param name="isGenericTypeReturn">if return type is Task<T>, must be true. </param>
         /// <param name="returnTypeArg">e.g. if return type is Task<Datetime>, you must be input System.Datetime </param>
         public MethodInfo(string methodName, string returnValueType, IReadOnlyList<(string typeName, string argName)> args, bool isGenericTypeReturn, string returnTypeGenericArg)

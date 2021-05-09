@@ -18,6 +18,7 @@ namespace SignalR.Shared
     {
         Task ReceiveMessage(string user, string message, UserDefineClass userDefine);
         Task SomeClientMethod();
+        void SomeVoidMethod();
     }
 
     public interface IHubContract

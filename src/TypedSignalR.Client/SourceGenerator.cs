@@ -71,7 +71,7 @@ namespace TypedSignalR.Client
                         //var typeArg = methodSymbol.TypeArguments;
                         INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
-                        ValidateReturnType(returnTypeSymbol, methodSymbol);
+                        ValidateHubReturnType(returnTypeSymbol, methodSymbol);
 
                         ITypeSymbol genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
 
@@ -97,7 +97,7 @@ namespace TypedSignalR.Client
                     {
                         INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
-                        ValidateReturnType(returnTypeSymbol, methodSymbol);
+                        ValidateClientReturnType(returnTypeSymbol, methodSymbol);
 
                         var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
                         var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
@@ -125,7 +125,7 @@ namespace TypedSignalR.Client
             }
         }
 
-        private void ValidateReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
+        private void ValidateHubReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
         {
             if (returnTypeSymbol.IsGenericType)
             {
@@ -137,6 +137,26 @@ namespace TypedSignalR.Client
             else
             {
                 if (returnTypeSymbol.ToDisplayString() is not "System.Threading.Tasks.Task")
+                {
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                }
+            }
+        }
+
+
+        private void ValidateClientReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
+        {
+            if (returnTypeSymbol.IsGenericType)
+            {
+                if (returnTypeSymbol.BaseType.ToDisplayString() is not "System.Threading.Tasks.Task")
+                {
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                }
+            }
+            else
+            {
+                var str = returnTypeSymbol.ToDisplayString();
+                if (str != "System.Threading.Tasks.Task" && str != "void")
                 {
                     throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
                 }
