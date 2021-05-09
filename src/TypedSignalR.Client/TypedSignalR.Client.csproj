@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>9</LangVersion>
+        <IsRoslynComponent>true</IsRoslynComponent>
+
+        <!-- does not need runtime self -->
+        <!--https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#package-a-generator-as-a-nuget-package-->
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <!--https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#package-a-generator-as-a-nuget-package-->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
+        <!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />-->
+    </ItemGroup>
+
+    <ItemGroup>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="CodeTemplate.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>CodeTemplate.tt</DependentUpon>
+        </Compile>
+        <Compile Update="RequiredComponent.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>RequiredComponent.tt</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="RequiredComponent.tt">
+            <Generator>TextTemplatingFilePreprocessor</Generator>
+            <LastGenOutput>RequiredComponent.cs</LastGenOutput>
+        </None>
+        <None Update="CodeTemplate.tt">
+            <Generator>TextTemplatingFilePreprocessor</Generator>
+            <LastGenOutput>CodeTemplate.cs</LastGenOutput>
+        </None>
+    </ItemGroup>
+
+</Project>
