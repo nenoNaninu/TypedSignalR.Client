@@ -14,8 +14,8 @@ namespace TypedSignalR.Client
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class HubClientBaseAttribute : Attribute
     {
-        public Type Client { get; }
         public Type Hub { get; }
+        public Type Client { get; }
 
         public HubClientBaseAttribute(Type hub, Type client)
         {

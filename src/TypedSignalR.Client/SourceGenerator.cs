@@ -62,25 +62,6 @@ namespace TypedSignalR.Client
                     continue;
                 }
 
-                var clientMethods = new List<MethodInfo>();
-                foreach (ISymbol symbol in attributeProperty.ClientTypeSymbol.GetMembers())
-                {
-                    if (symbol is IMethodSymbol methodSymbol)
-                    {
-                        INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
-
-                        ValidateReturnType(returnTypeSymbol, methodSymbol);
-
-                        var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
-                        var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
-                        clientMethods.Add(methodInfo);
-                    }
-                    else
-                    {
-                        throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
-                    }
-                }
-
                 var hubMethods = new List<MethodInfo>();
                 foreach (ISymbol symbol in attributeProperty.HubTypeSymbol.GetMembers())
                 {
@@ -102,6 +83,25 @@ namespace TypedSignalR.Client
                             genericArg?.ToDisplayString());
 
                         hubMethods.Add(methodInfo);
+                    }
+                    else
+                    {
+                        throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
+                    }
+                }
+
+                var clientMethods = new List<MethodInfo>();
+                foreach (ISymbol symbol in attributeProperty.ClientTypeSymbol.GetMembers())
+                {
+                    if (symbol is IMethodSymbol methodSymbol)
+                    {
+                        INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
+
+                        ValidateReturnType(returnTypeSymbol, methodSymbol);
+
+                        var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                        var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
+                        clientMethods.Add(methodInfo);
                     }
                     else
                     {

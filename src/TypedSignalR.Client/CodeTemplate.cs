@@ -108,6 +108,7 @@ namespace TypedSignalR.Client
                     {
                         it.Dispose();
                     }
+                    _disposables.Clear();
                 }
             }
         } // class CompositeDisposable

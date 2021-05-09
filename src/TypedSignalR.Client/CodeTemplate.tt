@@ -78,6 +78,7 @@ namespace <#= NameSpace #>
                     {
                         it.Dispose();
                     }
+                    _disposables.Clear();
                 }
             }
         } // class CompositeDisposable
