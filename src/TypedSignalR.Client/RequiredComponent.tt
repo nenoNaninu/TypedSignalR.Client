@@ -16,10 +16,11 @@ namespace TypedSignalR.Client
     {
         public Type Client { get; }
         public Type Hub { get; }
-        public HubClientBaseAttribute(Type client, Type hub)
+
+        public HubClientBaseAttribute(Type hub, Type client)
         {
-            Client = client;
             Hub = hub;
+            Client = client;
         }
     }
 

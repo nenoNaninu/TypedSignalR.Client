@@ -9,8 +9,9 @@ namespace SignalR.Server.Hubs
     {
         public async Task<Status> SendMessage(string user, string message)
         {
-            await Clients.All.ReceiveMessage(user, message, new UserDefineClass(){ Now =  DateTime.Now, RandomId = Guid.NewGuid()});
-            return new Status() { StatusMessage = $"[Success] Call SendMessageToServer : {DateTime.Now}" };
+            var userDefine = new UserDefineClass() {Datetime = DateTime.Now, RandomId = Guid.NewGuid()};
+            await Clients.All.ReceiveMessage(user, message, userDefine);
+            return new Status() { StatusMessage = $"[Success] Call SendMessage : {userDefine.Datetime}, {userDefine.RandomId}"};
         }
 
         public async Task SomeHubMethod()

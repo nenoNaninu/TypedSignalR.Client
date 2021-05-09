@@ -21,9 +21,9 @@ namespace <#= NameSpace #>
             {
                 _connection = connection;
             }
-
 <# foreach(var method in HubMethods) { #>
-            public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgPrameterToString() #>)
+
+            public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
             {
                 return _connection.InvokeAsync<#= method.ReturnTypeGenericArgToString() #>(nameof(<#= method.MethodName #>) <#= method.ArgNamesParameterToOneline() #>);
             }
@@ -40,17 +40,17 @@ namespace <#= NameSpace #>
             Connection = connection;
             Hub = new HubInvoker(connection);
 <# foreach(var method in ClientMethods) { #>
-            _compositeDisposable.Add(Connection.On<<#= method.ArgTypesParameterToOneline() #>>(nameof(<#= method.MethodName #>), <#= method.MethodName #>));
+            _compositeDisposable.Add(Connection.On<#= method.ArgTypesParameterToOneline() #>(nameof(<#= method.MethodName #>), <#= method.MethodName #>));
 <# } #>
         }
 
 <# foreach(var method in ClientMethods) { #>
-        public virtual <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgPrameterToString() #>)
+        public virtual <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
         {
             return default;
         }
-<# } #>
 
+<# } #>
         public void Dispose()
         {
             _compositeDisposable.Dispose();
@@ -58,7 +58,7 @@ namespace <#= NameSpace #>
 
         private sealed class CompositeDisposable : System.IDisposable
         {
-              private System.Collections.Generic.List<System.IDisposable> _disposables = new ();
+            private System.Collections.Generic.List<System.IDisposable> _disposables = new ();
 
             private object _lock = new object();
 

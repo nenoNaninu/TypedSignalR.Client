@@ -6,7 +6,7 @@ namespace SignalR.Shared
     public class UserDefineClass
     {
         public Guid RandomId { get; set; }
-        public DateTime Now { get; set; }
+        public DateTime Datetime { get; set; }
     }
 
     public class Status

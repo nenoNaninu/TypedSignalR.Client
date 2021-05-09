@@ -38,14 +38,14 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(HubInterfaceName));
             this.Write("\r\n        {\r\n            private readonly HubConnection _connection;\r\n\r\n         " +
                     "   public HubInvoker(HubConnection connection)\r\n            {\r\n                _" +
-                    "connection = connection;\r\n            }\r\n\r\n");
+                    "connection = connection;\r\n            }\r\n");
  foreach(var method in HubMethods) { 
-            this.Write("            public ");
+            this.Write("\r\n            public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnValueType));
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgPrameterToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
             this.Write(")\r\n            {\r\n                return _connection.InvokeAsync");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeGenericArgToString()));
             this.Write("(nameof(");
@@ -63,9 +63,9 @@ namespace TypedSignalR.Client
             this.Write("(HubConnection connection)\r\n        {\r\n            Connection = connection;\r\n    " +
                     "        Hub = new HubInvoker(connection);\r\n");
  foreach(var method in ClientMethods) { 
-            this.Write("            _compositeDisposable.Add(Connection.On<");
+            this.Write("            _compositeDisposable.Add(Connection.On");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypesParameterToOneline()));
-            this.Write(">(nameof(");
+            this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
@@ -78,18 +78,17 @@ namespace TypedSignalR.Client
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgPrameterToString()));
-            this.Write(")\r\n        {\r\n            return default;\r\n        }\r\n");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
+            this.Write(")\r\n        {\r\n            return default;\r\n        }\r\n\r\n");
  } 
-            this.Write(@"
-        public void Dispose()
+            this.Write(@"        public void Dispose()
         {
             _compositeDisposable.Dispose();
         }
 
         private sealed class CompositeDisposable : System.IDisposable
         {
-              private System.Collections.Generic.List<System.IDisposable> _disposables = new ();
+            private System.Collections.Generic.List<System.IDisposable> _disposables = new ();
 
             private object _lock = new object();
 

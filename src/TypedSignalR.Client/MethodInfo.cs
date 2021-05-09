@@ -68,10 +68,11 @@ namespace TypedSignalR.Client
 
             if (Args.Count == 1)
             {
-                return Args[0].typeName;
+                return $"<{Args[0].typeName}>";
             }
 
             var sb = new StringBuilder();
+            sb.Append('<');
 
             for (int i = 0; i < Args.Count - 1; i++)
             {
@@ -80,7 +81,7 @@ namespace TypedSignalR.Client
             }
 
             sb.Append(Args[Args.Count - 1].typeName);
-
+            sb.Append('>');
             return sb.ToString();
         }
 
