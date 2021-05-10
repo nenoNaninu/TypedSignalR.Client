@@ -26,147 +26,183 @@ namespace TypedSignalR.Client
 
             foreach (var (targetType, attributeSyntax) in receiver.Targets)
             {
-                var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
-
-                var attributeProperty = new AttributeProperty();
-
-                var hubArg = attributeSyntax.ArgumentList.Arguments[0];
-                if (hubArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxHub)
-                {
-                    attributeProperty.HubTypeSymbol = semanticModel.GetSymbolInfo(typeOfExpressionSyntaxHub.Type).Symbol as ITypeSymbol;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-
-                var clientArg = attributeSyntax.ArgumentList.Arguments[1];
-                if (clientArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxClient)
-                {
-                    attributeProperty.ClientTypeSymbol = semanticModel.GetSymbolInfo(typeOfExpressionSyntaxClient.Type).Symbol as ITypeSymbol;
-                }
-                else
-                {
-                    throw new Exception();
-                }
-
+                var attributeProperty = ExtractAttributeProperty(context, targetType, attributeSyntax);
                 targetClassWithAttributeList.Add((targetType, attributeProperty));
             }
 
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
-                INamedTypeSymbol typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
-
-                if (typeSymbol == null)
-                {
-                    continue;
-                }
-
-                var hubMethods = new List<MethodInfo>();
-                foreach (ISymbol symbol in attributeProperty.HubTypeSymbol.GetMembers())
-                {
-                    if (symbol is IMethodSymbol methodSymbol)
-                    {
-                        var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
-                        //var typeArg = methodSymbol.TypeArguments;
-                        INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
-
-                        ValidateHubReturnType(returnTypeSymbol, methodSymbol);
-
-                        ITypeSymbol genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
-
-                        var methodInfo = new MethodInfo(
-                            methodSymbol.Name,
-                            methodSymbol.ReturnType.ToDisplayString(),
-                            parameters,
-                            returnTypeSymbol.IsGenericType,
-                            genericArg?.ToDisplayString());
-
-                        hubMethods.Add(methodInfo);
-                    }
-                    else
-                    {
-                        throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
-                    }
-                }
-
-                var clientMethods = new List<MethodInfo>();
-                foreach (ISymbol symbol in attributeProperty.ClientTypeSymbol.GetMembers())
-                {
-                    if (symbol is IMethodSymbol methodSymbol)
-                    {
-                        INamedTypeSymbol returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
-
-                        ValidateClientReturnType(returnTypeSymbol, methodSymbol);
-
-                        var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
-                        var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
-                        clientMethods.Add(methodInfo);
-                    }
-                    else
-                    {
-                        throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
-                    }
-                }
-
-                var template = new CodeTemplate()
-                {
-                    NameSpace = typeSymbol.ContainingNamespace.ToDisplayString(),
-                    TypeName = typeSymbol.Name,
-                    HubInterfaceName = attributeProperty.HubTypeSymbol.ToDisplayString(),
-                    ClientInterfaceName = attributeProperty.ClientTypeSymbol.ToDisplayString(),
-                    HubMethods = hubMethods,
-                    ClientMethods = clientMethods
-                };
-
-                var text = template.TransformText();
-                Debug.WriteLine(text);
-                context.AddSource($"{template.NameSpace}.{template.TypeName}.Generated.cs", text);
+                var (hintName, source) = GenerateSource(context, targetType, attributeProperty);
+#if DEBUG
+                Debug.WriteLine(source);
+#endif
+                context.AddSource(hintName, source);
             }
         }
 
-        private void ValidateHubReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
+        private static (string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty)
         {
+            INamedTypeSymbol? typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
+
+            if (typeSymbol == null)
+            {
+                return (string.Empty, string.Empty);
+            }
+
+            var hubMethods = ExtractHubMethods(attributeProperty);
+            var clientMethods = ExtractClientMethods(attributeProperty);
+
+            var template = new CodeTemplate()
+            {
+                NameSpace = typeSymbol.ContainingNamespace.ToDisplayString(),
+                TargetTypeName = typeSymbol.Name,
+                HubInterfaceName = attributeProperty.HubTypeSymbol.ToDisplayString(),
+                ClientInterfaceName = attributeProperty.ClientTypeSymbol.ToDisplayString(),
+                HubMethods = hubMethods,
+                ClientMethods = clientMethods
+            };
+
+            string text = template.TransformText();
+
+            return ($"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
+        }
+
+        private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
+        {
+            var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
+
+            var hubArg = attributeSyntax.ArgumentList!.Arguments[0];
+
+            ITypeSymbol? hubTypeSymbol = hubArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxHub
+                ? semanticModel.GetSymbolInfo(typeOfExpressionSyntaxHub.Type).Symbol as ITypeSymbol : null;
+
+            var clientArg = attributeSyntax.ArgumentList!.Arguments[1];
+
+            ITypeSymbol? clientTypeSymbol = clientArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxClient
+                ? semanticModel.GetSymbolInfo(typeOfExpressionSyntaxClient.Type).Symbol as ITypeSymbol : null;
+
+            if (hubTypeSymbol != null && clientTypeSymbol != null)
+            {
+                return new AttributeProperty(hubTypeSymbol, clientTypeSymbol);
+            }
+
+            throw new Exception("Enter the HubClientBaseAttribute argument correctly.");
+        }
+
+        private static IReadOnlyList<MethodInfo> ExtractHubMethods(AttributeProperty attributeProperty)
+        {
+            var hubMethods = new List<MethodInfo>();
+            foreach (ISymbol symbol in attributeProperty.HubTypeSymbol.GetMembers())
+            {
+                if (symbol is IMethodSymbol methodSymbol)
+                {
+                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
+
+                    if (returnTypeSymbol == null)
+                    {
+                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
+                    }
+
+                    ValidateHubReturnType(returnTypeSymbol, methodSymbol);
+
+                    ITypeSymbol? genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
+
+                    var methodInfo = new MethodInfo(
+                        methodSymbol.Name,
+                        methodSymbol.ReturnType.ToDisplayString(),
+                        parameters,
+                        returnTypeSymbol.IsGenericType,
+                        genericArg?.ToDisplayString());
+
+                    hubMethods.Add(methodInfo);
+                }
+                else
+                {
+                    throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
+                }
+            }
+
+            return hubMethods;
+        }
+
+        private static IReadOnlyList<MethodInfo> ExtractClientMethods(AttributeProperty attributeProperty)
+        {
+            var clientMethods = new List<MethodInfo>();
+            foreach (ISymbol symbol in attributeProperty.ClientTypeSymbol.GetMembers())
+            {
+                if (symbol is IMethodSymbol methodSymbol)
+                {
+                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T> or void
+
+                    if (returnTypeSymbol == null)
+                    {
+                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
+                    }
+
+                    ValidateClientReturnType(returnTypeSymbol, methodSymbol);
+
+                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                    var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
+                    clientMethods.Add(methodInfo);
+                }
+                else
+                {
+                    throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
+                }
+            }
+
+            return clientMethods;
+        }
+
+        private static void ValidateHubReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
+        {
+
             if (returnTypeSymbol.IsGenericType)
             {
-                if (returnTypeSymbol.BaseType.ToDisplayString() is not "System.Threading.Tasks.Task")
+                if (returnTypeSymbol.BaseType!.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
                 }
             }
             else
             {
                 if (returnTypeSymbol.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
                 }
             }
         }
 
-
-        private void ValidateClientReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
+        private static void ValidateClientReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
         {
             if (returnTypeSymbol.IsGenericType)
             {
-                if (returnTypeSymbol.BaseType.ToDisplayString() is not "System.Threading.Tasks.Task")
+                if (returnTypeSymbol.BaseType!.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
                 }
             }
             else
             {
-                var str = returnTypeSymbol.ToDisplayString();
+                string str = returnTypeSymbol.ToDisplayString();
                 if (str != "System.Threading.Tasks.Task" && str != "void")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task of Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
                 }
             }
         }
     }
 
-    struct AttributeProperty
+    internal readonly struct AttributeProperty
     {
-        public ITypeSymbol ClientTypeSymbol { get; set; }
-        public ITypeSymbol HubTypeSymbol { get; set; }
+        public readonly ITypeSymbol HubTypeSymbol;
+        public readonly ITypeSymbol ClientTypeSymbol;
+
+        public AttributeProperty(ITypeSymbol hubTypeSymbol, ITypeSymbol clientTypeSymbol)
+        {
+            HubTypeSymbol = hubTypeSymbol;
+            ClientTypeSymbol = clientTypeSymbol;
+        }
     }
 }

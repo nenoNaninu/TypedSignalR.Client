@@ -8,13 +8,13 @@ namespace TypedSignalR.Client
 {
     public partial class CodeTemplate
     {
-        public string NameSpace { get; set; }
-        public string TypeName { get; set; }
+        public string? NameSpace { get; set; }
+        public string? TargetTypeName { get; set; }
 
-        public string ClientInterfaceName;
-        public string HubInterfaceName;
+        public string? ClientInterfaceName { get; set; }
+        public string? HubInterfaceName { get; set; }
 
-        public IEnumerable<MethodInfo> ClientMethods { get; set; }
-        public IEnumerable<MethodInfo> HubMethods { get; set; }
+        public IReadOnlyList<MethodInfo>? ClientMethods { get; set; }
+        public IReadOnlyList<MethodInfo>? HubMethods { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace TypedSignalR.Client
                     "\r\nusing Microsoft.AspNetCore.SignalR.Client;\r\n\r\nnamespace ");
             this.Write(this.ToStringHelper.ToStringWithCulture(NameSpace));
             this.Write("\r\n{\r\n    public partial class  ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(TargetTypeName));
             this.Write(" : TypedSignalR.Client.IHubClient<");
             this.Write(this.ToStringHelper.ToStringWithCulture(HubInterfaceName));
             this.Write(">, ");
@@ -51,7 +51,7 @@ namespace TypedSignalR.Client
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write(") ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNamesParameterToOneline()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNameParametersToString()));
             this.Write(");\r\n            }\r\n");
  } 
             this.Write("        } // class HubInvoker\r\n\r\n        public HubConnection Connection { get; }" +
@@ -59,12 +59,12 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(HubInterfaceName));
             this.Write(" Hub { get; }\r\n\r\n        private readonly CompositeDisposable _compositeDisposabl" +
                     "e = new CompositeDisposable();\r\n\r\n        public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(TargetTypeName));
             this.Write("(HubConnection connection)\r\n        {\r\n            Connection = connection;\r\n    " +
                     "        Hub = new HubInvoker(connection);\r\n");
  foreach(var method in ClientMethods) { 
             this.Write("            _compositeDisposable.Add(Connection.On");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypesParameterToOneline()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypeParametersToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
@@ -115,7 +115,7 @@ namespace TypedSignalR.Client
             }
         } // class CompositeDisposable
     } // class ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(TypeName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(TargetTypeName));
             this.Write("\r\n} // namespace");
             return this.GenerationEnvironment.ToString();
         }
