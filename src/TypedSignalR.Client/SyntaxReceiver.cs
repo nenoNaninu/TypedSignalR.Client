@@ -14,7 +14,7 @@ namespace TypedSignalR.Client
         {
             if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax && classDeclarationSyntax.AttributeLists.Count > 0)
             {
-                AttributeSyntax attr = classDeclarationSyntax.AttributeLists
+                AttributeSyntax? attr = classDeclarationSyntax.AttributeLists
                     .SelectMany(x => x.Attributes)
                     .FirstOrDefault(x => x.Name.ToString() is "HubClientBase" or "HubClientBaseAttribute");
                 if (attr != null)
