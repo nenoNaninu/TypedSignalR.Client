@@ -133,11 +133,11 @@ namespace TypedSignalR.Client
             {
                 if (symbol is IMethodSymbol methodSymbol)
                 {
-                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T> or void
+                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // only Task. not Task<T>.
 
                     if (returnTypeSymbol == null)
                     {
-                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
+                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
                     }
 
                     ValidateClientReturnType(returnTypeSymbol, methodSymbol);
@@ -162,14 +162,14 @@ namespace TypedSignalR.Client
             {
                 if (returnTypeSymbol.BaseType!.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
                 }
             }
             else
             {
                 if (returnTypeSymbol.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
                 }
             }
         }
@@ -178,14 +178,13 @@ namespace TypedSignalR.Client
         {
             if (returnTypeSymbol.IsGenericType)
             {
-                throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
+                throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
             }
             else
             {
-                string str = returnTypeSymbol.ToDisplayString();
-                if (str != "System.Threading.Tasks.Task" && str != "void")
+                if (returnTypeSymbol.ToDisplayString() is not "System.Threading.Tasks.Task")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
                 }
             }
         }

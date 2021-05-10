@@ -30,11 +30,6 @@ namespace SignalR.Client
 
             return Task.CompletedTask;
         }
-
-        public override void SomeVoidMethod()
-        {
-            Console.WriteLine($"{Environment.NewLine}[Call SomeVoidMethod]");
-        }
     }
 
     class Program
@@ -77,7 +72,7 @@ namespace SignalR.Client
             await client.Hub.SomeHubMethod();
 
             await client.Connection.StopAsync();
-            await client.Connection.DisposeAsync();
+            await client.DisposeAsync();
         }
     }
 }

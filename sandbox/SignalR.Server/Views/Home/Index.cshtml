@@ -21,9 +21,10 @@
         //Disable send button until connection is established
         document.getElementById("sendButton").disabled = true;
 
-        connection.on("ReceiveMessage", function (user, message) {
+        connection.on("ReceiveMessage", function (user, message, userDefine) {
             console.log(user);
             console.log(message);
+            console.log(userDefine);
         });
 
         connection.start().then(function () {
