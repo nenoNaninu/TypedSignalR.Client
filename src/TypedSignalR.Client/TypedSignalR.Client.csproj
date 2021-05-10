@@ -10,6 +10,20 @@
         <!--https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md#package-a-generator-as-a-nuget-package-->
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+        <!-- NuGet -->
+        <PackageId>TypedSignalR.Client</PackageId>
+        <AssemblyName>TypedSignalR.Client</AssemblyName>
+        <Title>TypedSignalR.Client</Title>
+        <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
+        <Version>0.0.1</Version>
+        <Authors>nenoNaninu</Authors>
+        <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
+        <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>signalr;sourcegenerator</PackageTags>
+        <Copyright>(c) nenoNaninu</Copyright>
     </PropertyGroup>
 
     <ItemGroup>
