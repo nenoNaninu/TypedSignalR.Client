@@ -158,7 +158,6 @@ class HubClient : ClientBase
         Console.WriteLine($"[On Reconnecting!]");
         return Task.CompletedTask;
     }
-    
 }
 ```
 Let's use it!
