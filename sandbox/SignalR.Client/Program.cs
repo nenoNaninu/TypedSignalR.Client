@@ -30,6 +30,24 @@ namespace SignalR.Client
 
             return Task.CompletedTask;
         }
+
+        public override Task OnClosed(Exception e)
+        {
+            Console.WriteLine($"[On Closed!]");
+            return Task.CompletedTask;
+        }
+
+        public override Task OnReconnected(string connectionId)
+        {
+            Console.WriteLine($"[On Reconnected!]");
+            return Task.CompletedTask;
+        }
+
+        public override Task OnReconnecting(Exception e)
+        {
+            Console.WriteLine($"[On Reconnecting!]");
+            return Task.CompletedTask;
+        }
     }
 
     class Program

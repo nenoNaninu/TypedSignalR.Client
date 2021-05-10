@@ -137,6 +137,28 @@ class HubClient : ClientBase
         Console.WriteLine("Call SomeClientMethod1!");
         return Task.CompletedTask;
     }
+
+    // SignalR event
+    public override Task OnClosed(Exception e)
+    {
+        Console.WriteLine($"[On Closed!]");
+        return Task.CompletedTask;
+    }
+
+    // SignalR event
+    public override Task OnReconnected(string connectionId)
+    {
+        Console.WriteLine($"[On Reconnected!]");
+        return Task.CompletedTask;
+    }
+
+    // SignalR event
+    public override Task OnReconnecting(Exception e)
+    {
+        Console.WriteLine($"[On Reconnecting!]");
+        return Task.CompletedTask;
+    }
+    
 }
 ```
 Let's use it!
