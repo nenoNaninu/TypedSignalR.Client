@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace <#= NameSpace #>
 {
-    public partial class  <#= TargetTypeName #> : TypedSignalR.Client.IHubClient<<#= HubInterfaceName #>>, <#= ClientInterfaceName #>, System.IDisposable
+    public partial class <#= TargetTypeName #> : TypedSignalR.Client.IHubClient<<#= HubInterfaceName #>>, <#= ClientInterfaceName #>, System.IDisposable
     {
         private class HubInvoker : <#= HubInterfaceName #>
         {

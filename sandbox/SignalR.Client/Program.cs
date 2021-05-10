@@ -30,6 +30,11 @@ namespace SignalR.Client
 
             return Task.CompletedTask;
         }
+
+        public override void SomeVoidMethod()
+        {
+            Console.WriteLine($"{Environment.NewLine}[Call SomeVoidMethod]");
+        }
     }
 
     class Program

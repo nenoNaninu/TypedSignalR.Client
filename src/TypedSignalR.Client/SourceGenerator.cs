@@ -86,7 +86,7 @@ namespace TypedSignalR.Client
                 return new AttributeProperty(hubTypeSymbol, clientTypeSymbol);
             }
 
-            throw new Exception("Enter the HubClientBaseAttribute argument correctly.");
+            throw new Exception("Set the HubClientBaseAttribute argument correctly.");
         }
 
         private static IReadOnlyList<MethodInfo> ExtractHubMethods(AttributeProperty attributeProperty)
@@ -137,7 +137,7 @@ namespace TypedSignalR.Client
 
                     if (returnTypeSymbol == null)
                     {
-                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
+                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
                     }
 
                     ValidateClientReturnType(returnTypeSymbol, methodSymbol);
@@ -178,17 +178,14 @@ namespace TypedSignalR.Client
         {
             if (returnTypeSymbol.IsGenericType)
             {
-                if (returnTypeSymbol.BaseType!.ToDisplayString() is not "System.Threading.Tasks.Task")
-                {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
-                }
+                throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
             }
             else
             {
                 string str = returnTypeSymbol.ToDisplayString();
                 if (str != "System.Threading.Tasks.Task" && str != "void")
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T> or void");
+                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or void");
                 }
             }
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 
 namespace TypedSignalR.Client
@@ -90,6 +89,9 @@ namespace TypedSignalR.Client
             return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
         }
 
+        /// <summary>
+        /// Only expecting to use client-side methods. 
+        /// </summary>
         public string ReturnStatement()
         {
             if(ReturnValueType == "void")
@@ -98,7 +100,7 @@ namespace TypedSignalR.Client
             }
             else
             {
-                return "return default;";
+                return "return System.Threading.Tasks.Task.CompletedTask;";
             }
         }
 
