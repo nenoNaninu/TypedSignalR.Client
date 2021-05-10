@@ -139,7 +139,7 @@ class HubClient : ClientBase
     }
 }
 ```
-Let's use it. 
+Let's use it!
 
 ```cs
 HubConnection connection = ...;
@@ -151,6 +151,7 @@ await client.Connection.StartAsync();
 // Invoke hub methods
 var response = await client.Hub.SomeHubMethod1("user", "message");
 Console.WriteLine(response);
+
 // client side function is invoke from hub(server).
 
 await client.Connection.StopAsync();
