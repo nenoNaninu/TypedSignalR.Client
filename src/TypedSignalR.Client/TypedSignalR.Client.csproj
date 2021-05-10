@@ -20,7 +20,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
-        <!--<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" PrivateAssets="all" />-->
     </ItemGroup>
 
     <ItemGroup>
