@@ -8,6 +8,31 @@ dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
 ```
 
+# Introduction
+
+The C # SignalR Client is untyped.
+To call a Hub (Server-side) function, you must specify the function defined in Hub as a string.
+
+```cs
+connection.InvokeAsync("HubMethod")
+```
+
+You also have to manually determine the return type.
+
+```cs
+var ret = await connection.InvokeAsync<SomeType>("HubMethod")
+```
+
+Registering a client function called by the server also requires a string, and the argument types must be set manually.
+
+```cs
+Connection.On<string, DateTime>("ClientMethodName", (str, dateTime) => {});
+```
+
+Therefore, if you change the code on the server-side, the modification on the client-side becomes very troublesome. The main cause is that it is not strongly typed.
+
+This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
+
 # Quick Start
 First, we define the interface of the client side and hub(server) side.
 
@@ -60,7 +85,7 @@ public partial class ClientBase : IHubClient<IHubContract>, IClientContract, IAs
 
         public Task<string> SomeHubMethod1(string user,string message)
         {
-            return _connection.InvokeAsync<string>(nameof(SomeHubMethod1) ,user, message);
+            return _connection.InvokeAsync<string>(nameof(SomeHubMethod1), user, message);
         }
 
         public Task SomeHubMethod2()
@@ -198,7 +223,6 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     }
 }
 ```
-
 
 # Example
 First, launch server. 

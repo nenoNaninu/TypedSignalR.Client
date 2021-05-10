@@ -25,7 +25,7 @@ namespace <#= NameSpace #>
 
             public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
             {
-                return _connection.InvokeAsync<#= method.ReturnTypeGenericArgToString() #>(nameof(<#= method.MethodName #>) <#= method.ArgNameParametersToString() #>);
+                return _connection.InvokeAsync<#= method.ReturnTypeGenericArgToString() #>(nameof(<#= method.MethodName #>)<#= method.ArgNameParametersToString() #>);
             }
 <# } #>
         } // class HubInvoker
@@ -47,7 +47,7 @@ namespace <#= NameSpace #>
             Connection.Reconnecting += OnReconnecting;
 
 <# foreach(var method in ClientMethods) { #>
-            _disposableList.Add(Connection.On<#= method.ArgTypeParametersToString() #>(nameof(<#= method.MethodName #>), <#= method.MethodName #>));
+            _disposableList.Add(Connection.On<#= method.ArgTypeParametersToString() #>(nameof(<#= method.MethodName #>),<#= method.MethodName #>));
 <# } #>
         }
 

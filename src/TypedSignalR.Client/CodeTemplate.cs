@@ -50,7 +50,7 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeGenericArgToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write(") ");
+            this.Write(")");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNameParametersToString()));
             this.Write(");\r\n            }\r\n");
  } 
@@ -77,7 +77,7 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypeParametersToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write("), ");
+            this.Write("),");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("));\r\n");
  } 
