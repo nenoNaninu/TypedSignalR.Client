@@ -30,12 +30,12 @@ namespace <#= NameSpace #>
 <# } #>
         } // class HubInvoker
 
+        protected readonly System.Collections.Generic.List<System.IDisposable> _disposableList = new();
+        protected int _isDisposed = 0;
+
         public HubConnection Connection { get; }
         public <#= HubInterfaceName #> Hub { get; }
         public bool IsDisposed => _isDisposed != 0;
-
-        protected int _isDisposed = 0;
-        protected readonly System.Collections.Generic.List<System.IDisposable> _disposableList = new();
 
         public <#= TargetTypeName #>(HubConnection connection)
         {
@@ -62,7 +62,7 @@ namespace <#= NameSpace #>
 
         public virtual System.Threading.Tasks.Task OnReconnecting(System.Exception e) => System.Threading.Tasks.Task.CompletedTask;
 
-        public async System.Threading.Tasks.ValueTask DisposeAsync()
+        public virtual async System.Threading.Tasks.ValueTask DisposeAsync()
         {
             if(System.Threading.Interlocked.Increment(ref _isDisposed) == 1)
             {

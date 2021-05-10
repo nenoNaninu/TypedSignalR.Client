@@ -54,12 +54,13 @@ namespace TypedSignalR.Client
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNameParametersToString()));
             this.Write(");\r\n            }\r\n");
  } 
-            this.Write("        } // class HubInvoker\r\n\r\n        public HubConnection Connection { get; }" +
-                    "\r\n        public ");
+            this.Write("        } // class HubInvoker\r\n\r\n        protected readonly System.Collections.Ge" +
+                    "neric.List<System.IDisposable> _disposableList = new();\r\n        protected int _" +
+                    "isDisposed = 0;\r\n\r\n        public HubConnection Connection { get; }\r\n        pub" +
+                    "lic ");
             this.Write(this.ToStringHelper.ToStringWithCulture(HubInterfaceName));
-            this.Write(" Hub { get; }\r\n        public bool IsDisposed => _isDisposed != 0;\r\n\r\n        pro" +
-                    "tected int _isDisposed = 0;\r\n        protected readonly System.Collections.Gener" +
-                    "ic.List<System.IDisposable> _disposableList = new();\r\n\r\n        public ");
+            this.Write(" Hub { get; }\r\n        public bool IsDisposed => _isDisposed != 0;\r\n\r\n        pub" +
+                    "lic ");
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetTypeName));
             this.Write(@"(HubConnection connection)
         {
@@ -94,7 +95,7 @@ namespace TypedSignalR.Client
 
         public virtual System.Threading.Tasks.Task OnReconnecting(System.Exception e) => System.Threading.Tasks.Task.CompletedTask;
 
-        public async System.Threading.Tasks.ValueTask DisposeAsync()
+        public virtual async System.Threading.Tasks.ValueTask DisposeAsync()
         {
             if(System.Threading.Interlocked.Increment(ref _isDisposed) == 1)
             {
