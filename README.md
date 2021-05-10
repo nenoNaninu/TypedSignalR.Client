@@ -95,7 +95,7 @@ public partial class ClientBase : IHubClient<IHubContract>, IClientContract, IAs
     public virtual Task SomeClientMethod2()
         => Task.CompletedTask;
 
-    public async ValueTask Dispose()
+    public async ValueTask DisposeAsync()
     {
         Connection.Closed -= OnClosed;
         Connection.Reconnected -= OnReconnected;
