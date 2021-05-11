@@ -157,10 +157,9 @@ namespace TypedSignalR.Client
 
         private static void ValidateHubReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol)
         {
-
             if (returnTypeSymbol.IsGenericType)
             {
-                if (returnTypeSymbol.BaseType!.ToDisplayString() is not "System.Threading.Tasks.Task")
+                if (returnTypeSymbol.IsUnboundGenericType || returnTypeSymbol.ConstructUnboundGenericType().ToDisplayString() is not "System.Threading.Tasks.Task<>")
                 {
                     throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
                 }

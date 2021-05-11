@@ -11,7 +11,7 @@ dotnet add package TypedSignalR.Client
 # Introduction
 
 The C # SignalR Client is untyped.
-To call a Hub (Server-side) function, you must specify the function defined in Hub as a string.
+To call a Hub (server-side) function, you must specify the function defined in Hub as a string.
 
 ```cs
 connection.InvokeAsync("HubMethod")
@@ -34,7 +34,7 @@ Therefore, if you change the code on the server-side, the modification on the cl
 This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
 
 # Quick Start
-First, we define the interface of the client side and hub(server) side.
+First, we define the interface of the client-side and hub-side(server).
 
 ```cs
 public class UserDefineClass
@@ -51,7 +51,7 @@ public interface IClientContract
     Task SomeClientMethod2();
 }
 
-// The return type of the method on the Hub side must be Task or Task <T>. 
+// The return type of the method on the hub-side must be Task or Task <T>. 
 public interface IHubContract
 {
     Task<string> SomeHubMethod1(string user, string message);
@@ -140,7 +140,7 @@ public partial class ClientBase : IHubClient<IHubContract>, IClientContract, IAs
 } // class ClientBase
 
 ```
-Then, extend the class annotated with HubClientBase and implement the client side function. 
+Then, extend the class annotated with HubClientBase and implement the client-side function. 
 
 ```cs
 class HubClient : ClientBase
@@ -198,7 +198,7 @@ await client.Connection.StartAsync();
 var response = await client.Hub.SomeHubMethod1("user", "message");
 Console.WriteLine(response);
 
-// client side function is invoke from hub(server).
+// client-side function is invoke from hub(server).
 
 await client.Connection.StopAsync();
 await client.DisposeAsync();
