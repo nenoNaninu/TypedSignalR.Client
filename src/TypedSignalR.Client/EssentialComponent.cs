@@ -18,9 +18,9 @@ namespace TypedSignalR.Client
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Users\neno\source\repos\TypedSignalR.Client\src\TypedSignalR.Client\RequiredComponent.tt"
+    #line 1 "C:\Users\neno\source\repos\TypedSignalR.Client\src\TypedSignalR.Client\EssentialComponent.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class RequiredComponent : RequiredComponentBase
+    public partial class EssentialComponent : EssentialComponentBase
     {
 #line hidden
         /// <summary>
@@ -64,7 +64,7 @@ namespace TypedSignalR.Client
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class RequiredComponentBase
+    public class EssentialComponentBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

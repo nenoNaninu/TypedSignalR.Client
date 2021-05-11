@@ -91,6 +91,7 @@ namespace SignalR.Client
 
             await client.Connection.StopAsync();
             await client.DisposeAsync();
+            await Task.Delay(TimeSpan.FromSeconds(1));
         }
     }
 }

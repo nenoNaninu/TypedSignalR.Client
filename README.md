@@ -26,7 +26,7 @@ var ret = await connection.InvokeAsync<SomeType>("HubMethod")
 Registering a client function called by the server also requires a string, and the argument types must be set manually.
 
 ```cs
-Connection.On<string, DateTime>("ClientMethodName", (str, dateTime) => {});
+Connection.On<string, DateTime>("ClientMethod", (str, dateTime) => {});
 ```
 
 Therefore, if you change the code on the server-side, the modification on the client-side becomes very troublesome. The main cause is that it is not strongly typed.
@@ -150,13 +150,14 @@ class HubClient : ClientBase
     {
     }
 
-    // override and impl
+    // override and impl!
     public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
     {
         Console.WriteLine("Call SomeClientMethod1!");
         return Task.CompletedTask;
     }
 
+    // override and impl!
     public override Task SomeClientMethod2()
     {
         Console.WriteLine("Call SomeClientMethod1!");

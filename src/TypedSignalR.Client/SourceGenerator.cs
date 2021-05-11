@@ -13,14 +13,18 @@ namespace TypedSignalR.Client
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.Component.cs", new RequiredComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialComponent.cs", new EssentialComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
             var receiver = context.SyntaxReceiver as SyntaxReceiver;
-            if (receiver == null) return;
+
+            if (receiver is null)
+            {
+                return;
+            }
 
             var targetClassWithAttributeList = new List<(ClassDeclarationSyntax, AttributeProperty)>();
 
@@ -32,21 +36,25 @@ namespace TypedSignalR.Client
 
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
-                var (hintName, source) = GenerateSource(context, targetType, attributeProperty);
-#if DEBUG
-                Debug.WriteLine(source);
-#endif
-                context.AddSource(hintName, source);
+                var (isValid, hintName, source) = GenerateSource(context, targetType, attributeProperty);
+         
+                if (isValid)
+                {
+                    context.AddSource(hintName, source);
+//#if DEBUG
+//                    Debug.WriteLine(source);
+//#endif       
+                }
             }
         }
 
-        private static (string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty)
+        private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty)
         {
             INamedTypeSymbol? typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
 
-            if (typeSymbol == null)
+            if (typeSymbol is null)
             {
-                return (string.Empty, string.Empty);
+                return (false, string.Empty, string.Empty);
             }
 
             var hubMethods = ExtractHubMethods(attributeProperty);
@@ -64,7 +72,7 @@ namespace TypedSignalR.Client
 
             string text = template.TransformText();
 
-            return ($"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
+            return (true, $"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
         }
 
         private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
@@ -81,7 +89,7 @@ namespace TypedSignalR.Client
             ITypeSymbol? clientTypeSymbol = clientArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxClient
                 ? semanticModel.GetSymbolInfo(typeOfExpressionSyntaxClient.Type).Symbol as ITypeSymbol : null;
 
-            if (hubTypeSymbol != null && clientTypeSymbol != null)
+            if (hubTypeSymbol is not null && clientTypeSymbol is not null)
             {
                 return new AttributeProperty(hubTypeSymbol, clientTypeSymbol);
             }
@@ -99,7 +107,7 @@ namespace TypedSignalR.Client
                     var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
                     INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
-                    if (returnTypeSymbol == null)
+                    if (returnTypeSymbol is null)
                     {
                         throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
                     }
@@ -135,7 +143,7 @@ namespace TypedSignalR.Client
                 {
                     INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // only Task. not Task<T>.
 
-                    if (returnTypeSymbol == null)
+                    if (returnTypeSymbol is null)
                     {
                         throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
                     }
