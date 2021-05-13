@@ -16,7 +16,7 @@
         <AssemblyName>TypedSignalR.Client</AssemblyName>
         <Title>TypedSignalR.Client</Title>
         <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
@@ -41,10 +41,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="CodeTemplate.cs">
+        <Compile Update="ClientBaseTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>CodeTemplate.tt</DependentUpon>
+            <DependentUpon>ClientBaseTemplate.tt</DependentUpon>
         </Compile>
         <Compile Update="EssentialComponent.cs">
             <DesignTime>True</DesignTime>
@@ -58,9 +58,9 @@
             <Generator>TextTemplatingFilePreprocessor</Generator>
             <LastGenOutput>EssentialComponent.cs</LastGenOutput>
         </None>
-        <None Update="CodeTemplate.tt">
+        <None Update="ClientBaseTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>CodeTemplate.cs</LastGenOutput>
+            <LastGenOutput>ClientBaseTemplate.cs</LastGenOutput>
         </None>
     </ItemGroup>
 

@@ -60,7 +60,7 @@ namespace TypedSignalR.Client
             var hubMethods = ExtractHubMethods(attributeProperty);
             var clientMethods = ExtractClientMethods(attributeProperty);
 
-            var template = new CodeTemplate()
+            var template = new ClientBaseTemplate()
             {
                 NameSpace = typeSymbol.ContainingNamespace.ToDisplayString(),
                 TargetTypeName = typeSymbol.Name,

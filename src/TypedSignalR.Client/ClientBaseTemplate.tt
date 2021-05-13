@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace <#= NameSpace #>
 {
-    public partial class <#= TargetTypeName #> : TypedSignalR.Client.IHubClient<<#= HubInterfaceName #>>, <#= ClientInterfaceName #>, System.IAsyncDisposable
+    abstract partial class <#= TargetTypeName #> : TypedSignalR.Client.IHubClient<<#= HubInterfaceName #>>, <#= ClientInterfaceName #>, System.IAsyncDisposable
     {
         protected class HubInvoker : <#= HubInterfaceName #>
         {
@@ -52,8 +52,7 @@ namespace <#= NameSpace #>
         }
 
 <# foreach(var method in ClientMethods) { #>
-        public virtual System.Threading.Tasks.Task <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
-            => System.Threading.Tasks.Task.CompletedTask;
+        public abstract System.Threading.Tasks.Task <#= method.MethodName #>(<#= method.ArgParameterToString() #>);
 
 <# } #>
         public virtual System.Threading.Tasks.Task OnClosed(System.Exception e) => System.Threading.Tasks.Task.CompletedTask;

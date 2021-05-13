@@ -2,7 +2,7 @@
 
 namespace TypedSignalR.Client
 {
-    public partial class CodeTemplate
+    public partial class ClientBaseTemplate
     {
         public string? NameSpace { get; set; }
         public string? TargetTypeName { get; set; }

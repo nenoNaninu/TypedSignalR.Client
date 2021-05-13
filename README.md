@@ -72,7 +72,7 @@ partial class ClientBase
 By annotating the HubClientBase Attribute, the following code will be generated (simplified here). 
 
 ```cs
-public partial class ClientBase : IHubClient<IHubContract>, IClientContract, IAsyncDisposable
+partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, IAsyncDisposable
 {
     private class HubInvoker : IHubContract
     {
@@ -114,11 +114,9 @@ public partial class ClientBase : IHubClient<IHubContract>, IClientContract, IAs
         disposableList.Add(d2);
     }
 
-    public virtual Task SomeClientMethod1(string user,string message, UserDefineClass userDefine)
-        => Task.CompletedTask;
+    public abstract Task SomeClientMethod1(string user,string message, UserDefineClass userDefine);
 
-    public virtual Task SomeClientMethod2()
-        => Task.CompletedTask;
+    public abstract Task SomeClientMethod2();
 
     public async ValueTask DisposeAsync()
     {
