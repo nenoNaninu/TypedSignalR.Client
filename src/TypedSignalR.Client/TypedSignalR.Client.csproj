@@ -16,7 +16,7 @@
         <AssemblyName>TypedSignalR.Client</AssemblyName>
         <Title>TypedSignalR.Client</Title>
         <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
-        <Version>1.0.3</Version>
+        <Version>1.1.0</Version>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
