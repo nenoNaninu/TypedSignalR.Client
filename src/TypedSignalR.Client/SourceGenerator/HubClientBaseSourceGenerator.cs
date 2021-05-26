@@ -5,27 +5,29 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using TypedSignalR.Client.T4;
 
 namespace TypedSignalR.Client
 {
     [Generator]
-    public class SourceGenerator : ISourceGenerator
+    public class HubClientBaseSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialComponent.cs", new EssentialComponent().TransformText()));
-            context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialBaseComponent.cs", new EssentialBaseComponent().TransformText()));
+            context.RegisterForSyntaxNotifications(() => new AttributeSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var receiver = context.SyntaxReceiver as SyntaxReceiver;
-
-            if (receiver is null)
+            if (context.SyntaxReceiver is AttributeSyntaxReceiver receiver)
             {
-                return;
+                ExecuteCore(context, receiver);
             }
+        }
 
+        private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        {
             var targetClassWithAttributeList = new List<(ClassDeclarationSyntax, AttributeProperty)>();
 
             foreach (var (targetType, attributeSyntax) in receiver.Targets)
@@ -37,13 +39,13 @@ namespace TypedSignalR.Client
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
                 var (isValid, hintName, source) = GenerateSource(context, targetType, attributeProperty);
-         
+
                 if (isValid)
                 {
                     context.AddSource(hintName, source);
-//#if DEBUG
-//                    Debug.WriteLine(source);
-//#endif       
+                    //#if DEBUG
+                    //                    Debug.WriteLine(source);
+                    //#endif       
                 }
             }
         }

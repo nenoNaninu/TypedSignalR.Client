@@ -34,6 +34,15 @@ Therefore, if you change the code on the server-side, the modification on the cl
 This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
 
 # Quick Start
+
+The overall procedure flow is as follows. 
+
+1. Defines the interface shared by the server(Hub) and client.
+2. Annotate the attribute `[HubClientBase (typeof (IHub), typeof (IClient))]`to the partial class. 
+3. Inherit the class with `HubClientBase` attribute and implement the function on the client side.
+
+## Example
+
 First, we define the interface of the client-side and hub-side(server).
 
 ```cs
@@ -59,7 +68,7 @@ public interface IHubContract
 }
 ```
 
-Next, define the partial class and annotate the HubClientBase Attribute. 
+Next, define the partial class and annotate the `HubClientBase` Attribute. 
 ```cs
 using TypedSignalR.Client;
 
@@ -69,7 +78,80 @@ partial class ClientBase
 }
 ```
 
-By annotating the HubClientBase Attribute, the following code will be generated (simplified here). 
+Then, extend the class annotated with HubClientBase and implement the client-side function. 
+
+```cs
+class HubClient : ClientBase
+{
+    // HubConnection is required for the base class constructor. 
+    public HubClient(HubConnection connection) : base(connection)
+    {
+    }
+
+    // override and impl!
+    public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
+    {
+        Console.WriteLine("Call SomeClientMethod1!");
+        return Task.CompletedTask;
+    }
+
+    // override and impl!
+    public override Task SomeClientMethod2()
+    {
+        Console.WriteLine("Call SomeClientMethod1!");
+        return Task.CompletedTask;
+    }
+
+    // SignalR events can also be implemented without callbacks. 
+    // OnClosed, OnReconnected, OnReconnecting are supported.
+    public override Task OnClosed(Exception e)
+    {
+        Console.WriteLine($"[On Closed!]");
+        return Task.CompletedTask;
+    }
+}
+```
+Let's use it!
+
+```cs
+HubConnection connection = ...;
+
+var client = new HubClient(connection);
+
+await client.Connection.StartAsync();
+
+// Invoke hub methods
+var response = await client.Hub.SomeHubMethod1("user", "message");
+Console.WriteLine(response);
+
+// client-side function is invoke from hub(server).
+
+await client.Connection.StopAsync();
+await client.DisposeAsync();
+```
+
+On the server side (ASP.NET Core), it can be strongly typed as follows:
+
+```cs
+using Microsoft.AspNetCore.SignalR;
+
+public class SomeHub : Hub<IClientContract>, IHubContract
+{
+    public async Task<string> SomeHubMethod1(string user, string message)
+    {
+        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
+        return "OK!";
+    }
+
+    public async Task SomeHubMethod2()
+    {
+        await this.Clients.Caller.SomeClientMethod2();
+    }
+}
+```
+
+## What kind of source code will be generated?
+By annotating the `[HubClientBase(typeof(IHubContract), typeof(IClientContract))]` Attribute, the following code will be generated (simplified here). 
 
 ```cs
 partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, IAsyncDisposable
@@ -138,92 +220,8 @@ partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, I
 } // class ClientBase
 
 ```
-Then, extend the class annotated with HubClientBase and implement the client-side function. 
 
-```cs
-class HubClient : ClientBase
-{
-    // HubConnection is required for the base class constructor. 
-    public HubClient(HubConnection connection) : base(connection)
-    {
-    }
-
-    // override and impl!
-    public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
-    {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // override and impl!
-    public override Task SomeClientMethod2()
-    {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnClosed(Exception e)
-    {
-        Console.WriteLine($"[On Closed!]");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnReconnected(string connectionId)
-    {
-        Console.WriteLine($"[On Reconnected!]");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnReconnecting(Exception e)
-    {
-        Console.WriteLine($"[On Reconnecting!]");
-        return Task.CompletedTask;
-    }
-}
-```
-Let's use it!
-
-```cs
-HubConnection connection = ...;
-
-var client = new HubClient(connection);
-
-await client.Connection.StartAsync();
-
-// Invoke hub methods
-var response = await client.Hub.SomeHubMethod1("user", "message");
-Console.WriteLine(response);
-
-// client-side function is invoke from hub(server).
-
-await client.Connection.StopAsync();
-await client.DisposeAsync();
-```
-
-On the server side (ASP.NET Core), it can be strongly typed as follows:
-
-```cs
-using Microsoft.AspNetCore.SignalR;
-
-public class SomeHub : Hub<IClientContract>, IHubContract
-{
-    public async Task<string> SomeHubMethod1(string user, string message)
-    {
-        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
-        return "OK!";
-    }
-
-    public async Task SomeHubMethod2()
-    {
-        await this.Clients.Caller.SomeClientMethod2();
-    }
-}
-```
-
-# Example
+# Demo
 First, launch server. 
 
 ```

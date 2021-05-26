@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.T4
 {
     public partial class ClientBaseTemplate
     {

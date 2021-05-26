@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TypedSignalR.Client
 {
-    public class SyntaxReceiver : ISyntaxReceiver
+    public class AttributeSyntaxReceiver : ISyntaxReceiver
     {
         public List<(ClassDeclarationSyntax type, AttributeSyntax attr)> Targets { get; } = new();
 

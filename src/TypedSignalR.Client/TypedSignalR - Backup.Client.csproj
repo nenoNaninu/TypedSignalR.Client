@@ -44,34 +44,33 @@
         <Compile Update="T4\ClientBaseTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>ClientBaseTemplate.tt</DependentUpon>
+            <DependentUpon>T4\ClientBaseTemplate.tt</DependentUpon>
         </Compile>
         <Compile Update="T4\EssentialBaseComponent.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>EssentialBaseComponent.tt</DependentUpon>
         </Compile>
-        <Compile Update="T4\EssentialProxyComponent.cs">
-            <DependentUpon>EssentialProxyComponent.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
+        <Compile Update="T4\EssentialProxyComponent - コピー.cs">
+          <DependentUpon>EssentialProxyComponent.tt</DependentUpon>
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
         </Compile>
         <Compile Update="T4\ProxyTemplate.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>ProxyTemplate.tt</DependentUpon>
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>ProxyTemplate.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
         <None Update="T4\ProxyTemplate.tt">
-            <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
+          <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
+          <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
         <None Update="T4\EssentialProxyComponent.tt">
-            <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>EssentialProxyComponent.cs</LastGenOutput>
+          <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
+          <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
         <None Update="T4\EssentialBaseComponent.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
