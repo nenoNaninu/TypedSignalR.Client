@@ -51,8 +51,8 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>EssentialBaseComponent.tt</DependentUpon>
         </Compile>
-        <Compile Update="T4\EssentialProxyComponent.cs">
-            <DependentUpon>EssentialProxyComponent.tt</DependentUpon>
+        <Compile Update="T4\EssentialHubProxyComponent.cs">
+            <DependentUpon>EssentialHubProxyComponent.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
@@ -68,10 +68,9 @@
             <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
-        <None Update="T4\EssentialProxyComponent.tt">
-            <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
+        <None Update="T4\EssentialHubProxyComponent.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>EssentialProxyComponent.cs</LastGenOutput>
+            <LastGenOutput>EssentialHubProxyComponent.cs</LastGenOutput>
         </None>
         <None Update="T4\EssentialBaseComponent.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>

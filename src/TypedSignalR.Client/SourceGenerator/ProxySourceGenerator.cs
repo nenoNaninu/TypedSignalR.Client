@@ -11,7 +11,7 @@ namespace TypedSignalR.Client
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialProxyComponent.cs", new EssentialProxyComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialProxyComponent.cs", new EssentialHubProxyComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new HubProxyMethodSyntaxReceiver());
         }
 
@@ -31,7 +31,7 @@ namespace TypedSignalR.Client
 
                 Debug.WriteLine(code);
 
-                context.AddSource("TypedSignalR.Client.Proxy.Generated.cs", code);
+                context.AddSource("TypedSignalR.Client.HubProxy.Generated.cs", code);
             }
         }
 
@@ -66,19 +66,46 @@ namespace TypedSignalR.Client
 
                             invokerList.Add(invoker);
                         }
+                    }
+                }
+            }
 
-                        if (methodSymbol.TypeArguments.Length == 2)
+            foreach (var target in receiver.CreateHubProxyWithMethods)
+            {
+                var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
+
+                var hubConnectionType = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
+                var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+                var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+
+                var callerType = semanticModel.GetTypeInfo(target.Expression).Type;
+
+                if (hubConnectionType!.Equals(callerType, SymbolEqualityComparer.Default))
+                {
+                    var symbol = semanticModel.GetSymbolInfo(target).Symbol;
+
+                    if (symbol is IMethodSymbol methodSymbol)
+                    {
+                        ITypeSymbol hubType = methodSymbol.TypeArguments[0];
+
+                        if (!invokerList.Any(hubType))
                         {
-                            ITypeSymbol reciverType = methodSymbol.TypeArguments[1];
+                            var hubMethods = AnalysisUtility.ExtractHubMethods(hubType, taskSymbol!, genericTaskSymbol!);
 
-                            if (!receiverList.Any(reciverType))
-                            {
-                                var reciverMethods = AnalysisUtility.ExtractClientMethods(reciverType, taskSymbol!);
+                            var invoker = new InvokerInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
 
-                                var receiverInfo = new ReceiverInfo(reciverType, reciverType.Name, reciverType.ToDisplayString(), reciverMethods);
+                            invokerList.Add(invoker);
+                        }
 
-                                receiverList.Add(receiverInfo);
-                            }
+                        ITypeSymbol reciverType = methodSymbol.TypeArguments[1];
+
+                        if (!receiverList.Any(reciverType))
+                        {
+                            var reciverMethods = AnalysisUtility.ExtractClientMethods(reciverType, taskSymbol!);
+
+                            var receiverInfo = new ReceiverInfo(reciverType, reciverType.Name, reciverType.ToDisplayString(), reciverMethods);
+
+                            receiverList.Add(receiverInfo);
                         }
                     }
                 }

@@ -62,11 +62,11 @@ namespace ConsoleApp
             
             var id = connection.ConnectionId;
 
-            var hub = connection.CreateHubProxy<IHubContract>();
+            var hub1 = connection.CreateHubProxy<IHubContract>();
             var hub2 = connection.CreateHubProxy<IHubContract>();
-            var hub3 = connection.CreateHubProxy<IHubContract, IClientContract>(new Receiver());
+            var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
-            //connection.Register<IClientContract>(new Receiver());
+            var subscription2 =  connection.Register<IClientContract>(new Receiver());
         }
     }
 }

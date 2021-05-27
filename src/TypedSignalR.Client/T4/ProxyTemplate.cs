@@ -56,32 +56,35 @@ namespace TypedSignalR.Client.T4
             this.Write("        }\r\n\r\n");
  } 
  foreach(var receiver in ReceiverList){ 
-            this.Write("        public static void Connect");
+            this.Write("        public static System.IDisposable Connect");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceName));
             this.Write("(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, ");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceFullName));
-            this.Write(" receiver)\r\n        {\r\n");
+            this.Write(" receiver)\r\n        {\r\n            var compositeDisposable = new CompositeDisposa" +
+                    "ble(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(receiver.ClientMethods.Count));
+            this.Write(");\r\n");
  foreach(var method in receiver.ClientMethods) { 
-            this.Write("            connection.On");
+            this.Write("            compositeDisposable.Add(connection.On");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypeParametersToString()));
             this.Write("(nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("),receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write(");\r\n");
+            this.Write("));\r\n");
  } 
-            this.Write("        }\r\n\r\n");
+            this.Write("            return compositeDisposable;\r\n        }\r\n\r\n");
  } 
             this.Write("        static Ex()\r\n        {\r\n");
  foreach(var invoker in InvokerList) {
-            this.Write("            HubInvokerCache<");
+            this.Write("            HubInvokerConstructorCache<");
             this.Write(this.ToStringHelper.ToStringWithCulture(invoker.InterfaceFullName));
             this.Write(">.Construct = static connection => new HubInvokerFor");
             this.Write(this.ToStringHelper.ToStringWithCulture(invoker.InterfaceName));
             this.Write("(connection);\r\n");
  } 
  foreach(var receiver in ReceiverList){ 
-            this.Write("            ClientBinderCache<");
+            this.Write("            ReceiverBinderCache<");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceFullName));
             this.Write(">.Bind = Connect");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceName));

@@ -33,21 +33,23 @@ namespace TypedSignalR.Client
 
 <# } #>
 <# foreach(var receiver in ReceiverList){ #>
-        public static void Connect<#= receiver.InterfaceName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
+        public static System.IDisposable Connect<#= receiver.InterfaceName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
         {
+            var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count #>);
 <# foreach(var method in receiver.ClientMethods) { #>
-            connection.On<#= method.ArgTypeParametersToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>);
+            compositeDisposable.Add(connection.On<#= method.ArgTypeParametersToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
 <# } #>
+            return compositeDisposable;
         }
 
 <# } #>
         static Ex()
         {
 <# foreach(var invoker in InvokerList) {#>
-            HubInvokerCache<<#= invoker.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= invoker.InterfaceName #>(connection);
+            HubInvokerConstructorCache<<#= invoker.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= invoker.InterfaceName #>(connection);
 <# } #>
 <# foreach(var receiver in ReceiverList){ #>
-            ClientBinderCache<<#= receiver.InterfaceFullName #>>.Bind = Connect<#= receiver.InterfaceName #>;
+            ReceiverBinderCache<<#= receiver.InterfaceFullName #>>.Bind = Connect<#= receiver.InterfaceName #>;
 <# } #>
         }
     }
