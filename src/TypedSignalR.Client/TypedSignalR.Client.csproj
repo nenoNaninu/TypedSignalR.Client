@@ -56,16 +56,16 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
-        <Compile Update="T4\ProxyTemplate.cs">
+        <Compile Update="T4\HubProxyTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>ProxyTemplate.tt</DependentUpon>
+            <DependentUpon>HubProxyTemplate.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="T4\ProxyTemplate.tt">
-            <LastGenOutput>ProxyTemplate.cs</LastGenOutput>
+        <None Update="T4\HubProxyTemplate.tt">
+            <LastGenOutput>HubProxyTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
         <None Update="T4\EssentialHubProxyComponent.tt">

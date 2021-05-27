@@ -36,36 +36,37 @@ namespace TypedSignalR.Client.T4
                     "is Microsoft.AspNetCore.SignalR.Client.HubConnection source)\r\n        {\r\n       " +
                     "     return HubInvokerConstructorCache<THub>.Construct(source);\r\n        }\r\n\r\n  " +
                     "      public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith" +
-                    "<THub, TClient>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, T" +
-                    "Client receiver)\r\n        {\r\n            var hubProxy = HubInvokerConstructorCac" +
-                    "he<THub>.Construct(source);\r\n            var subscription = ReceiverBinderCache<" +
-                    "TClient>.Bind(source, receiver);\r\n            return (hubProxy, subscription);\r\n" +
-                    "        }\r\n\r\n        public static IDisposable Register<TClient>(this Microsoft." +
-                    "AspNetCore.SignalR.Client.HubConnection source, TClient receiver)\r\n        {\r\n  " +
-                    "          return ReceiverBinderCache<TClient>.Bind(source, receiver);\r\n        }" +
-                    "\r\n\r\n        private sealed class CompositeDisposable : IDisposable\r\n        {\r\n " +
-                    "           private readonly object _gate = new();\r\n            private readonly " +
-                    "List<IDisposable> _disposables;\r\n\r\n            private bool _disposed;\r\n\r\n      " +
-                    "      public CompositeDisposable()\r\n            {\r\n                _disposables " +
-                    "= new List<IDisposable>();\r\n            }\r\n\r\n            public CompositeDisposa" +
-                    "ble(int capacity)\r\n            {\r\n                _disposables = new List<IDispo" +
-                    "sable>(capacity < 0 ? 0 : capacity);\r\n            }\r\n\r\n            public void A" +
-                    "dd(IDisposable item)\r\n            {\r\n                var shouldDispose = false;\r" +
-                    "\n\r\n                lock (_gate)\r\n                {\r\n                    shouldDi" +
-                    "spose = _disposed;\r\n\r\n                    if (!_disposed)\r\n                    {" +
-                    "\r\n                        _disposables.Add(item);\r\n                    }\r\n      " +
-                    "          }\r\n\r\n                if (shouldDispose)\r\n                {\r\n          " +
-                    "          item.Dispose();\r\n                }\r\n            }\r\n\r\n            publi" +
-                    "c void Dispose()\r\n            {\r\n                var currentDisposables = defaul" +
-                    "t(IDisposable[]);\r\n\r\n                lock (_gate)\r\n                {\r\n          " +
-                    "          if (!_disposed)\r\n                    {\r\n                        _dispo" +
-                    "sed = true;\r\n                        currentDisposables = _disposables.ToArray()" +
-                    ";\r\n                        _disposables.Clear();\r\n                    }\r\n       " +
-                    "         }\r\n\r\n                if (currentDisposables is not null)\r\n             " +
-                    "   {\r\n                    foreach (var item in currentDisposables)\r\n            " +
-                    "        {\r\n                        if (item is not null)\r\n                      " +
-                    "  {\r\n                            item.Dispose();\r\n                        }\r\n   " +
-                    "                 }\r\n                }\r\n            }\r\n        }\r\n    }\r\n}");
+                    "<THub, TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source," +
+                    " TReceiver receiver)\r\n        {\r\n            var hubProxy = HubInvokerConstructo" +
+                    "rCache<THub>.Construct(source);\r\n            var subscription = ReceiverBinderCa" +
+                    "che<TReceiver>.Bind(source, receiver);\r\n            return (hubProxy, subscripti" +
+                    "on);\r\n        }\r\n\r\n        public static IDisposable Register<TReceiver>(this Mi" +
+                    "crosoft.AspNetCore.SignalR.Client.HubConnection source, TReceiver receiver)\r\n   " +
+                    "     {\r\n            return ReceiverBinderCache<TReceiver>.Bind(source, receiver)" +
+                    ";\r\n        }\r\n\r\n        private sealed class CompositeDisposable : IDisposable\r\n" +
+                    "        {\r\n            private readonly object _gate = new();\r\n            priva" +
+                    "te readonly List<IDisposable> _disposables;\r\n\r\n            private bool _dispose" +
+                    "d;\r\n\r\n            public CompositeDisposable()\r\n            {\r\n                _" +
+                    "disposables = new List<IDisposable>();\r\n            }\r\n\r\n            public Comp" +
+                    "ositeDisposable(int capacity)\r\n            {\r\n                _disposables = new" +
+                    " List<IDisposable>(capacity < 0 ? 0 : capacity);\r\n            }\r\n\r\n            p" +
+                    "ublic void Add(IDisposable item)\r\n            {\r\n                var shouldDispo" +
+                    "se = false;\r\n\r\n                lock (_gate)\r\n                {\r\n                " +
+                    "    shouldDispose = _disposed;\r\n\r\n                    if (!_disposed)\r\n         " +
+                    "           {\r\n                        _disposables.Add(item);\r\n                 " +
+                    "   }\r\n                }\r\n\r\n                if (shouldDispose)\r\n                {" +
+                    "\r\n                    item.Dispose();\r\n                }\r\n            }\r\n\r\n     " +
+                    "       public void Dispose()\r\n            {\r\n                var currentDisposab" +
+                    "les = default(IDisposable[]);\r\n\r\n                lock (_gate)\r\n                {" +
+                    "\r\n                    if (!_disposed)\r\n                    {\r\n                  " +
+                    "      _disposed = true;\r\n                        currentDisposables = _disposabl" +
+                    "es.ToArray();\r\n                        _disposables.Clear();\r\n                  " +
+                    "  }\r\n                }\r\n\r\n                if (currentDisposables is not null)\r\n " +
+                    "               {\r\n                    foreach (var item in currentDisposables)\r\n" +
+                    "                    {\r\n                        if (item is not null)\r\n          " +
+                    "              {\r\n                            item.Dispose();\r\n                  " +
+                    "      }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n   " +
+                    " }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

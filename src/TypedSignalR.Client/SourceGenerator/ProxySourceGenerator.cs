@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Diagnostics;
 using TypedSignalR.Client.T4;
@@ -7,11 +6,11 @@ using TypedSignalR.Client.T4;
 namespace TypedSignalR.Client
 {
     [Generator]
-    class ProxySourceGenerator : ISourceGenerator
+    class HubProxySourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialProxyComponent.cs", new EssentialHubProxyComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialHubProxyComponent.cs", new EssentialHubProxyComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new HubProxyMethodSyntaxReceiver());
         }
 
@@ -21,17 +20,17 @@ namespace TypedSignalR.Client
             {
                 var (invokerList, receiverList) = ExtructInfo(context, receiver);
 
-                var template = new ProxyTemplate()
+                var template = new HubProxyTemplate()
                 {
                     InvokerList = invokerList,
                     ReceiverList = receiverList
                 };
 
-                var code = template.TransformText();
-
-                Debug.WriteLine(code);
-
-                context.AddSource("TypedSignalR.Client.HubProxy.Generated.cs", code);
+                var sourceCode = template.TransformText();
+//#if DEBUG
+//                Debug.WriteLine(sourceCode);
+//#endif
+                context.AddSource("TypedSignalR.Client.HubProxy.Generated.cs", sourceCode);
             }
         }
 
@@ -44,13 +43,13 @@ namespace TypedSignalR.Client
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
-                var hubConnectionType = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
+                var hubConnectionSymbol = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
                 var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
                 var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
 
-                var callerType = semanticModel.GetTypeInfo(target.Expression).Type;
+                var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionType!.Equals(callerType, SymbolEqualityComparer.Default))
+                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 
@@ -74,13 +73,13 @@ namespace TypedSignalR.Client
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
-                var hubConnectionType = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
+                var hubConnectionSymbol = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
                 var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
                 var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
 
-                var callerType = semanticModel.GetTypeInfo(target.Expression).Type;
+                var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionType!.Equals(callerType, SymbolEqualityComparer.Default))
+                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 
@@ -115,12 +114,12 @@ namespace TypedSignalR.Client
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
-                var hubConnectionType = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
+                var hubConnectionSymbol = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
                 var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
 
-                var callerType = semanticModel.GetTypeInfo(target.Expression).Type;
+                var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionType!.Equals(callerType, SymbolEqualityComparer.Default))
+                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 

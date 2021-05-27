@@ -29,16 +29,16 @@ namespace TypedSignalR.Client
             return HubInvokerConstructorCache<THub>.Construct(source);
         }
 
-        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TClient>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TClient receiver)
+        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TReceiver receiver)
         {
             var hubProxy = HubInvokerConstructorCache<THub>.Construct(source);
-            var subscription = ReceiverBinderCache<TClient>.Bind(source, receiver);
+            var subscription = ReceiverBinderCache<TReceiver>.Bind(source, receiver);
             return (hubProxy, subscription);
         }
 
-        public static IDisposable Register<TClient>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TClient receiver)
+        public static IDisposable Register<TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TReceiver receiver)
         {
-            return ReceiverBinderCache<TClient>.Bind(source, receiver);
+            return ReceiverBinderCache<TReceiver>.Bind(source, receiver);
         }
 
         private sealed class CompositeDisposable : IDisposable

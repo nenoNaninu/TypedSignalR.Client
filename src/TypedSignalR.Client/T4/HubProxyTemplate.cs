@@ -18,7 +18,7 @@ namespace TypedSignalR.Client.T4
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class ProxyTemplate : ProxyTemplateBase
+    public partial class HubProxyTemplate : HubProxyTemplateBase
     {
         /// <summary>
         /// Create the template output
@@ -99,7 +99,7 @@ namespace TypedSignalR.Client.T4
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class ProxyTemplateBase
+    public class HubProxyTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;
