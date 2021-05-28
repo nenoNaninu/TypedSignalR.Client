@@ -3,6 +3,7 @@ using TypedSignalR.Client;
 using SignalR.Shared;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.Generic;
 
 namespace ConsoleApp
 {
@@ -64,9 +65,12 @@ namespace ConsoleApp
 
             var hub1 = connection.CreateHubProxy<IHubContract>();
             var hub2 = connection.CreateHubProxy<IHubContract>();
-            var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+            //var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
-            var subscription2 =  connection.Register<IClientContract>(new Receiver());
+            IClientContract receiver = new Receiver();
+            var subscription2 = connection.Register<IClientContract>(new Receiver());
+            var subscription3 = connection.Register(receiver);
+
         }
     }
 }

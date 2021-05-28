@@ -80,15 +80,14 @@ namespace TypedSignalR.Client
 
             public void Dispose()
             {
-                var currentDisposables = default(IDisposable[]);
+                var currentDisposables = default(List<IDisposable>);
 
                 lock (_gate)
                 {
                     if (!_disposed)
                     {
                         _disposed = true;
-                        currentDisposables = _disposables.ToArray();
-                        _disposables.Clear();
+                        currentDisposables = _disposables;
                     }
                 }
 
@@ -101,6 +100,8 @@ namespace TypedSignalR.Client
                             item.Dispose();
                         }
                     }
+
+                    currentDisposables.Clear();
                 }
             }
         }

@@ -57,16 +57,16 @@ namespace TypedSignalR.Client.T4
                     "   }\r\n                }\r\n\r\n                if (shouldDispose)\r\n                {" +
                     "\r\n                    item.Dispose();\r\n                }\r\n            }\r\n\r\n     " +
                     "       public void Dispose()\r\n            {\r\n                var currentDisposab" +
-                    "les = default(IDisposable[]);\r\n\r\n                lock (_gate)\r\n                {" +
-                    "\r\n                    if (!_disposed)\r\n                    {\r\n                  " +
-                    "      _disposed = true;\r\n                        currentDisposables = _disposabl" +
-                    "es.ToArray();\r\n                        _disposables.Clear();\r\n                  " +
-                    "  }\r\n                }\r\n\r\n                if (currentDisposables is not null)\r\n " +
-                    "               {\r\n                    foreach (var item in currentDisposables)\r\n" +
-                    "                    {\r\n                        if (item is not null)\r\n          " +
-                    "              {\r\n                            item.Dispose();\r\n                  " +
-                    "      }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n   " +
-                    " }\r\n}");
+                    "les = default(List<IDisposable>);\r\n\r\n                lock (_gate)\r\n             " +
+                    "   {\r\n                    if (!_disposed)\r\n                    {\r\n              " +
+                    "          _disposed = true;\r\n                        currentDisposables = _dispo" +
+                    "sables;\r\n                    }\r\n                }\r\n\r\n                if (current" +
+                    "Disposables is not null)\r\n                {\r\n                    foreach (var it" +
+                    "em in currentDisposables)\r\n                    {\r\n                        if (it" +
+                    "em is not null)\r\n                        {\r\n                            item.Dis" +
+                    "pose();\r\n                        }\r\n                    }\r\n\r\n                   " +
+                    " currentDisposables.Clear();\r\n                }\r\n            }\r\n        }\r\n    }" +
+                    "\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
