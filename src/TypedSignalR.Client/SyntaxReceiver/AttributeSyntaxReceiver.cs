@@ -17,6 +17,7 @@ namespace TypedSignalR.Client
                 AttributeSyntax? attr = classDeclarationSyntax.AttributeLists
                     .SelectMany(x => x.Attributes)
                     .FirstOrDefault(x => x.Name.ToString() is "HubClientBase" or "HubClientBaseAttribute");
+
                 if (attr != null)
                 {
                     Targets.Add((classDeclarationSyntax, attr));
