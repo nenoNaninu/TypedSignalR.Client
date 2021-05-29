@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using TypedSignalR.Client.T4;
+using System.Linq;
 
 namespace TypedSignalR.Client
 {
@@ -27,6 +28,13 @@ namespace TypedSignalR.Client
 
         private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
+            var (isVaild, taskSymbol, genericTaskSymbol) = GetImportantSymbols(context, receiver);
+
+            if (!isVaild)
+            {
+                return;
+            }
+
             var targetClassWithAttributeList = new List<(ClassDeclarationSyntax, AttributeProperty)>();
 
             foreach (var (targetType, attributeSyntax) in receiver.Targets)
@@ -38,26 +46,49 @@ namespace TypedSignalR.Client
 
                 if (hubClientBaseAttributeSymbol!.Equals(attributeSymbol, SymbolEqualityComparer.Default))
                 {
-                    var attributeProperty = ExtractAttributeProperty(context, targetType, attributeSyntax);
-                    targetClassWithAttributeList.Add((targetType, attributeProperty));
+                    try
+                    {
+                        var attributeProperty = ExtractAttributeProperty(context, targetType, attributeSyntax);
+                        targetClassWithAttributeList.Add((targetType, attributeProperty));
+                    }
+                    catch(Exception e)
+                    {
+                        Debug.WriteLine(e);
+                    }
                 }
             }
 
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
-                var (isValid, hintName, source) = GenerateSource(context, targetType, attributeProperty);
+                var (isValid, hintName, source) = GenerateSource(context, targetType, attributeProperty, taskSymbol!, genericTaskSymbol!);
 
                 if (isValid)
                 {
                     context.AddSource(hintName, source);
-//#if DEBUG
-//                    Debug.WriteLine(source);
-//#endif       
+                    
+                    Debug.WriteLine(source);
                 }
             }
         }
 
-        private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty)
+        private static (bool isVaild, INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetImportantSymbols(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        {
+            var (firstSyntax, _) = receiver.Targets.FirstOrDefault();
+
+            if (firstSyntax is null)
+            {
+                return (false, null, null);
+            }
+
+            var semanticModel = context.Compilation.GetSemanticModel(firstSyntax.SyntaxTree);
+
+            var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+            var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+
+            return (true, taskSymbol, genericTaskSymbol);
+        }
+
+        private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)
         {
             INamedTypeSymbol? typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
 
@@ -66,31 +97,35 @@ namespace TypedSignalR.Client
                 return (false, string.Empty, string.Empty);
             }
 
-            var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
-
-            var taskTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-            var genericTaskTypeSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-
-            var hubMethods = AnalysisUtility.ExtractHubMethods(attributeProperty.HubTypeSymbol, taskTypeSymbol!, genericTaskTypeSymbol!);
-            var clientMethods = AnalysisUtility.ExtractClientMethods(attributeProperty.ClientTypeSymbol, taskTypeSymbol!);
-
-            var template = new ClientBaseTemplate()
+            try
             {
-                NameSpace = typeSymbol.ContainingNamespace.ToDisplayString(),
-                TargetTypeName = typeSymbol.Name,
-                HubInterfaceName = attributeProperty.HubTypeSymbol.ToDisplayString(),
-                ClientInterfaceName = attributeProperty.ClientTypeSymbol.ToDisplayString(),
-                HubMethods = hubMethods,
-                ClientMethods = clientMethods
-            };
+                var hubMethods = AnalysisUtility.ExtractHubMethods(context, attributeProperty.HubTypeSymbol, taskTypeSymbol!, genericTaskTypeSymbol!);
+                var clientMethods = AnalysisUtility.ExtractClientMethods(context, attributeProperty.ClientTypeSymbol, taskTypeSymbol!);
 
-            string text = template.TransformText();
+                var template = new ClientBaseTemplate()
+                {
+                    NameSpace = typeSymbol.ContainingNamespace.ToDisplayString(),
+                    TargetTypeName = typeSymbol.Name,
+                    HubInterfaceName = attributeProperty.HubTypeSymbol.ToDisplayString(),
+                    ClientInterfaceName = attributeProperty.ClientTypeSymbol.ToDisplayString(),
+                    HubMethods = hubMethods,
+                    ClientMethods = clientMethods
+                };
 
-            return (true, $"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
+                string text = template.TransformText();
+
+                return (true, $"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine(e);
+                return (false, string.Empty, string.Empty);
+            }
         }
 
         private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
         {
+            bool isVaild = true;
             var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
 
             var hubArg = attributeSyntax.ArgumentList!.Arguments[0];
@@ -98,17 +133,39 @@ namespace TypedSignalR.Client
             ITypeSymbol? hubTypeSymbol = hubArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxHub
                 ? semanticModel.GetSymbolInfo(typeOfExpressionSyntaxHub.Type).Symbol as ITypeSymbol : null;
 
+            if (hubTypeSymbol?.TypeKind != TypeKind.Interface)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptorCollection.AttributeArgumentRule,
+                    attributeSyntax.GetLocation(),
+                    hubTypeSymbol?.ToDisplayString()));
+
+                isVaild = false;
+            }
+
             var clientArg = attributeSyntax.ArgumentList!.Arguments[1];
 
             ITypeSymbol? clientTypeSymbol = clientArg.Expression is TypeOfExpressionSyntax typeOfExpressionSyntaxClient
                 ? semanticModel.GetSymbolInfo(typeOfExpressionSyntaxClient.Type).Symbol as ITypeSymbol : null;
 
-            if (hubTypeSymbol is not null && clientTypeSymbol is not null)
+            if (clientTypeSymbol?.TypeKind != TypeKind.Interface)
             {
-                return new AttributeProperty(hubTypeSymbol, clientTypeSymbol);
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptorCollection.AttributeArgumentRule,
+                    attributeSyntax.GetLocation(),
+                    clientTypeSymbol?.ToDisplayString()));
+
+                isVaild = false;
             }
 
-            throw new Exception($"Set the HubClientBaseAttribute argument correctly. Hub: {attributeSyntax.ArgumentList!.Arguments[0]}, Client: {attributeSyntax.ArgumentList!.Arguments[1]}");
+            if (isVaild)
+            {
+                return new AttributeProperty(hubTypeSymbol!, clientTypeSymbol!);
+            }
+            else
+            {
+                throw new Exception($"Set the HubClientBaseAttribute argument correctly. Hub: {attributeSyntax.ArgumentList!.Arguments[0]}, Client: {attributeSyntax.ArgumentList!.Arguments[1]}");
+            }
         }
     }
 

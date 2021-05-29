@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client
 {
     public static class AnalysisUtility
     {
-        public static IReadOnlyList<MethodInfo> ExtractHubMethods(ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol)
+        public static IReadOnlyList<MethodInfo> ExtractHubMethods(GeneratorExecutionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol)
         {
             var hubMethods = new List<MethodInfo>();
             foreach (ISymbol symbol in hubTypeSymbol.GetMembers())
@@ -19,10 +19,17 @@ namespace TypedSignalR.Client
 
                     if (returnTypeSymbol is null)
                     {
-                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
+                        var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                        context.ReportDiagnostic(Diagnostic.Create(
+                            DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                            location,
+                            methodSymbol.ToDisplayString()));
+
+                        throw new Exception($"Return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>");
                     }
 
-                    ValidateHubReturnType(returnTypeSymbol, methodSymbol, taskSymbol, genericsTaskSymbol);
+                    ValidateHubReturnType(context, returnTypeSymbol, methodSymbol, taskSymbol, genericsTaskSymbol);
 
                     ITypeSymbol? genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
 
@@ -37,14 +44,21 @@ namespace TypedSignalR.Client
                 }
                 else
                 {
-                    throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
+                    var location = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.InterfaceDefineRule,
+                        location,
+                        symbol.ToDisplayString()));
+
+                    throw new Exception($"Only define methods in the interface. {symbol.ToDisplayString()} is not method.");
                 }
             }
 
             return hubMethods;
         }
 
-        public static IReadOnlyList<MethodInfo> ExtractClientMethods(ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol)
+        public static IReadOnlyList<MethodInfo> ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol)
         {
             var clientMethods = new List<MethodInfo>();
             foreach (ISymbol symbol in clientTypeSymbol.GetMembers())
@@ -55,10 +69,17 @@ namespace TypedSignalR.Client
 
                     if (returnTypeSymbol is null)
                     {
-                        throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
+                        var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                        context.ReportDiagnostic(Diagnostic.Create(
+                            DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                            location,
+                            methodSymbol.ToDisplayString()));
+
+                        throw new Exception($"Return value type of {methodSymbol.ToDisplayString()} must be Task.");
                     }
 
-                    ValidateClientReturnType(returnTypeSymbol, methodSymbol, taskSymbol);
+                    ValidateClientReturnType(context, returnTypeSymbol, methodSymbol, taskSymbol);
 
                     var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
                     var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
@@ -66,51 +87,87 @@ namespace TypedSignalR.Client
                 }
                 else
                 {
-                    throw new Exception($"Define only methods in the interface. {symbol.ToDisplayString()} is not method.");
+                    var location = symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.InterfaceDefineRule,
+                        location,
+                        symbol.ToDisplayString()));
+
+                    throw new Exception($"Only define methods in the interface. {symbol.ToDisplayString()} is not method.");
                 }
             }
 
             return clientMethods;
         }
 
-        private static void ValidateHubReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol)
+        private static void ValidateHubReturnType(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol)
         {
             if (returnTypeSymbol.IsGenericType)
             {
                 if (returnTypeSymbol.IsUnboundGenericType || !returnTypeSymbol.OriginalDefinition.Equals(genericsTaskSymbol, SymbolEqualityComparer.Default))
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
+                    var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                        location,
+                        methodSymbol.ToDisplayString()));
+
+                    throw new Exception($"Return value type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
                 }
             }
             else
             {
                 if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default))
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
+                    var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                        location,
+                        methodSymbol.ToDisplayString()));
+
+                    throw new Exception($"Return value type of {methodSymbol.ToDisplayString()} must be Task or Task<T>.");
                 }
             }
         }
 
-        private static void ValidateClientReturnType(INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol)
+        private static void ValidateClientReturnType(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol)
         {
             if (returnTypeSymbol.IsGenericType)
             {
-                throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
+                var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                context.ReportDiagnostic(Diagnostic.Create(
+                    DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                    location,
+                    methodSymbol.ToDisplayString()));
+
+                throw new Exception($"Return value type of {methodSymbol.ToDisplayString()} must be Task.");
             }
             else
             {
                 if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default))
                 {
-                    throw new Exception($"return type of {methodSymbol.ToDisplayString()} must be Task.");
+
+                    var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
+
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                        location,
+                        methodSymbol.ToDisplayString()));
+
+                    throw new Exception($"Return value type of {methodSymbol.ToDisplayString()} must be Task.");
                 }
             }
         }
 
         public static bool Any(this List<InvokerInfo> source, ITypeSymbol typeSymbol)
         {
-            foreach(var item in source)
+            foreach (var item in source)
             {
-                if(item.TypeSymbol.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                if (item.TypeSymbol.Equals(typeSymbol, SymbolEqualityComparer.Default))
                 {
                     return true;
                 }

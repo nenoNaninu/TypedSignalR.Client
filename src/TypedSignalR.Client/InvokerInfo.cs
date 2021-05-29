@@ -19,7 +19,9 @@ namespace TypedSignalR.Client
             HubMethods = hubMethods;
         }
 
+#pragma warning disable RS1024 
         public override int GetHashCode() => TypeSymbol.GetHashCode();
+#pragma warning restore RS1024
 
         public bool Equals(InvokerInfo other)
         {

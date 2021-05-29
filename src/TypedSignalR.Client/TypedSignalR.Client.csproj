@@ -16,7 +16,7 @@
         <AssemblyName>TypedSignalR.Client</AssemblyName>
         <Title>TypedSignalR.Client</Title>
         <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
-        <Version>1.1.0</Version>
+        <Version>1.2.0</Version>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
@@ -33,6 +33,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
     </ItemGroup>
 
@@ -82,4 +86,8 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
 </Project>

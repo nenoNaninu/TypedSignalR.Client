@@ -8,7 +8,9 @@ namespace TypedSignalR.Client
 {
     public class AttributeSyntaxReceiver : ISyntaxReceiver
     {
-        public List<(ClassDeclarationSyntax type, AttributeSyntax attr)> Targets { get; } = new();
+        public IReadOnlyList<(ClassDeclarationSyntax type, AttributeSyntax attr)> Targets => _targets;
+
+        private readonly List<(ClassDeclarationSyntax type, AttributeSyntax attr)> _targets  = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -20,7 +22,7 @@ namespace TypedSignalR.Client
 
                 if (attr != null)
                 {
-                    Targets.Add((classDeclarationSyntax, attr));
+                    _targets.Add((classDeclarationSyntax, attr));
                 }
             }
         }

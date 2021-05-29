@@ -16,12 +16,16 @@ namespace TypedSignalR.Client
     {
         private static class HubInvokerConstructorCache<T>
         {
+#pragma warning disable CS0649
             public static Func<Microsoft.AspNetCore.SignalR.Client.HubConnection, T> Construct;
+#pragma warning restore CS0649 
         }
 
         private static class ReceiverBinderCache<T>
         {
+#pragma warning disable CS0649
             public static Func<Microsoft.AspNetCore.SignalR.Client.HubConnection, T, IDisposable> Bind;
+#pragma warning restore CS0649
         }
 
         public static THub CreateHubProxy<THub>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source)

@@ -9,9 +9,13 @@ namespace TypedSignalR.Client
 {
     class HubProxyMethodSyntaxReceiver : ISyntaxReceiver
     {
-        public List<MemberAccessExpressionSyntax> CreateHubProxyMethods { get; } = new();
-        public List<MemberAccessExpressionSyntax> CreateHubProxyWithMethods { get; } = new();
-        public List<MemberAccessExpressionSyntax> RegisterMethods { get; } = new();
+        public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyMethods => _createHubProxyMethods;
+        public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyWithMethods => _createHubProxyWithMethods;
+        public IReadOnlyList<MemberAccessExpressionSyntax> RegisterMethods => _registerMethods;
+
+        private readonly List<MemberAccessExpressionSyntax> _createHubProxyMethods = new();
+        private readonly List<MemberAccessExpressionSyntax> _createHubProxyWithMethods  = new();
+        private readonly List<MemberAccessExpressionSyntax> _registerMethods = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
@@ -21,20 +25,17 @@ namespace TypedSignalR.Client
                 {
                     if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "CreateHubProxy")
                     {
-                        CreateHubProxyMethods.Add(memberAccessExpressionSyntax);
-                        Debug.WriteLine(memberAccessExpressionSyntax.ToFullString());
+                        _createHubProxyMethods.Add(memberAccessExpressionSyntax);
                     }
 
                     if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "CreateHubProxyWith")
                     {
-                        CreateHubProxyWithMethods.Add(memberAccessExpressionSyntax);
-                        Debug.WriteLine(memberAccessExpressionSyntax.ToFullString());
+                        _createHubProxyWithMethods.Add(memberAccessExpressionSyntax);
                     }
 
                     if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "Register")
                     {
-                        RegisterMethods.Add(memberAccessExpressionSyntax);
-                        Debug.WriteLine(memberAccessExpressionSyntax.ToFullString());
+                        _registerMethods.Add(memberAccessExpressionSyntax);
                     }
                 }
             }

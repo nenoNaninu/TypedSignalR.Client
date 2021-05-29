@@ -3,7 +3,6 @@ using TypedSignalR.Client;
 using SignalR.Shared;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
-using System.Collections.Generic;
 
 namespace ConsoleApp
 {
@@ -53,6 +52,41 @@ namespace ConsoleApp
         }
     }
 
+    interface IErrorProxy
+    {
+        Task<string> Hoge();
+        int Id { get; }
+    }
+
+    interface IErrorProxy2
+    {
+        Task<string> Hoge();
+        int Id();
+    }
+
+    interface IErrorReceiver
+    {
+        Task<string> Hoge();
+    }
+
+    class ErrorReceiver : IErrorReceiver
+    {
+        public Task<string> Hoge()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    [HubClientBase(typeof(IErrorProxy), typeof(IClientContract))] // error
+    partial class ClientErrorBase
+    {
+    }
+
+    [HubClientBase(typeof(IErrorProxy), typeof(Clinet))] // error
+    partial class ClientErrorBase1
+    {
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -65,11 +99,18 @@ namespace ConsoleApp
 
             var hub1 = connection.CreateHubProxy<IHubContract>();
             var hub2 = connection.CreateHubProxy<IHubContract>();
-            //var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+            var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
             IClientContract receiver = new Receiver();
             var subscription2 = connection.Register<IClientContract>(new Receiver());
             var subscription3 = connection.Register(receiver);
+
+            var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
+            var hub4 = connection.CreateHubProxy<Receiver>(); // error
+            var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
+
+            var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
+            var subscription5 = connection.Register(new ErrorReceiver()); // error
 
         }
     }
