@@ -33,20 +33,34 @@ Therefore, if you change the code on the server-side, the modification on the cl
 
 This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
 
-# Quick Start
+# API
+There are two types of APIs.
+1. A pattern to generate a `HubProxy` from an interface and register a `Receiver` (callback).
+2. A pattern that can be written in a similar way to inheriting Hub <T> on the server-side. 
 
-The overall procedure flow is as follows. 
-
-1. Defines the interface shared by the server(Hub) and client.
-2. Annotate the attribute `[HubClientBase (typeof (IHub), typeof (IClient))]`to the partial class. 
-3. Inherit the class with `HubClientBase` attribute and implement the function on the client side.
-
-## Example
-
-First, we define the interface of the client-side and hub-side(server).
-
+## Pattern of HubProxy and Receiver
+Three extension methods for HubConnection are defined as API. 
 ```cs
-public class UserDefineClass
+THub CreateHubProxy<THub>(this HubConnection source);
+
+IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
+
+(THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
+```
+
+## Pattern similar to Hub\<T\> on the server-side
+Only one Attribute is provided.
+```
+public class HubClientBaseAttribute : Attribute
+{
+    public HubClientBaseAttribute(Type hub, Type client){ }
+}
+```
+
+# Usage
+Suppose you have the following interface defined:
+```cs
+public class UserDefine
 {
     public Guid RandomId { get; set; }
     public DateTime Datetime { get; set; }
@@ -56,7 +70,7 @@ public class UserDefineClass
 public interface IClientContract
 {
     // Of course, user defined type is OK. 
-    Task SomeClientMethod1(string user, string message, UserDefineClass userDefine);
+    Task SomeClientMethod1(string user, string message, UserDefine userDefine);
     Task SomeClientMethod2();
 }
 
@@ -66,21 +80,70 @@ public interface IHubContract
     Task<string> SomeHubMethod1(string user, string message);
     Task SomeHubMethod2();
 }
+
+class Receiver : IClientContract
+{
+    // impl
+}
+```
+I recommend that these interfaces be shared between the client and server sides, for example, by project references.
+
+```
+server.csproj => shared.csproj <= client.csproj
 ```
 
-Next, define the partial class and annotate the `HubClientBase` Attribute. 
+By the way, using these definitions, you can write as follows on the server side (ASP.NET Core). 
 ```cs
-using TypedSignalR.Client;
+using Microsoft.AspNetCore.SignalR;
 
+public class SomeHub : Hub<IClientContract>, IHubContract
+{
+    public async Task<string> SomeHubMethod1(string user, string message)
+    {
+        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
+        return "OK!";
+    }
+
+    public async Task SomeHubMethod2()
+    {
+        await this.Clients.Caller.SomeClientMethod2();
+    }
+}
+```
+
+
+## Pattern of HubProxy and Receiver
+It's very easy to use. 
+```cs
+HubConnection connection = ...;
+
+var hub = connection.CreateHubProxy<IHubContract>();
+var subscription = connection.Register<IClientContract>(new Receiver());
+// or
+var (hub, subscription) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+
+// Invoke hub methods
+hub.SomeHubMethod1("user", "message");
+
+// Unregister the receiver
+subscription.Dispose();
+```
+
+## Pattern similar to Hub\<T\> on the server-side
+Define a base class that annotates HubClientBaseAttribute. 
+Then just define a class that inherits from that base class. 
+
+The HubClientBaseAttribute constructor takes the type of the interface. 
+
+```cs
+// The base class must be a partial class. 
 [HubClientBase(typeof(IHubContract), typeof(IClientContract))]
 partial class ClientBase
 {
 }
-```
 
-Then, extend the class annotated with HubClientBase and implement the client-side function. 
-
-```cs
+// inherit base class
+// If you type "ctrl + ." or "override", visual studio (or rider) will generate the function for you. 
 class HubClient : ClientBase
 {
     // HubConnection is required for the base class constructor. 
@@ -89,6 +152,7 @@ class HubClient : ClientBase
     }
 
     // override and impl!
+    // These methods are automatically registered for connection. 
     public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
     {
         Console.WriteLine("Call SomeClientMethod1!");
@@ -111,7 +175,8 @@ class HubClient : ClientBase
     }
 }
 ```
-Let's use it!
+
+Usage is simple. 
 
 ```cs
 HubConnection connection = ...;
@@ -130,27 +195,21 @@ await client.Connection.StopAsync();
 await client.DisposeAsync();
 ```
 
-On the server side (ASP.NET Core), it can be strongly typed as follows:
+# Compile-time error support
+This source generator has some restrictions, including those that come from the server side. 
 
-```cs
-using Microsoft.AspNetCore.SignalR;
+- Type argument of `CreateHubProxy/CreateHubProxyWith/Register` must be an interface.
+- Only define methods in the interface used for `HubProxy/Receiver/HubClientBase`. 
+  - Properties should not be defined. 
+- The return type of the method in the interface used for `Hub/HubProxy` must be `Task` or `Task<T>`.
+- The return type of the method in the interface used for `Receiver/Client-side` must be `Task`.
+- Argument of `HubClientBaseAttribute` must be interface type.
 
-public class SomeHub : Hub<IClientContract>, IHubContract
-{
-    public async Task<string> SomeHubMethod1(string user, string message)
-    {
-        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
-        return "OK!";
-    }
+It is very difficult for humans to properly comply with these restrictions. Therefore, it is designed so that the compiler (Roslyn) looks for the part where the constraint is not observed at compile time and reports a detailed error. Therefore, no run-time error occurs. 
 
-    public async Task SomeHubMethod2()
-    {
-        await this.Clients.Caller.SomeClientMethod2();
-    }
-}
-```
+![compile-time-error](img/compile-time-error.png)
 
-## What kind of source code will be generated?
+# What kind of source code will be generated?
 By annotating the `[HubClientBase(typeof(IHubContract), typeof(IClientContract))]` Attribute, the following code will be generated (simplified here). 
 
 ```cs
@@ -222,7 +281,8 @@ partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, I
 ```
 
 # Demo
-First, launch server. 
+First, launch server.
+Then access it from your browser and open the console(F12). 
 
 ```
 git clone https://github.com/nenoNaninu/TypedSignalR.Client.git
