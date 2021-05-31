@@ -11,19 +11,8 @@ namespace ConsoleApp
     {
     }
 
-    //public static class Ex
-    //{
-    //    public static T Build<T>(this IHubConnectionBuilder source, Func<HubConnection,T> factory)
-    //    {
-    //        HubConnection connection = source.Build();
-
-    //        return factory.Invoke(connection);
-    //    }
-    //}
-
     class Clinet : ClientBase
     {
-
         public Clinet(HubConnection connection, string arg) : base(connection)
         {
         }
@@ -55,18 +44,18 @@ namespace ConsoleApp
     interface IErrorProxy
     {
         Task<string> Hoge();
-        int Id { get; }
+        int Id { get; } // forbidden property
     }
 
     interface IErrorProxy2
     {
         Task<string> Hoge();
-        int Id();
+        int Id(); // must Task or Task<T>
     }
 
     interface IErrorReceiver
     {
-        Task<string> Hoge();
+        Task<string> Hoge(); // must Task. not Task<T>
     }
 
     class ErrorReceiver : IErrorReceiver
@@ -104,14 +93,18 @@ namespace ConsoleApp
             IClientContract receiver = new Receiver();
             var subscription2 = connection.Register<IClientContract>(new Receiver());
             var subscription3 = connection.Register(receiver);
+            
+            
+            {
+                // error pattern!
 
-            var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
-            var hub4 = connection.CreateHubProxy<Receiver>(); // error
-            var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
+                var hub4 = connection.CreateHubProxy<Receiver>(); // error
+                var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
+                var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
 
-            var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
-            var subscription5 = connection.Register(new ErrorReceiver()); // error
-
+                var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
+                var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
+            }
         }
     }
 }

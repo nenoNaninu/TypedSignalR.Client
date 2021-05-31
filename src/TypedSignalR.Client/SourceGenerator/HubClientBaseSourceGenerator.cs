@@ -1,20 +1,21 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TypedSignalR.Client.T4;
 using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TypedSignalR.Client.SyntaxReceiver;
+using TypedSignalR.Client.T4;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.SourceGenerator
 {
     [Generator]
     public class HubClientBaseSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialBaseComponent.cs", new EssentialBaseComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialBaseComponent.Generated.cs", new EssentialBaseComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new AttributeSyntaxReceiver());
         }
 
@@ -28,9 +29,9 @@ namespace TypedSignalR.Client
 
         private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
-            var (isVaild, taskSymbol, genericTaskSymbol) = GetImportantSymbols(context, receiver);
+            var (isValid, taskSymbol, genericTaskSymbol) = GetSpecialSymbols(context, receiver);
 
-            if (!isVaild)
+            if (!isValid)
             {
                 return;
             }
@@ -43,7 +44,7 @@ namespace TypedSignalR.Client
 
                 var hubClientBaseAttributeSymbol = semanticModel.Compilation.GetTypeByMetadataName("TypedSignalR.Client.HubClientBaseAttribute");
                 var attributeSymbol = semanticModel.GetTypeInfo(attributeSyntax).ConvertedType;
-
+                
                 if (hubClientBaseAttributeSymbol!.Equals(attributeSymbol, SymbolEqualityComparer.Default))
                 {
                     try
@@ -60,9 +61,9 @@ namespace TypedSignalR.Client
 
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
-                var (isValid, hintName, source) = GenerateSource(context, targetType, attributeProperty, taskSymbol!, genericTaskSymbol!);
+                var (success, hintName, source) = GenerateSource(context, targetType, attributeProperty, taskSymbol!, genericTaskSymbol!);
 
-                if (isValid)
+                if (success)
                 {
                     context.AddSource(hintName, source);
                     
@@ -71,7 +72,7 @@ namespace TypedSignalR.Client
             }
         }
 
-        private static (bool isVaild, INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetImportantSymbols(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        private static (bool isVaild, INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
             var (firstSyntax, _) = receiver.Targets.FirstOrDefault();
 
@@ -125,7 +126,7 @@ namespace TypedSignalR.Client
 
         private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
         {
-            bool isVaild = true;
+            bool isValid = true;
             var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
 
             var hubArg = attributeSyntax.ArgumentList!.Arguments[0];
@@ -140,7 +141,7 @@ namespace TypedSignalR.Client
                     attributeSyntax.GetLocation(),
                     hubTypeSymbol?.ToDisplayString()));
 
-                isVaild = false;
+                isValid = false;
             }
 
             var clientArg = attributeSyntax.ArgumentList!.Arguments[1];
@@ -155,10 +156,10 @@ namespace TypedSignalR.Client
                     attributeSyntax.GetLocation(),
                     clientTypeSymbol?.ToDisplayString()));
 
-                isVaild = false;
+                isValid = false;
             }
 
-            if (isVaild)
+            if (isValid)
             {
                 return new AttributeProperty(hubTypeSymbol!, clientTypeSymbol!);
             }
@@ -167,17 +168,17 @@ namespace TypedSignalR.Client
                 throw new Exception($"Set the HubClientBaseAttribute argument correctly. Hub: {attributeSyntax.ArgumentList!.Arguments[0]}, Client: {attributeSyntax.ArgumentList!.Arguments[1]}");
             }
         }
-    }
 
-    internal readonly struct AttributeProperty
-    {
-        public readonly ITypeSymbol HubTypeSymbol;
-        public readonly ITypeSymbol ClientTypeSymbol;
-
-        public AttributeProperty(ITypeSymbol hubTypeSymbol, ITypeSymbol clientTypeSymbol)
+        private readonly struct AttributeProperty
         {
-            HubTypeSymbol = hubTypeSymbol;
-            ClientTypeSymbol = clientTypeSymbol;
+            public readonly ITypeSymbol HubTypeSymbol;
+            public readonly ITypeSymbol ClientTypeSymbol;
+
+            public AttributeProperty(ITypeSymbol hubTypeSymbol, ITypeSymbol clientTypeSymbol)
+            {
+                HubTypeSymbol = hubTypeSymbol;
+                ClientTypeSymbol = clientTypeSymbol;
+            }
         }
     }
 }

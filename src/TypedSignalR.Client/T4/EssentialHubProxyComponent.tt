@@ -9,40 +9,72 @@
 // </auto-generated>
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace TypedSignalR.Client
 {
-    public static partial class Ex
+    public interface IHubConnectionObserver
+    {
+        Task OnClosed(Exception e);
+        Task OnReconnected(string connectionId);
+        Task OnReconnecting(Exception e);
+    }
+
+    public static partial class Extensions
     {
         private static class HubInvokerConstructorCache<T>
         {
 #pragma warning disable CS0649
-            public static Func<Microsoft.AspNetCore.SignalR.Client.HubConnection, T> Construct;
+            public static Func<HubConnection, T> Construct;
 #pragma warning restore CS0649 
         }
 
         private static class ReceiverBinderCache<T>
         {
 #pragma warning disable CS0649
-            public static Func<Microsoft.AspNetCore.SignalR.Client.HubConnection, T, IDisposable> Bind;
+            public static Func<HubConnection, T, CompositeDisposable> Bind;
 #pragma warning restore CS0649
         }
 
-        public static THub CreateHubProxy<THub>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source)
+        public static THub CreateHubProxy<THub>(this HubConnection source)
+        {
+            return source.CreateHubProxyCore<THub>();
+        }
+
+        public static IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver)
+        {
+            return source.RegisterCore<TReceiver>(receiver);
+        }
+
+        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver)
+        {
+            var hubProxy = source.CreateHubProxyCore<THub>();
+            var subscription = source.RegisterCore<TReceiver>(receiver);
+            return (hubProxy, subscription);
+        }
+
+        private static THub CreateHubProxyCore<THub>(this HubConnection source)
         {
             return HubInvokerConstructorCache<THub>.Construct(source);
         }
 
-        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TReceiver receiver)
+        private static IDisposable RegisterCore<TReceiver>(this HubConnection source, TReceiver receiver)
         {
-            var hubProxy = HubInvokerConstructorCache<THub>.Construct(source);
-            var subscription = ReceiverBinderCache<TReceiver>.Bind(source, receiver);
-            return (hubProxy, subscription);
-        }
+            if(typeof(TReceiver) == typeof(IHubConnectionObserver))
+            {
+                return new HubConnectionEventSubscription(source, receiver as IHubConnectionObserver);;
+            }
 
-        public static IDisposable Register<TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection source, TReceiver receiver)
-        {
-            return ReceiverBinderCache<TReceiver>.Bind(source, receiver);
+            var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(source, receiver);
+
+            if (receiver is IHubConnectionObserver hubConnectionEvent)
+            {
+                var evnetSubscription = new HubConnectionEventSubscription(source, hubConnectionEvent);
+                compositeDisposable.Add(evnetSubscription);
+            }
+
+            return compositeDisposable;
         }
 
         private sealed class CompositeDisposable : IDisposable
@@ -107,6 +139,28 @@ namespace TypedSignalR.Client
 
                     currentDisposables.Clear();
                 }
+            }
+        }
+
+        private class HubConnectionEventSubscription : IDisposable
+        {
+            private readonly HubConnection _connection;
+            private readonly IHubConnectionObserver _hubConnectionEvent;
+
+            public HubConnectionEventSubscription(HubConnection connection, IHubConnectionObserver hubConnectionEvent)
+            {
+                _connection = connection;
+                _hubConnectionEvent = hubConnectionEvent;
+                _connection.Closed += _hubConnectionEvent.OnClosed;
+                _connection.Reconnected += _hubConnectionEvent.OnReconnected;
+                _connection.Reconnecting += _hubConnectionEvent.OnReconnecting;
+            }
+
+            public void Dispose()
+            {
+                _connection.Closed -= _hubConnectionEvent.OnClosed;
+                _connection.Reconnected -= _hubConnectionEvent.OnReconnected;
+                _connection.Reconnecting -= _hubConnectionEvent.OnReconnecting;
             }
         }
     }

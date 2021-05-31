@@ -47,10 +47,19 @@ IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
 
 (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
 ```
+One interface 
+```cs
+interface IHubConnectionObserver
+{
+    Task OnClosed(Exception e);
+    Task OnReconnected(string connectionId);
+    Task OnReconnecting(Exception e);
+}
+```
 
 ## Pattern similar to Hub\<T\> on the server-side
 Only one Attribute is provided.
-```
+```cs
 public class HubClientBaseAttribute : Attribute
 {
     public HubClientBaseAttribute(Type hub, Type client){ }

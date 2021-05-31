@@ -11,8 +11,9 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace TypedSignalR.Client
 {
-    public static partial class Ex
+    public static partial class Extensions
     {
+
 <# foreach(var invoker in InvokerList) {#>
         private class HubInvokerFor<#= invoker.InterfaceName #> : <#= invoker.InterfaceFullName  #>
         {
@@ -33,9 +34,9 @@ namespace TypedSignalR.Client
 
 <# } #>
 <# foreach(var receiver in ReceiverList){ #>
-        public static System.IDisposable Connect<#= receiver.InterfaceName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
+        private static CompositeDisposable Connect<#= receiver.InterfaceName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
         {
-            var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count #>);
+            var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count + 1 #>);
 <# foreach(var method in receiver.ClientMethods) { #>
             compositeDisposable.Add(connection.On<#= method.ArgTypeParametersToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
 <# } #>
@@ -43,7 +44,7 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-        static Ex()
+        static Extensions()
         {
 <# foreach(var invoker in InvokerList) {#>
             HubInvokerConstructorCache<<#= invoker.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= invoker.InterfaceName #>(connection);

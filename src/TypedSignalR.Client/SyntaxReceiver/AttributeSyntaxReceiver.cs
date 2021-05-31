@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.SyntaxReceiver
 {
     public class AttributeSyntaxReceiver : ISyntaxReceiver
     {
@@ -14,7 +13,7 @@ namespace TypedSignalR.Client
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is ClassDeclarationSyntax classDeclarationSyntax && classDeclarationSyntax.AttributeLists.Count > 0)
+            if (syntaxNode is ClassDeclarationSyntax {AttributeLists: {Count: > 0}} classDeclarationSyntax)
             {
                 AttributeSyntax? attr = classDeclarationSyntax.AttributeLists
                     .SelectMany(x => x.Attributes)

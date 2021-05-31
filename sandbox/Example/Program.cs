@@ -26,7 +26,7 @@ namespace Example
         Task SomeHubMethod2();
     }
 
-    class Receiver : IClientContract
+    class Receiver : IClientContract, IHubConnectionObserver
     {
         public Task SomeClientMethod1(string user, string message, UserDefine userDefine)
         {
@@ -39,6 +39,21 @@ namespace Example
         }
 
         public Task SomeClientMethod3()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task OnClosed(Exception e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task OnReconnected(string connectionId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task OnReconnecting(Exception e)
         {
             throw new NotImplementedException();
         }
@@ -55,6 +70,16 @@ namespace Example
         Task<string> Hoge();
         int Id { get; }
     }
+
+    public static class Ex
+    {
+        public static IDisposable Subscribe<T>(this HubConnection source, T o)
+        {
+            return null;
+        }
+
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -63,10 +88,11 @@ namespace Example
                .WithUrl("https://~~~")
                .Build();
 
-            var hub = connection.CreateHubProxy<IErrorProxy>();
+            // var hub = connection.CreateHubProxy<IErrorProxy>();
 
+            connection.Register<IClientContract>(new Receiver());
 
-            hub.Hoge();
+            //hub.Hoge();
             //{
             //    var hub = connection.CreateHubProxy<IHubContract>();
             //    var subscription = connection.Register<IClientContract>(new Receiver());

@@ -1,18 +1,19 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using TypedSignalR.Client.T4;
 using System.Linq;
-using System;
+using Microsoft.CodeAnalysis;
+using TypedSignalR.Client.SyntaxReceiver;
+using TypedSignalR.Client.T4;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.SourceGenerator
 {
     [Generator]
     class HubProxySourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialHubProxyComponent.cs", new EssentialHubProxyComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialHubProxyComponent.Generated.cs", new EssentialHubProxyComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new HubProxyMethodSyntaxReceiver());
         }
 
@@ -22,7 +23,7 @@ namespace TypedSignalR.Client
             {
                 try
                 {
-                    var (invokerList, receiverList) = ExtructInfo(context, receiver);
+                    var (invokerList, receiverList) = ExtractInfo(context, receiver);
 
                     var template = new HubProxyTemplate()
                     {
@@ -43,7 +44,7 @@ namespace TypedSignalR.Client
             }
         }
 
-        private static (bool isVaild, INamedTypeSymbol? hubConnection, INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetImportantSymbols(GeneratorExecutionContext context, HubProxyMethodSyntaxReceiver receiver)
+        private static (bool isVaild, SpecialSymbols specialSymbols) GetSpecialSymbols(GeneratorExecutionContext context, HubProxyMethodSyntaxReceiver receiver)
         {
             var firstSyntax = receiver.CreateHubProxyMethods.FirstOrDefault()
                 ?? receiver.CreateHubProxyWithMethods.FirstOrDefault()
@@ -51,7 +52,7 @@ namespace TypedSignalR.Client
 
             if (firstSyntax is null)
             {
-                return (false, null, null, null);
+                return (false, default);
             }
 
             var semanticModel = context.Compilation.GetSemanticModel(firstSyntax.SyntaxTree);
@@ -59,18 +60,19 @@ namespace TypedSignalR.Client
             var hubConnectionSymbol = semanticModel.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
             var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+            var hubConnectionObserverSymbol = semanticModel.Compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
 
-            return (true, hubConnectionSymbol, taskSymbol, genericTaskSymbol);
+            return (true, new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!));
         }
 
-        private static (IReadOnlyList<InvokerInfo> invokerList, IReadOnlyList<ReceiverInfo> receiverList) ExtructInfo(GeneratorExecutionContext context, HubProxyMethodSyntaxReceiver receiver)
+        private static (IReadOnlyList<InvokerInfo> invokerList, IReadOnlyList<ReceiverInfo> receiverList) ExtractInfo(GeneratorExecutionContext context, HubProxyMethodSyntaxReceiver receiver)
         {
             List<InvokerInfo> invokerList = new();
             List<ReceiverInfo> receiverList = new();
 
-            var (isVaild, hubConnectionSymbol, taskSymbol, genericTaskSymbol) = GetImportantSymbols(context, receiver);
+            var (isValid, specialSymbols) = GetSpecialSymbols(context, receiver);
 
-            if (!isVaild)
+            if (!isValid)
             {
                 return (invokerList, receiverList);
             }
@@ -82,7 +84,7 @@ namespace TypedSignalR.Client
 
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
+                if (specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 
@@ -105,7 +107,7 @@ namespace TypedSignalR.Client
                         {
                             try
                             {
-                                var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, taskSymbol!, genericTaskSymbol!);
+                                var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
                                 var invoker = new InvokerInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
 
@@ -126,7 +128,7 @@ namespace TypedSignalR.Client
 
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
+                if (specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 
@@ -149,7 +151,7 @@ namespace TypedSignalR.Client
                         {
                             try
                             {
-                                var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, taskSymbol!, genericTaskSymbol!);
+                                var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
                                 var invoker = new InvokerInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
 
@@ -161,26 +163,26 @@ namespace TypedSignalR.Client
                             }
                         }
 
-                        ITypeSymbol reciverType = methodSymbol.TypeArguments[1];
+                        ITypeSymbol receiverType = methodSymbol.TypeArguments[1];
 
-                        if (reciverType.TypeKind != TypeKind.Interface)
+                        if (receiverType.TypeKind != TypeKind.Interface)
                         {
                             context.ReportDiagnostic(Diagnostic.Create(
                                 DiagnosticDescriptorCollection.TypeArgumentRule,
                                 target.GetLocation(),
                                 methodSymbol.OriginalDefinition.ToDisplayString(),
-                                reciverType.ToDisplayString()));
+                                receiverType.ToDisplayString()));
 
                             continue;
                         }
 
-                        if (!receiverList.Any(reciverType))
+                        if (!receiverList.Any(receiverType))
                         {
                             try
                             {
-                                var reciverMethods = AnalysisUtility.ExtractClientMethods(context, reciverType, taskSymbol!);
+                                var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                                var receiverInfo = new ReceiverInfo(reciverType, reciverType.Name, reciverType.ToDisplayString(), reciverMethods);
+                                var receiverInfo = new ReceiverInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
 
                                 receiverList.Add(receiverInfo);
                             }
@@ -199,32 +201,37 @@ namespace TypedSignalR.Client
 
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
 
-                if (hubConnectionSymbol!.Equals(callerSymbol, SymbolEqualityComparer.Default))
+                if (specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default))
                 {
                     var symbol = semanticModel.GetSymbolInfo(target).Symbol;
 
                     if (symbol is IMethodSymbol methodSymbol)
                     {
-                        ITypeSymbol reciverType = methodSymbol.TypeArguments[0];
+                        ITypeSymbol receiverType = methodSymbol.TypeArguments[0];
 
-                        if (reciverType.TypeKind != TypeKind.Interface)
+                        if (receiverType.TypeKind != TypeKind.Interface)
                         {
                             context.ReportDiagnostic(Diagnostic.Create(
                                 DiagnosticDescriptorCollection.TypeArgumentRule,
                                 target.GetLocation(),
                                 methodSymbol.OriginalDefinition.ToDisplayString(),
-                                reciverType.ToDisplayString()));
+                                receiverType.ToDisplayString()));
 
                             continue;
                         }
 
-                        if (!receiverList.Any(reciverType))
+                        if (receiverType.Equals(specialSymbols.HubConnectionObserver, SymbolEqualityComparer.Default))
+                        {
+                            continue;
+                        }
+
+                        if (!receiverList.Any(receiverType))
                         {
                             try
                             {
-                                var reciverMethods = AnalysisUtility.ExtractClientMethods(context, reciverType, taskSymbol!);
+                                var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                                var receiverInfo = new ReceiverInfo(reciverType, reciverType.Name, reciverType.ToDisplayString(), reciverMethods);
+                                var receiverInfo = new ReceiverInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
 
                                 receiverList.Add(receiverInfo);
                             }
@@ -238,6 +245,22 @@ namespace TypedSignalR.Client
             }
 
             return (invokerList, receiverList);
+        }
+
+        private readonly struct SpecialSymbols
+        {
+            public readonly INamedTypeSymbol HubConnection;
+            public readonly INamedTypeSymbol Task;
+            public readonly INamedTypeSymbol GenericTask;
+            public readonly INamedTypeSymbol HubConnectionObserver;
+
+            public SpecialSymbols(INamedTypeSymbol hubConnection, INamedTypeSymbol task, INamedTypeSymbol genericTask, INamedTypeSymbol hubConnectionObserver)
+            {
+                HubConnection = hubConnection;
+                Task = task;
+                GenericTask = genericTask;
+                HubConnectionObserver = hubConnectionObserver;
+            }
         }
     }
 }
