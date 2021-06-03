@@ -4,33 +4,33 @@ using System.Collections.Generic;
 
 namespace TypedSignalR.Client
 {
-    public class ReceiverInfo : IEquatable<ReceiverInfo>
+    public class InvokerTypeInfo : IEquatable<InvokerTypeInfo>
     {
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }
         public string InterfaceFullName { get; }
-        public IReadOnlyList<MethodInfo> ClientMethods { get; }
+        public IReadOnlyList<MethodInfo> HubMethods { get; }
 
-        public ReceiverInfo(ITypeSymbol typeSymbol, string interfaceName, string interfaceFullName, IReadOnlyList<MethodInfo> clientMethods)
+        public InvokerTypeInfo(ITypeSymbol typeSymbol, string interfaceName, string interfaceFullName, IReadOnlyList<MethodInfo> hubMethods)
         {
             TypeSymbol = typeSymbol;
             InterfaceName = interfaceName;
             InterfaceFullName = interfaceFullName;
-            ClientMethods = clientMethods;
+            HubMethods = hubMethods;
         }
 
-#pragma warning disable RS1024
+#pragma warning disable RS1024 
         public override int GetHashCode() => TypeSymbol.GetHashCode();
-#pragma warning restore RS1024 
+#pragma warning restore RS1024
 
-        public bool Equals(ReceiverInfo other)
+        public bool Equals(InvokerTypeInfo other)
         {
             return TypeSymbol.Equals(other.TypeSymbol, SymbolEqualityComparer.Default);
         }
 
         public override bool Equals(object other)
         {
-            if (other is ReceiverInfo invokerInfo)
+            if(other is InvokerTypeInfo invokerInfo)
             {
                 return this.Equals(invokerInfo);
             }

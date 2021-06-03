@@ -4,7 +4,7 @@ namespace TypedSignalR.Client.T4
 {
     public partial class ExtensionMethodInternalTemplate
     {
-        public IReadOnlyList<InvokerInfo>? InvokerList { get; set; }
-        public IReadOnlyList<ReceiverInfo>? ReceiverList { get; set; }
+        public IReadOnlyList<InvokerTypeInfo>? InvokerList { get; set; }
+        public IReadOnlyList<ReceiverTypeInfo>? ReceiverList { get; set; }
     }
 }

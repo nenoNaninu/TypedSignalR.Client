@@ -83,6 +83,7 @@ namespace TypedSignalR.Client
 
                     var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
                     var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
+
                     clientMethods.Add(methodInfo);
                 }
                 else
@@ -163,7 +164,7 @@ namespace TypedSignalR.Client
             }
         }
 
-        public static bool Any(this List<InvokerInfo> source, ITypeSymbol typeSymbol)
+        public static bool Any(this List<InvokerTypeInfo> source, ITypeSymbol typeSymbol)
         {
             foreach (var item in source)
             {
@@ -176,7 +177,7 @@ namespace TypedSignalR.Client
             return false;
         }
 
-        public static bool Any(this List<ReceiverInfo> source, ITypeSymbol typeSymbol)
+        public static bool Any(this List<ReceiverTypeInfo> source, ITypeSymbol typeSymbol)
         {
             foreach (var item in source)
             {

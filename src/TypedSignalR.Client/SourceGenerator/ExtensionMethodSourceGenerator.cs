@@ -22,7 +22,7 @@ namespace TypedSignalR.Client.SourceGenerator
             {
                 try
                 {
-                    var (invokerList, receiverList) = ExtractInfo(context, receiver);
+                    var (invokerList, receiverList) = ExtractTargetTypes(context, receiver);
 
                     var template = new ExtensionMethodInternalTemplate()
                     {
@@ -54,10 +54,10 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
-        private static (IReadOnlyList<InvokerInfo> invokerList, IReadOnlyList<ReceiverInfo> receiverList) ExtractInfo(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
         {
-            List<InvokerInfo> invokerList = new();
-            List<ReceiverInfo> receiverList = new();
+            List<InvokerTypeInfo> invokerList = new();
+            List<ReceiverTypeInfo> receiverList = new();
 
             var specialSymbols = GetSpecialSymbols(context);
 
@@ -68,12 +68,17 @@ namespace TypedSignalR.Client.SourceGenerator
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
                 var createHubProxySymbol = semanticModel.GetSymbolInfo(target).Symbol;
 
+                if (callerSymbol is null)
+                {
+                    continue;
+                }
+
                 if (createHubProxySymbol is null)
                 {
                     continue;
                 }
 
-                if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) ||
+                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) ||
                     !createHubProxySymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
@@ -100,7 +105,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
-                            var invoker = new InvokerInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
+                            var invoker = new InvokerTypeInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
 
                             invokerList.Add(invoker);
                         }
@@ -119,12 +124,17 @@ namespace TypedSignalR.Client.SourceGenerator
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
                 var createHubProxyWithSymbol = semanticModel.GetSymbolInfo(target).Symbol;
 
+                if (callerSymbol is null)
+                {
+                    continue;
+                }
+
                 if (createHubProxyWithSymbol is null)
                 {
                     continue;
                 }
 
-                if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) ||
+                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) ||
                     !createHubProxyWithSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
@@ -151,7 +161,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
-                            var invoker = new InvokerInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
+                            var invoker = new InvokerTypeInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
 
                             invokerList.Add(invoker);
                         }
@@ -180,7 +190,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                            var receiverInfo = new ReceiverInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
+                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
 
                             receiverList.Add(receiverInfo);
                         }
@@ -199,12 +209,17 @@ namespace TypedSignalR.Client.SourceGenerator
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
                 var registerSymbol = semanticModel.GetSymbolInfo(target).Symbol;
 
+                if (callerSymbol is null)
+                {
+                    continue;
+                }
+
                 if (registerSymbol is null)
                 {
                     continue;
                 }
 
-                if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) || 
+                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) || 
                     !registerSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
@@ -236,7 +251,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                            var receiverInfo = new ReceiverInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
+                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
 
                             receiverList.Add(receiverInfo);
                         }
