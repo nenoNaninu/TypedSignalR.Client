@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TypedSignalR.Client.SyntaxReceiver
 {
-    class HubProxyMethodSyntaxReceiver : ISyntaxReceiver
+    class ExtensionMethodSyntaxReceiver : ISyntaxReceiver
     {
         public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyMethods => _createHubProxyMethods;
         public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyWithMethods => _createHubProxyWithMethods;

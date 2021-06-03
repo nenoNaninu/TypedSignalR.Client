@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using TypedSignalR.Client.SyntaxReceiver;
 using TypedSignalR.Client.T4;
@@ -9,23 +8,23 @@ using TypedSignalR.Client.T4;
 namespace TypedSignalR.Client.SourceGenerator
 {
     [Generator]
-    class HubProxySourceGenerator : ISourceGenerator
+    class ExtensionMethodSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialHubProxyComponent.Generated.cs", new EssentialHubProxyComponent().TransformText()));
-            context.RegisterForSyntaxNotifications(() => new HubProxyMethodSyntaxReceiver());
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.Extensions.Generated.cs", new ExtensionMethodTemplate().TransformText()));
+            context.RegisterForSyntaxNotifications(() => new ExtensionMethodSyntaxReceiver());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxReceiver is HubProxyMethodSyntaxReceiver receiver)
+            if (context.SyntaxReceiver is ExtensionMethodSyntaxReceiver receiver)
             {
                 try
                 {
                     var (invokerList, receiverList) = ExtractInfo(context, receiver);
 
-                    var template = new HubProxyTemplate()
+                    var template = new ExtensionMethodInternalTemplate()
                     {
                         InvokerList = invokerList,
                         ReceiverList = receiverList
@@ -35,7 +34,7 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     Debug.WriteLine(source);
 
-                    context.AddSource("TypedSignalR.Client.HubProxy.Generated.cs", source);
+                    context.AddSource("TypedSignalR.Client.Extensions.Internal.Generated.cs", source);
                 }
                 catch (Exception e)
                 {
@@ -55,7 +54,7 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
-        private static (IReadOnlyList<InvokerInfo> invokerList, IReadOnlyList<ReceiverInfo> receiverList) ExtractInfo(GeneratorExecutionContext context, HubProxyMethodSyntaxReceiver receiver)
+        private static (IReadOnlyList<InvokerInfo> invokerList, IReadOnlyList<ReceiverInfo> receiverList) ExtractInfo(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
         {
             List<InvokerInfo> invokerList = new();
             List<ReceiverInfo> receiverList = new();
@@ -75,7 +74,7 @@ namespace TypedSignalR.Client.SourceGenerator
                 }
 
                 if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) ||
-                    !createHubProxySymbol.ContainingNamespace.Equals(specialSymbols.NamespaceSymbol, SymbolEqualityComparer.Default))
+                    !createHubProxySymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
                 }
@@ -126,7 +125,7 @@ namespace TypedSignalR.Client.SourceGenerator
                 }
 
                 if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) ||
-                    !createHubProxyWithSymbol.ContainingNamespace.Equals(specialSymbols.NamespaceSymbol, SymbolEqualityComparer.Default))
+                    !createHubProxyWithSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
                 }
@@ -206,7 +205,7 @@ namespace TypedSignalR.Client.SourceGenerator
                 }
 
                 if (!specialSymbols.HubConnection.Equals(callerSymbol, SymbolEqualityComparer.Default) || 
-                    !registerSymbol.ContainingNamespace.Equals(specialSymbols.NamespaceSymbol, SymbolEqualityComparer.Default))
+                    !registerSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
                 }
@@ -258,21 +257,21 @@ namespace TypedSignalR.Client.SourceGenerator
             public readonly INamedTypeSymbol Task;
             public readonly INamedTypeSymbol GenericTask;
             public readonly INamedTypeSymbol HubConnectionObserver;
-            public readonly INamespaceSymbol NamespaceSymbol;
+            public readonly INamespaceSymbol TypedSignalRNamespace;
 
             public SpecialSymbols(
                 INamedTypeSymbol hubConnection, 
                 INamedTypeSymbol task, 
                 INamedTypeSymbol genericTask, 
                 INamedTypeSymbol hubConnectionObserver,
-                INamespaceSymbol namespaceSymbol
+                INamespaceSymbol typedSignalRNamespace
                )
             {
                 HubConnection = hubConnection;
                 Task = task;
                 GenericTask = genericTask;
                 HubConnectionObserver = hubConnectionObserver;
-                NamespaceSymbol = namespaceSymbol;
+                TypedSignalRNamespace = typedSignalRNamespace;
             }
         }
     }

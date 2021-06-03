@@ -15,7 +15,7 @@ namespace TypedSignalR.Client.SourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.EssentialBaseComponent.Generated.cs", new EssentialBaseComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.HubClientBaseAttribute.Generated.cs", new EssentialBaseComponent().TransformText()));
             context.RegisterForSyntaxNotifications(() => new AttributeSyntaxReceiver());
         }
 
@@ -42,7 +42,7 @@ namespace TypedSignalR.Client.SourceGenerator
             {
                 var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
 
-                var hubClientBaseAttributeSymbol = semanticModel.Compilation.GetTypeByMetadataName("TypedSignalR.Client.HubClientBaseAttribute");
+                var hubClientBaseAttributeSymbol = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.HubClientBaseAttribute");
                 var attributeSymbol = semanticModel.GetTypeInfo(attributeSyntax).ConvertedType;
                 
                 if (hubClientBaseAttributeSymbol!.Equals(attributeSymbol, SymbolEqualityComparer.Default))
@@ -115,7 +115,7 @@ namespace TypedSignalR.Client.SourceGenerator
 
                 string text = template.TransformText();
 
-                return (true, $"{template.NameSpace}.{template.TargetTypeName}.Generated.cs", text);
+                return (true, $"{template.NameSpace}.{template.TargetTypeName}.ClientBase.Generated.cs", text);
             }
             catch(Exception e)
             {

@@ -18,7 +18,7 @@ namespace TypedSignalR.Client.T4
     /// Class to produce the template output
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public partial class EssentialHubProxyComponent : EssentialHubProxyComponentBase
+    public partial class ExtensionMethodTemplate : ExtensionMethodTemplateBase
     {
         /// <summary>
         /// Create the template output
@@ -101,7 +101,7 @@ namespace TypedSignalR.Client.T4
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "16.0.0.0")]
-    public class EssentialHubProxyComponentBase
+    public class ExtensionMethodTemplateBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

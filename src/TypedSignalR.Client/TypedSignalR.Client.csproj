@@ -46,35 +46,35 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>ClientBaseTemplate.tt</DependentUpon>
         </Compile>
-        <Compile Update="T4\EssentialBaseComponent.cs">
+        <Compile Update="T4\HubClientBaseAttributeTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>EssentialBaseComponent.tt</DependentUpon>
+            <DependentUpon>HubClientBaseAttributeTemplate.tt</DependentUpon>
         </Compile>
-        <Compile Update="T4\EssentialHubProxyComponent.cs">
-            <DependentUpon>EssentialHubProxyComponent.tt</DependentUpon>
+        <Compile Update="T4\ExtensionMethodTemplate.cs">
+            <DependentUpon>ExtensionMethodTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
-        <Compile Update="T4\HubProxyTemplate.cs">
+        <Compile Update="T4\ExtensionMethodInternalTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>HubProxyTemplate.tt</DependentUpon>
+            <DependentUpon>ExtensionMethodInternalTemplate.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="T4\HubProxyTemplate.tt">
-            <LastGenOutput>HubProxyTemplate.cs</LastGenOutput>
+        <None Update="T4\ExtensionMethodInternalTemplate.tt">
+            <LastGenOutput>ExtensionMethodInternalTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
-        <None Update="T4\EssentialHubProxyComponent.tt">
+        <None Update="T4\ExtensionMethodTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>EssentialHubProxyComponent.cs</LastGenOutput>
+            <LastGenOutput>ExtensionMethodTemplate.cs</LastGenOutput>
         </None>
-        <None Update="T4\EssentialBaseComponent.tt">
+        <None Update="T4\HubClientBaseAttributeTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>EssentialBaseComponent.cs</LastGenOutput>
+            <LastGenOutput>HubClientBaseAttributeTemplate.cs</LastGenOutput>
         </None>
         <None Update="T4\ClientBaseTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
