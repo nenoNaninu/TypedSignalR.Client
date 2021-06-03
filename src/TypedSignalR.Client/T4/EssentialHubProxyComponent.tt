@@ -63,15 +63,15 @@ namespace TypedSignalR.Client
         {
             if(typeof(TReceiver) == typeof(IHubConnectionObserver))
             {
-                return new HubConnectionEventSubscription(source, receiver as IHubConnectionObserver);;
+                return new HubConnectionObserverSubscription(source, receiver as IHubConnectionObserver);;
             }
 
             var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(source, receiver);
 
-            if (receiver is IHubConnectionObserver hubConnectionEvent)
+            if (receiver is IHubConnectionObserver hubConnectionObserver)
             {
-                var evnetSubscription = new HubConnectionEventSubscription(source, hubConnectionEvent);
-                compositeDisposable.Add(evnetSubscription);
+                var subscription = new HubConnectionObserverSubscription(source, hubConnectionObserver);
+                compositeDisposable.Add(subscription);
             }
 
             return compositeDisposable;
@@ -142,12 +142,12 @@ namespace TypedSignalR.Client
             }
         }
 
-        private class HubConnectionEventSubscription : IDisposable
+        private class HubConnectionObserverSubscription : IDisposable
         {
             private readonly HubConnection _connection;
             private readonly IHubConnectionObserver _hubConnectionEvent;
 
-            public HubConnectionEventSubscription(HubConnection connection, IHubConnectionObserver hubConnectionEvent)
+            public HubConnectionObserverSubscription(HubConnection connection, IHubConnectionObserver hubConnectionEvent)
             {
                 _connection = connection;
                 _hubConnectionEvent = hubConnectionEvent;

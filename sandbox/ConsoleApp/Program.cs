@@ -66,15 +66,15 @@ namespace ConsoleApp
         }
     }
 
-    [HubClientBase(typeof(IErrorProxy), typeof(IClientContract))] // error
-    partial class ClientErrorBase
-    {
-    }
+    //[HubClientBase(typeof(IErrorProxy), typeof(IClientContract))] // error
+    //partial class ClientErrorBase
+    //{
+    //}
 
-    [HubClientBase(typeof(IErrorProxy), typeof(Clinet))] // error
-    partial class ClientErrorBase1
-    {
-    }
+    //[HubClientBase(typeof(IErrorProxy), typeof(Clinet))] // error
+    //partial class ClientErrorBase1
+    //{
+    //}
 
     class Program
     {
@@ -83,28 +83,38 @@ namespace ConsoleApp
             var connection = new HubConnectionBuilder()
                 .WithUrl("https://~~~")
                 .Build();
-            
+
             var id = connection.ConnectionId;
-
-            var hub1 = connection.CreateHubProxy<IHubContract>();
-            var hub2 = connection.CreateHubProxy<IHubContract>();
-            var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
-
-            IClientContract receiver = new Receiver();
-            var subscription2 = connection.Register<IClientContract>(new Receiver());
-            var subscription3 = connection.Register(receiver);
-            
-            
             {
-                // error pattern!
+                var hub1 = connection.CreateHubProxy<IHubContract>();
+                var hub2 = connection.CreateHubProxy<IHubContract>();
+                var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
-                var hub4 = connection.CreateHubProxy<Receiver>(); // error
-                var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
-                var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
-
-                var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
-                var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
+                IClientContract receiver = new Receiver();
+                var subscription2 = connection.Register<IClientContract>(new Receiver());
+                var subscription3 = connection.Register(receiver);
             }
+
+            {
+                var hub1 = connection.CreateHubProxy<IHubContract2>();
+                var hub2 = connection.CreateHubProxy<IHubContract2>();
+                var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract2, IClientContract2>(new Receiver2());
+
+                IClientContract2 receiver = new Receiver2();
+                var subscription2 = connection.Register<IClientContract2>(new Receiver2());
+                var subscription3 = connection.Register(receiver);
+            }
+
+            //{
+            //    // error pattern!
+
+            //    var hub4 = connection.CreateHubProxy<Receiver>(); // error
+            //    var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
+            //    var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
+
+            //    var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
+            //    var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
+            //}
         }
     }
 }
