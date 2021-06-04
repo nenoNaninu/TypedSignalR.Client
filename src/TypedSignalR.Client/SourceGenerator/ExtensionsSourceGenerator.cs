@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TypedSignalR.Client.SyntaxReceiver;
 using TypedSignalR.Client.T4;
 
 namespace TypedSignalR.Client.SourceGenerator
 {
     [Generator]
-    class ExtensionMethodSourceGenerator : ISourceGenerator
+    public class ExtensionsSourceGenerator : ISourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.Extensions.Generated.cs", new ExtensionMethodTemplate().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.Extensions.Generated.cs", new ExtensionsTemplate().TransformText()));
             context.RegisterForSyntaxNotifications(() => new ExtensionMethodSyntaxReceiver());
         }
 
@@ -24,7 +25,7 @@ namespace TypedSignalR.Client.SourceGenerator
                 {
                     var (invokerList, receiverList) = ExtractTargetTypes(context, receiver);
 
-                    var template = new ExtensionMethodInternalTemplate()
+                    var template = new ExtensionsInternalTemplate()
                     {
                         InvokerList = invokerList,
                         ReceiverList = receiverList
@@ -50,21 +51,20 @@ namespace TypedSignalR.Client.SourceGenerator
             var genericTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
             var hubConnectionObserverSymbol = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
             var containingNamespace = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.ContainingNamespace;
-            
+
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
-        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        private static void ExtractFromCreateHubProxyMethods(
+            GeneratorExecutionContext context,
+            IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyMethods,
+            in SpecialSymbols specialSymbols,
+            List<InvokerTypeInfo> invokerList)
         {
-            List<InvokerTypeInfo> invokerList = new();
-            List<ReceiverTypeInfo> receiverList = new();
-
-            var specialSymbols = GetSpecialSymbols(context);
-
-            foreach (var target in receiver.CreateHubProxyMethods)
+            foreach (var target in createHubProxyMethods)
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
-                
+
                 var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
                 var createHubProxySymbol = semanticModel.GetSymbolInfo(target).Symbol;
 
@@ -116,8 +116,16 @@ namespace TypedSignalR.Client.SourceGenerator
                     }
                 }
             }
+        }
 
-            foreach (var target in receiver.CreateHubProxyWithMethods)
+        private static void ExtractFromCreateHubProxyWithMethods(
+            GeneratorExecutionContext context,
+            IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyWithMethods,
+            in SpecialSymbols specialSymbols,
+            List<InvokerTypeInfo> invokerList,
+            List<ReceiverTypeInfo> receiverList)
+        {
+            foreach (var target in createHubProxyWithMethods)
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
@@ -201,8 +209,15 @@ namespace TypedSignalR.Client.SourceGenerator
                     }
                 }
             }
+        }
 
-            foreach (var target in receiver.RegisterMethods)
+        private static void ExtractFromRegisterMethods(
+            GeneratorExecutionContext context,
+            IReadOnlyList<MemberAccessExpressionSyntax> registerMethods,
+            in SpecialSymbols specialSymbols,
+            List<ReceiverTypeInfo> receiverList)
+        {
+            foreach (var target in registerMethods)
             {
                 var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
 
@@ -219,7 +234,7 @@ namespace TypedSignalR.Client.SourceGenerator
                     continue;
                 }
 
-                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) || 
+                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) ||
                     !registerSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
                 {
                     continue;
@@ -262,6 +277,18 @@ namespace TypedSignalR.Client.SourceGenerator
                     }
                 }
             }
+        }
+
+        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        {
+            var invokerList = new List<InvokerTypeInfo>();
+            var receiverList = new List<ReceiverTypeInfo>();
+
+            var specialSymbols = GetSpecialSymbols(context);
+
+            ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, in specialSymbols, invokerList);
+            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, in specialSymbols, invokerList, receiverList);
+            ExtractFromRegisterMethods(context, receiver.RegisterMethods, in specialSymbols, receiverList);
 
             return (invokerList, receiverList);
         }
@@ -275,9 +302,9 @@ namespace TypedSignalR.Client.SourceGenerator
             public readonly INamespaceSymbol TypedSignalRNamespace;
 
             public SpecialSymbols(
-                INamedTypeSymbol hubConnection, 
-                INamedTypeSymbol task, 
-                INamedTypeSymbol genericTask, 
+                INamedTypeSymbol hubConnection,
+                INamedTypeSymbol task,
+                INamedTypeSymbol genericTask,
                 INamedTypeSymbol hubConnectionObserver,
                 INamespaceSymbol typedSignalRNamespace
                )

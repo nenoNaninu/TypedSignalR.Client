@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,7 +14,7 @@ namespace TypedSignalR.Client.SourceGenerator
     {
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.HubClientBaseAttribute.Generated.cs", new EssentialBaseComponent().TransformText()));
+            context.RegisterForPostInitialization(ctx => ctx.AddSource("TypedSignalR.Client.HubClientBaseAttribute.Generated.cs", new HubClientBaseAttributeTemplate().TransformText()));
             context.RegisterForSyntaxNotifications(() => new AttributeSyntaxReceiver());
         }
 
@@ -23,18 +22,20 @@ namespace TypedSignalR.Client.SourceGenerator
         {
             if (context.SyntaxReceiver is AttributeSyntaxReceiver receiver)
             {
-                ExecuteCore(context, receiver);
+                try
+                {
+                    ExecuteCore(context, receiver);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e);
+                }
             }
         }
 
         private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
-            var (isValid, taskSymbol, genericTaskSymbol) = GetSpecialSymbols(context, receiver);
-
-            if (!isValid)
-            {
-                return;
-            }
+            var (taskSymbol, genericTaskSymbol) = GetSpecialSymbols(context);
 
             var targetClassWithAttributeList = new List<(ClassDeclarationSyntax, AttributeProperty)>();
 
@@ -72,21 +73,12 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static (bool isVaild, INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        private static (INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(GeneratorExecutionContext context)
         {
-            var (firstSyntax, _) = receiver.Targets.FirstOrDefault();
+            var taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+            var genericTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
 
-            if (firstSyntax is null)
-            {
-                return (false, null, null);
-            }
-
-            var semanticModel = context.Compilation.GetSemanticModel(firstSyntax.SyntaxTree);
-
-            var taskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-            var genericTaskSymbol = semanticModel.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
-
-            return (true, taskSymbol, genericTaskSymbol);
+            return (taskSymbol, genericTaskSymbol);
         }
 
         private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)

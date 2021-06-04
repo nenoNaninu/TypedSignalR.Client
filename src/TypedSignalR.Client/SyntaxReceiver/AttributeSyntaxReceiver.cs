@@ -19,7 +19,7 @@ namespace TypedSignalR.Client.SyntaxReceiver
                     .SelectMany(x => x.Attributes)
                     .FirstOrDefault(x => x.Name.ToString() is "HubClientBase" or "HubClientBaseAttribute");
 
-                if (attr != null)
+                if (attr is not null)
                 {
                     _targets.Add((classDeclarationSyntax, attr));
                 }

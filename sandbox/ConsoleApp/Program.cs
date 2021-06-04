@@ -103,7 +103,6 @@ namespace ConsoleApp
                 IClientContract2 receiver = new Receiver2();
                 var subscription2 = connection.Register<IClientContract2>(new Receiver2());
                 var subscription3 = connection.Register(receiver);
-                connection.InvokeAsync()
             }
 
             //{

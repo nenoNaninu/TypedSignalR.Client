@@ -12,6 +12,17 @@ namespace TypedSignalR.Client
         public bool IsGenericTypeReturn { get; }
         public string? ReturnTypeGenericArg { get; }
 
+        /// <param name="isGenericTypeReturn">if return type is Task<T>, must be true. if return type is Task, must be false. </param>
+        /// <param name="returnTypeGenericArg">e.g. if return type is Task<Datetime>, you must be input System.Datetime. if not generics, you must be input null. </param>
+        public MethodInfo(string methodName, string returnValueType, IReadOnlyList<(string typeName, string argName)> args, bool isGenericTypeReturn, string? returnTypeGenericArg)
+        {
+            MethodName = methodName;
+            ReturnValueType = returnValueType;
+            Args = args;
+            IsGenericTypeReturn = isGenericTypeReturn;
+            ReturnTypeGenericArg = returnTypeGenericArg;
+        }
+
         public string ArgParameterToString()
         {
             if (Args.Count == 0)
@@ -87,17 +98,6 @@ namespace TypedSignalR.Client
         public string ReturnTypeGenericArgToString()
         {
             return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
-        }
-
-        /// <param name="isGenericTypeReturn">if return type is Task<T>, must be true. if return type is Task, must be false. </param>
-        /// <param name="returnTypeGenericArg">e.g. if return type is Task<Datetime>, you must be input System.Datetime. if not generics, you must be input null. </param>
-        public MethodInfo(string methodName, string returnValueType, IReadOnlyList<(string typeName, string argName)> args, bool isGenericTypeReturn, string? returnTypeGenericArg)
-        {
-            MethodName = methodName;
-            ReturnValueType = returnValueType;
-            Args = args;
-            IsGenericTypeReturn = isGenericTypeReturn;
-            ReturnTypeGenericArg = returnTypeGenericArg;
         }
     }
 }

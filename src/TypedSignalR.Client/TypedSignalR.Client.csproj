@@ -51,26 +51,26 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>HubClientBaseAttributeTemplate.tt</DependentUpon>
         </Compile>
-        <Compile Update="T4\ExtensionMethodTemplate.cs">
-            <DependentUpon>ExtensionMethodTemplate.tt</DependentUpon>
+        <Compile Update="T4\ExtensionsTemplate.cs">
+            <DependentUpon>ExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
-        <Compile Update="T4\ExtensionMethodInternalTemplate.cs">
+        <Compile Update="T4\ExtensionsInternalTemplate.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>ExtensionMethodInternalTemplate.tt</DependentUpon>
+            <DependentUpon>ExtensionsInternalTemplate.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="T4\ExtensionMethodInternalTemplate.tt">
-            <LastGenOutput>ExtensionMethodInternalTemplate.cs</LastGenOutput>
+        <None Update="T4\ExtensionsInternalTemplate.tt">
+            <LastGenOutput>ExtensionsInternalTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
-        <None Update="T4\ExtensionMethodTemplate.tt">
+        <None Update="T4\ExtensionsTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>ExtensionMethodTemplate.cs</LastGenOutput>
+            <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
         </None>
         <None Update="T4\HubClientBaseAttributeTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>

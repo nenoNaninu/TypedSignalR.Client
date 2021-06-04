@@ -1,17 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TypedSignalR.Client.SyntaxReceiver
 {
-    class ExtensionMethodSyntaxReceiver : ISyntaxReceiver
+    public class ExtensionMethodSyntaxReceiver : ISyntaxReceiver
     {
         public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyMethods => _createHubProxyMethods;
         public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyWithMethods => _createHubProxyWithMethods;
         public IReadOnlyList<MemberAccessExpressionSyntax> RegisterMethods => _registerMethods;
 
         private readonly List<MemberAccessExpressionSyntax> _createHubProxyMethods = new();
-        private readonly List<MemberAccessExpressionSyntax> _createHubProxyWithMethods  = new();
+        private readonly List<MemberAccessExpressionSyntax> _createHubProxyWithMethods = new();
         private readonly List<MemberAccessExpressionSyntax> _registerMethods = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
@@ -20,20 +21,15 @@ namespace TypedSignalR.Client.SyntaxReceiver
             {
                 if (invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
                 {
-                    if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "CreateHubProxy")
+                    var list = memberAccessExpressionSyntax.Name.Identifier.ValueText switch
                     {
-                        _createHubProxyMethods.Add(memberAccessExpressionSyntax);
-                    }
+                        "CreateHubProxy" => _createHubProxyMethods,
+                        "CreateHubProxyWith" => _createHubProxyWithMethods,
+                        "Register" => _registerMethods,
+                        _ => null
+                    };
 
-                    if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "CreateHubProxyWith")
-                    {
-                        _createHubProxyWithMethods.Add(memberAccessExpressionSyntax);
-                    }
-
-                    if (memberAccessExpressionSyntax.Name.Identifier.ValueText == "Register")
-                    {
-                        _registerMethods.Add(memberAccessExpressionSyntax);
-                    }
+                    list?.Add(memberAccessExpressionSyntax);
                 }
             }
         }
