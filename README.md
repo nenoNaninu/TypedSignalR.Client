@@ -35,29 +35,34 @@ This TypedSignalR.Client (Source Generator) aims to generate a strongly typed Si
 
 # API
 There are two types of APIs.
-1. A pattern to generate a `HubProxy` from an interface and register a `Receiver` (callback).
-2. A pattern that can be written in a similar way to inheriting Hub <T> on the server-side. 
+1. Extension method pattern.
+   - Generate a `HubProxy` from an interface and register a `Receiver` (callback).
+2. A pattern to annotate an attribute. 
+   - Generate a base class that can be written in the same way as inheriting Hub <T> on the server side. 
 
-## Pattern of HubProxy and Receiver
-Three extension methods for HubConnection are defined as API. 
+## Extension method pattern
+There are three extension methods and one interface. 
 ```cs
-THub CreateHubProxy<THub>(this HubConnection source);
+static class Ex
+{
+    THub CreateHubProxy<THub>(this HubConnection source);
 
-IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
+    IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
 
-(THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
-```
-One interface 
-```cs
+    (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
+}
+
+// An interface for observing SigalR events.
 interface IHubConnectionObserver
 {
     Task OnClosed(Exception e);
     Task OnReconnected(string connectionId);
     Task OnReconnecting(Exception e);
 }
+
 ```
 
-## Pattern similar to Hub\<T\> on the server-side
+## A pattern to annotate an attribute
 Only one Attribute is provided.
 ```cs
 public class HubClientBaseAttribute : Attribute
@@ -90,7 +95,12 @@ public interface IHubContract
     Task SomeHubMethod2();
 }
 
-class Receiver : IClientContract
+class Receiver1 : IClientContract
+{
+    // impl
+}
+
+class Receiver2 : IClientContract, IHubConnectionObserver
 {
     // impl
 }
@@ -121,15 +131,20 @@ public class SomeHub : Hub<IClientContract>, IHubContract
 ```
 
 
-## Pattern of HubProxy and Receiver
+## Extension method pattern
 It's very easy to use. 
 ```cs
 HubConnection connection = ...;
 
 var hub = connection.CreateHubProxy<IHubContract>();
-var subscription = connection.Register<IClientContract>(new Receiver());
+var subscription1 = connection.Register<IClientContract>(new Receiver1());
+
+// When an instance of a class that implements IHubConnectionObserver is registered (Receiver2 in this case), 
+//the method defined in IHubConnectionObserver is automatically registered regardless of the type argument. 
+var subscription2 = connection.Register<IClientContract>(new Receiver2());
+
 // or
-var (hub, subscription) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+var (hub2, subscription3) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
 // Invoke hub methods
 hub.SomeHubMethod1("user", "message");
@@ -138,7 +153,7 @@ hub.SomeHubMethod1("user", "message");
 subscription.Dispose();
 ```
 
-## Pattern similar to Hub\<T\> on the server-side
+## A pattern to annotate an attribute
 Define a base class that annotates HubClientBaseAttribute. 
 Then just define a class that inherits from that base class. 
 
