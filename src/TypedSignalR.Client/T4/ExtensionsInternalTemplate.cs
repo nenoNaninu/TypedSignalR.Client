@@ -45,12 +45,12 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
-            this.Write(")\r\n            {\r\n                return _connection.InvokeAsync");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeGenericArgToString()));
+            this.Write(")\r\n            {\r\n                return _connection.InvokeCoreAsync");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnGenericTypeArgToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write(")");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNameParametersToString()));
+            this.Write("),");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNamesToStringForInvokeCoreAsync()));
             this.Write(");\r\n            }\r\n");
  } 
             this.Write("        }\r\n\r\n");
@@ -66,7 +66,7 @@ namespace TypedSignalR.Client.T4
             this.Write(");\r\n");
  foreach(var method in receiver.ClientMethods) { 
             this.Write("            compositeDisposable.Add(connection.On");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypeParametersToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.TypeArgsToString()));
             this.Write("(nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("),receiver.");

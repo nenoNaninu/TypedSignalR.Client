@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using TypedSignalR.Client;
 
@@ -24,6 +25,7 @@ namespace Example
     {
         Task<string> SomeHubMethod1(string user, string message);
         Task SomeHubMethod2();
+        Task<string> SomeHubMethod3(string user, string message, CancellationToken cancellationToken);
     }
 
     class Receiver : IClientContract, IHubConnectionObserver

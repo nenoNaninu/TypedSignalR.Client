@@ -37,39 +37,46 @@ namespace TypedSignalR.Client
 
             var sb = new StringBuilder();
 
-            for (int i = 0; i < Args.Count - 1; i++)
+            sb.Append(Args[0].typeName);
+            sb.Append(' ');
+            sb.Append(Args[0].argName);
+
+            for (int i = 1; i < Args.Count; i++)
             {
+                sb.Append(',');
                 sb.Append(Args[i].typeName);
                 sb.Append(' ');
                 sb.Append(Args[i].argName);
-                sb.Append(',');
             }
 
-            sb.Append(Args[Args.Count - 1].typeName);
-            sb.Append(' ');
-            sb.Append(Args[Args.Count - 1].argName);
             return sb.ToString();
         }
 
-        public string ArgNameParametersToString()
+        public string ArgNamesToStringForInvokeCoreAsync()
         {
             if (Args.Count == 0)
             {
-                return string.Empty;
+                return "System.Array.Empty<object>()";
             }
 
             var sb = new StringBuilder();
 
-            foreach (var arg in Args)
+            sb.Append("new object[]{");
+            sb.Append(Args[0].argName);
+
+
+            for (int i = 1; i < Args.Count; i++)
             {
                 sb.Append(',');
-                sb.Append(arg.argName);
+                sb.Append(Args[i].argName);
             }
+
+            sb.Append("}");
 
             return sb.ToString();
         }
 
-        public string ArgTypeParametersToString()
+        public string TypeArgsToString()
         {
             if (Args.Count == 0)
             {
@@ -82,20 +89,21 @@ namespace TypedSignalR.Client
             }
 
             var sb = new StringBuilder();
-            sb.Append('<');
 
-            for (int i = 0; i < Args.Count - 1; i++)
+            sb.Append('<');
+            sb.Append(Args[0].typeName);
+
+            for (int i = 1; i < Args.Count; i++)
             {
-                sb.Append(Args[i].typeName);
                 sb.Append(',');
+                sb.Append(Args[i].typeName);
             }
 
-            sb.Append(Args[Args.Count - 1].typeName);
             sb.Append('>');
             return sb.ToString();
         }
 
-        public string ReturnTypeGenericArgToString()
+        public string ReturnGenericTypeArgToString()
         {
             return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
         }

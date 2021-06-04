@@ -167,7 +167,7 @@ partial class ClientBase
 }
 
 // inherit base class
-// If you type "ctrl + ." or "override", visual studio (or rider) will generate the function for you. 
+// If you type "ctrl + ." or "override", visual studio will generate the function for you. 
 class HubClient : ClientBase
 {
     // HubConnection is required for the base class constructor. 

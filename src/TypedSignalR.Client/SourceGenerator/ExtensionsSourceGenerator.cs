@@ -55,6 +55,20 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
+        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        {
+            var invokerList = new List<InvokerTypeInfo>();
+            var receiverList = new List<ReceiverTypeInfo>();
+
+            var specialSymbols = GetSpecialSymbols(context);
+
+            ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, in specialSymbols, invokerList);
+            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, in specialSymbols, invokerList, receiverList);
+            ExtractFromRegisterMethods(context, receiver.RegisterMethods, in specialSymbols, receiverList);
+
+            return (invokerList, receiverList);
+        }
+
         private static void ExtractFromCreateHubProxyMethods(
             GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyMethods,
@@ -277,20 +291,6 @@ namespace TypedSignalR.Client.SourceGenerator
                     }
                 }
             }
-        }
-
-        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
-        {
-            var invokerList = new List<InvokerTypeInfo>();
-            var receiverList = new List<ReceiverTypeInfo>();
-
-            var specialSymbols = GetSpecialSymbols(context);
-
-            ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, in specialSymbols, invokerList);
-            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, in specialSymbols, invokerList, receiverList);
-            ExtractFromRegisterMethods(context, receiver.RegisterMethods, in specialSymbols, receiverList);
-
-            return (invokerList, receiverList);
         }
 
         private readonly struct SpecialSymbols

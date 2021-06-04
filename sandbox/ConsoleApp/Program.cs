@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using TypedSignalR.Client;
 using SignalR.Shared;
 using System.Threading.Tasks;
@@ -93,6 +94,12 @@ namespace ConsoleApp
                 IClientContract receiver = new Receiver();
                 var subscription2 = connection.Register<IClientContract>(new Receiver());
                 var subscription3 = connection.Register(receiver);
+
+                hub1.SendMessage("a", "a");
+                connection.InvokeCoreAsync<string>("a", new object[] { "a", 1 });
+                connection.InvokeCoreAsync("a", new object[] { "a", 1 });
+
+                connection.InvokeAsync<string>("a");
             }
 
             {
@@ -104,6 +111,7 @@ namespace ConsoleApp
                 var subscription2 = connection.Register<IClientContract2>(new Receiver2());
                 var subscription3 = connection.Register(receiver);
             }
+
 
             //{
             //    // error pattern!

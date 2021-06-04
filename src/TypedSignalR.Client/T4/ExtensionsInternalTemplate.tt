@@ -27,7 +27,7 @@ namespace TypedSignalR.Client
 
             public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
             {
-                return _connection.InvokeAsync<#= method.ReturnTypeGenericArgToString() #>(nameof(<#= method.MethodName #>)<#= method.ArgNameParametersToString() #>);
+                return _connection.InvokeCoreAsync<#= method.ReturnGenericTypeArgToString() #>(nameof(<#= method.MethodName #>),<#= method.ArgNamesToStringForInvokeCoreAsync() #>);
             }
 <# } #>
         }
@@ -38,7 +38,7 @@ namespace TypedSignalR.Client
         {
             var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count + 1 #>);
 <# foreach(var method in receiver.ClientMethods) { #>
-            compositeDisposable.Add(connection.On<#= method.ArgTypeParametersToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
+            compositeDisposable.Add(connection.On<#= method.TypeArgsToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
 <# } #>
             return compositeDisposable;
         }

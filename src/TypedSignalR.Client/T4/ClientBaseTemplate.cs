@@ -46,12 +46,12 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
-            this.Write(")\r\n            {\r\n                return _connection.InvokeAsync");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeGenericArgToString()));
+            this.Write(")\r\n            {\r\n                return _connection.InvokeCoreAsync");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnGenericTypeArgToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write(")");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNameParametersToString()));
+            this.Write("),");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNamesToStringForInvokeCoreAsync()));
             this.Write(");\r\n            }\r\n");
  } 
             this.Write("        } // class HubInvoker\r\n\r\n        protected readonly System.Collections.Ge" +
@@ -74,7 +74,7 @@ namespace TypedSignalR.Client.T4
 ");
  foreach(var method in ClientMethods) { 
             this.Write("            _disposableList.Add(Connection.On");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgTypeParametersToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.TypeArgsToString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("),");
