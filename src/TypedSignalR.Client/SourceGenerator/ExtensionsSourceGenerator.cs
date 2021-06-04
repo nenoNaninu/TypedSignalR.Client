@@ -119,7 +119,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
-                            var invoker = new InvokerTypeInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
+                            var invoker = new InvokerTypeInfo(hubType, hubMethods);
 
                             invokerList.Add(invoker);
                         }
@@ -183,7 +183,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
 
-                            var invoker = new InvokerTypeInfo(hubType, hubType.Name, hubType.ToDisplayString(), hubMethods);
+                            var invoker = new InvokerTypeInfo(hubType, hubMethods);
 
                             invokerList.Add(invoker);
                         }
@@ -212,7 +212,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
+                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
 
                             receiverList.Add(receiverInfo);
                         }
@@ -280,7 +280,7 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
 
-                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverType.Name, receiverType.ToDisplayString(), receiverMethods);
+                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
 
                             receiverList.Add(receiverInfo);
                         }

@@ -2,6 +2,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SignalR.Shared;
 using TypedSignalR.Client;
 
 namespace Example
@@ -61,6 +62,19 @@ namespace Example
         }
     }
 
+    class Re2 : SignalR.Shared.IClientContract
+    {
+        public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SomeClientMethod()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [HubClientBase(typeof(IHubContract), typeof(IClientContract))]
     partial class Base
     {
@@ -93,6 +107,8 @@ namespace Example
             // var hub = connection.CreateHubProxy<IErrorProxy>();
 
             connection.Register<IClientContract>(new Receiver());
+            connection.Register<SignalR.Shared.IClientContract>(new Re2());
+
 
             //hub.Hoge();
             //{

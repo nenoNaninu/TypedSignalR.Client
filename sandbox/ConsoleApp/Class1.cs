@@ -17,19 +17,19 @@ namespace ConsoleApp
         public string StatusMessage { get; set; }
     }
 
-    public interface IClientContract2
+    public interface IClientContract
     {
         Task ReceiveMessage(string user, string message, UserDefineClass2 userDefine);
         Task SomeClientMethod();
     }
 
-    public interface IHubContract2
+    public interface IHubContract
     {
         Task<Status2> SendMessage(string user, string message);
         Task SomeHubMethod();
     }
 
-    class Receiver2 : IClientContract2
+    class Receiver2 : IClientContract
     {
         public Task ReceiveMessage(string user, string message, UserDefineClass2 userDefine)
         {

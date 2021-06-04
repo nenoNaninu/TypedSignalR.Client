@@ -9,13 +9,15 @@ namespace TypedSignalR.Client
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }
         public string InterfaceFullName { get; }
+        public string CollisionFreeName { get; }
         public IReadOnlyList<MethodInfo> HubMethods { get; }
 
-        public InvokerTypeInfo(ITypeSymbol typeSymbol, string interfaceName, string interfaceFullName, IReadOnlyList<MethodInfo> hubMethods)
+        public InvokerTypeInfo(ITypeSymbol typeSymbol, IReadOnlyList<MethodInfo> hubMethods)
         {
             TypeSymbol = typeSymbol;
-            InterfaceName = interfaceName;
-            InterfaceFullName = interfaceFullName;
+            InterfaceName = typeSymbol.Name;
+            InterfaceFullName = typeSymbol.ToDisplayString();
+            CollisionFreeName = InterfaceFullName.Replace(".", null);
             HubMethods = hubMethods;
         }
 
@@ -30,7 +32,7 @@ namespace TypedSignalR.Client
 
         public override bool Equals(object other)
         {
-            if(other is InvokerTypeInfo invokerInfo)
+            if (other is InvokerTypeInfo invokerInfo)
             {
                 return this.Equals(invokerInfo);
             }

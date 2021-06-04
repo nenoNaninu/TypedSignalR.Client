@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ConsoleApp
 {
-    [HubClientBase(typeof(IHubContract), typeof(IClientContract))]
+    [HubClientBase(typeof(SignalR.Shared.IHubContract), typeof(SignalR.Shared.IClientContract))]
     partial class ClientBase
     {
     }
@@ -29,7 +29,7 @@ namespace ConsoleApp
         }
     }
 
-    class Receiver : IClientContract
+    class Receiver : SignalR.Shared.IClientContract
     {
         public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
         {
@@ -87,12 +87,12 @@ namespace ConsoleApp
 
             var id = connection.ConnectionId;
             {
-                var hub1 = connection.CreateHubProxy<IHubContract>();
-                var hub2 = connection.CreateHubProxy<IHubContract>();
-                var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+                var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
+                var hub2 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
+                var (hub3, subscription1) = connection.CreateHubProxyWith<SignalR.Shared.IHubContract, SignalR.Shared.IClientContract>(new Receiver());
 
-                IClientContract receiver = new Receiver();
-                var subscription2 = connection.Register<IClientContract>(new Receiver());
+                SignalR.Shared.IClientContract receiver = new Receiver();
+                var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
                 var subscription3 = connection.Register(receiver);
 
                 hub1.SendMessage("a", "a");
@@ -103,12 +103,12 @@ namespace ConsoleApp
             }
 
             {
-                var hub1 = connection.CreateHubProxy<IHubContract2>();
-                var hub2 = connection.CreateHubProxy<IHubContract2>();
-                var (hub3, subscription1) = connection.CreateHubProxyWith<IHubContract2, IClientContract2>(new Receiver2());
+                var hub1 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
+                var hub2 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
+                var (hub3, subscription1) = connection.CreateHubProxyWith<ConsoleApp.IHubContract, ConsoleApp.IClientContract>(new Receiver2());
 
-                IClientContract2 receiver = new Receiver2();
-                var subscription2 = connection.Register<IClientContract2>(new Receiver2());
+                ConsoleApp.IClientContract receiver = new Receiver2();
+                var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
                 var subscription3 = connection.Register(receiver);
             }
 

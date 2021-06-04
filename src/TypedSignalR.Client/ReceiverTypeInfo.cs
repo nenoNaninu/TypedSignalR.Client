@@ -9,13 +9,15 @@ namespace TypedSignalR.Client
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }
         public string InterfaceFullName { get; }
+        public string CollisionFreeName { get; }
         public IReadOnlyList<MethodInfo> ClientMethods { get; }
 
-        public ReceiverTypeInfo(ITypeSymbol typeSymbol, string interfaceName, string interfaceFullName, IReadOnlyList<MethodInfo> clientMethods)
+        public ReceiverTypeInfo(ITypeSymbol typeSymbol, IReadOnlyList<MethodInfo> clientMethods)
         {
             TypeSymbol = typeSymbol;
-            InterfaceName = interfaceName;
-            InterfaceFullName = interfaceFullName;
+            InterfaceName = typeSymbol.Name;
+            InterfaceFullName = typeSymbol.ToDisplayString();
+            CollisionFreeName = InterfaceFullName.Replace(".", null);
             ClientMethods = clientMethods;
         }
 

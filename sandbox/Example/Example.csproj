@@ -11,6 +11,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\TypedSignalR.Client\TypedSignalR.Client.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\SignalR.Shared\SignalR.Shared.csproj" />
     </ItemGroup>
 
 </Project>
