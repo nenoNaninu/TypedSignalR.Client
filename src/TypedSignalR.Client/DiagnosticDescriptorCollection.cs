@@ -15,47 +15,29 @@ namespace TypedSignalR.Client
 
         public static readonly DiagnosticDescriptor InterfaceDefineRule = new(
             id: "TypedSiRCA002",
-            title: "TypedSignalR.Client.Analyzer.002: Only define methods in the interface used for HubProxy/Receiver/HubClientBase",
-            messageFormat: "[Only define methods in the interface used for HubProxy/Receiver/HubClientBase] {0} is not method",
+            title: "TypedSignalR.Client.Analyzer.002: Only define methods in the interface used for HubProxy/Receiver",
+            messageFormat: "[Only define methods in the interface used for HubProxy/Receiver] {0} is not method",
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Only define methods in the interface used for HubProxy/Receiver/HubClientBase.");
+            description: "Only define methods in the interface used for HubProxy/Receiver.");
 
         public static readonly DiagnosticDescriptor HubMethodReturnValueTypeRule = new(
             id: "TypedSiRAC003",
-            title: "TypedSignalR.Client.Analyzer.003: The return type of the method in the interface used for Hub/HubProxy must be Task or Task<T>",
-            messageFormat: "[The return type of the method in the interface used for Hub/HubProxy must be Task or Task<T>] Return type of {0} is not Task or Task<T>",
+            title: "TypedSignalR.Client.Analyzer.003: The return type of the method in the interface used for HubProxy must be Task or Task<T>",
+            messageFormat: "[The return type of the method in the interface used for HubProxy must be Task or Task<T>] Return type of {0} is not Task or Task<T>",
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "The return type of the method in the interface used for Hub/HubProxy must be Task or Task<T>.");
+            description: "The return type of the method in the interface used for HubProxy must be Task or Task<T>.");
 
         public static readonly DiagnosticDescriptor ReceiverMethodReturnValueTypeRule = new(
             id: "TypedSiRCA004",
-            title: "TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Client/Receiver must be Task",
-            messageFormat: "[The return type of the method in the interface used for Client/Receiver must be Task] Return type of {0} is not Task",
+            title: "TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Receiver must be Task",
+            messageFormat: "[The return type of the method in the interface used for Receiver must be Task] Return type of {0} is not Task",
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "The return type of the method in the interface used for Client/Receiver must be Task.");
-
-        public static readonly DiagnosticDescriptor AttributeArgumentRule = new(
-            id: "TypedSiRCA005",
-            title: "TypedSignalR.Client.Analyzer.005: Argument of HubClientBaseAttribute must be an interface",
-            messageFormat: "[Argument of HubClientBaseAttribute must be typeof(interface)] {0} is not interface",
-            category: "Usage",
-            defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true,
-            description: "Argument of HubClientBaseAttribute must be typeof(interface).");
-
-        public static readonly DiagnosticDescriptor AttributeAnnotationTargetTypeRule = new(
-            id: "TypedSiRCA006",
-            title: "TypedSignalR.Client.Analyzer.006: The class that annotates HubClientBaseAttribute must be a partial class",
-            messageFormat: "[The class that annotates HubClientBaseAttribute must be a partial class] {0} is not partial class",
-            category: "Usage",
-            defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: true,
-            description: " The class that annotates HubClientBaseAttribute must be a partial class.");
+            description: "The return type of the method in the interface used for Receiver must be Task.");
     }
 }

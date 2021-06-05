@@ -41,16 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="T4\ClientBaseTemplate.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>ClientBaseTemplate.tt</DependentUpon>
-        </Compile>
-        <Compile Update="T4\HubClientBaseAttributeTemplate.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>HubClientBaseAttributeTemplate.tt</DependentUpon>
-        </Compile>
         <Compile Update="T4\ExtensionsTemplate.cs">
             <DependentUpon>ExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
@@ -71,14 +61,6 @@
         <None Update="T4\ExtensionsTemplate.tt">
             <Generator>TextTemplatingFilePreprocessor</Generator>
             <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
-        </None>
-        <None Update="T4\HubClientBaseAttributeTemplate.tt">
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>HubClientBaseAttributeTemplate.cs</LastGenOutput>
-        </None>
-        <None Update="T4\ClientBaseTemplate.tt">
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>ClientBaseTemplate.cs</LastGenOutput>
         </None>
     </ItemGroup>
 

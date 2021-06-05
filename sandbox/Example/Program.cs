@@ -75,12 +75,6 @@ namespace Example
         }
     }
 
-    [HubClientBase(typeof(IHubContract), typeof(IClientContract))]
-    partial class Base
-    {
-
-    }
-
     interface IErrorProxy
     {
         Task<string> Hoge();

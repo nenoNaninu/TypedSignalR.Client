@@ -7,28 +7,6 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 namespace ConsoleApp
 {
-    [HubClientBase(typeof(SignalR.Shared.IHubContract), typeof(SignalR.Shared.IClientContract))]
-    partial class ClientBase
-    {
-    }
-
-    class Clinet : ClientBase
-    {
-        public Clinet(HubConnection connection, string arg) : base(connection)
-        {
-        }
-
-        public override Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task SomeClientMethod()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     class Receiver : SignalR.Shared.IClientContract
     {
         public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
@@ -37,6 +15,19 @@ namespace ConsoleApp
         }
 
         public Task SomeClientMethod()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    interface IErrorReceiver
+    {
+        Task<string> Hoge(); // must Task. not Task<T>
+    }
+
+    class ErrorReceiver : IErrorReceiver
+    {
+        public Task<string> Hoge()
         {
             throw new NotImplementedException();
         }
@@ -54,29 +45,6 @@ namespace ConsoleApp
         int Id(); // must Task or Task<T>
     }
 
-    interface IErrorReceiver
-    {
-        Task<string> Hoge(); // must Task. not Task<T>
-    }
-
-    class ErrorReceiver : IErrorReceiver
-    {
-        public Task<string> Hoge()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    //[HubClientBase(typeof(IErrorProxy), typeof(IClientContract))] // error
-    //partial class ClientErrorBase
-    //{
-    //}
-
-    //[HubClientBase(typeof(IErrorProxy), typeof(Clinet))] // error
-    //partial class ClientErrorBase1
-    //{
-    //}
-
     class Program
     {
         static void Main(string[] args)
@@ -85,14 +53,19 @@ namespace ConsoleApp
                 .WithUrl("https://~~~")
                 .Build();
 
+            //connection.CreateHubProxy<IErrorProxy>();
+            //connection.CreateHubProxy<IErrorProxy2>();
+
+
             var id = connection.ConnectionId;
             {
                 var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
                 var hub2 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
                 var (hub3, subscription1) = connection.CreateHubProxyWith<SignalR.Shared.IHubContract, SignalR.Shared.IClientContract>(new Receiver());
 
-                SignalR.Shared.IClientContract receiver = new Receiver();
                 var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
+                
+                SignalR.Shared.IClientContract receiver = new Receiver();
                 var subscription3 = connection.Register(receiver);
 
                 hub1.SendMessage("a", "a");
