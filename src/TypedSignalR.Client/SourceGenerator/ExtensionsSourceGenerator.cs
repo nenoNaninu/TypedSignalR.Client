@@ -44,7 +44,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static SpecialSymbols GetSpecialSymbols(in GeneratorExecutionContext context)
+        private static SpecialSymbols GetSpecialSymbols(GeneratorExecutionContext context)
         {
             var hubConnectionSymbol = context.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
             var taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
@@ -55,7 +55,7 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
-        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(in GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
         {
             var invokerList = new List<InvokerTypeInfo>();
             var receiverList = new List<ReceiverTypeInfo>();
@@ -70,7 +70,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromCreateHubProxyMethods(
-            in GeneratorExecutionContext context,
+            GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyMethods,
             in SpecialSymbols specialSymbols,
             List<InvokerTypeInfo> invokerList)

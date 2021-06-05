@@ -33,7 +33,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static void ExecuteCore(in GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
             var (taskSymbol, genericTaskSymbol) = GetSpecialSymbols(context);
 
@@ -84,7 +84,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static (INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(in GeneratorExecutionContext context)
+        private static (INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(GeneratorExecutionContext context)
         {
             var taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var genericTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
@@ -92,7 +92,7 @@ namespace TypedSignalR.Client.SourceGenerator
             return (taskSymbol, genericTaskSymbol);
         }
 
-        private static (bool isValid, string hintName, string source) GenerateSource(in GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)
+        private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)
         {
             INamedTypeSymbol? typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
 
@@ -127,7 +127,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static AttributeProperty ExtractAttributeProperty(in GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
+        private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
         {
             bool isValid = true;
             var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
