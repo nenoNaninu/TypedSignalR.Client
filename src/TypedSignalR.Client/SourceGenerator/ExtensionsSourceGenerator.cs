@@ -44,7 +44,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static SpecialSymbols GetSpecialSymbols(GeneratorExecutionContext context)
+        private static SpecialSymbols GetSpecialSymbols(in GeneratorExecutionContext context)
         {
             var hubConnectionSymbol = context.Compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
             var taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
@@ -55,7 +55,7 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
-        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
+        private static (IReadOnlyList<InvokerTypeInfo> invokerList, IReadOnlyList<ReceiverTypeInfo> receiverList) ExtractTargetTypes(in GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
         {
             var invokerList = new List<InvokerTypeInfo>();
             var receiverList = new List<ReceiverTypeInfo>();
@@ -70,7 +70,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromCreateHubProxyMethods(
-            GeneratorExecutionContext context,
+            in GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyMethods,
             in SpecialSymbols specialSymbols,
             List<InvokerTypeInfo> invokerList)
@@ -133,7 +133,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromCreateHubProxyWithMethods(
-            GeneratorExecutionContext context,
+            in GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyWithMethods,
             in SpecialSymbols specialSymbols,
             List<InvokerTypeInfo> invokerList,
@@ -226,7 +226,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromRegisterMethods(
-            GeneratorExecutionContext context,
+            in GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> registerMethods,
             in SpecialSymbols specialSymbols,
             List<ReceiverTypeInfo> receiverList)

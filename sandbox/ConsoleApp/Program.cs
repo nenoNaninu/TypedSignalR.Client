@@ -96,10 +96,6 @@ namespace ConsoleApp
                 var subscription3 = connection.Register(receiver);
 
                 hub1.SendMessage("a", "a");
-                connection.InvokeCoreAsync<string>("a", new object[] { "a", 1 });
-                connection.InvokeCoreAsync("a", new object[] { "a", 1 });
-
-                connection.InvokeAsync<string>("a");
             }
 
             {

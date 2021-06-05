@@ -33,7 +33,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static void ExecuteCore(GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
+        private static void ExecuteCore(in GeneratorExecutionContext context, AttributeSyntaxReceiver receiver)
         {
             var (taskSymbol, genericTaskSymbol) = GetSpecialSymbols(context);
 
@@ -41,11 +41,22 @@ namespace TypedSignalR.Client.SourceGenerator
 
             foreach (var (targetType, attributeSyntax) in receiver.Targets)
             {
+
+                if (!targetType.Modifiers.Any("partial"))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorCollection.AttributeAnnotationTargetTypeRule,
+                        targetType.GetLocation(),
+                        targetType.Identifier));
+
+                    continue;
+                }
+
                 var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);
 
                 var hubClientBaseAttributeSymbol = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.HubClientBaseAttribute");
                 var attributeSymbol = semanticModel.GetTypeInfo(attributeSyntax).ConvertedType;
-                
+
                 if (hubClientBaseAttributeSymbol!.Equals(attributeSymbol, SymbolEqualityComparer.Default))
                 {
                     try
@@ -63,7 +74,7 @@ namespace TypedSignalR.Client.SourceGenerator
             foreach (var (targetType, attributeProperty) in targetClassWithAttributeList)
             {
                 var (success, hintName, source) = GenerateSource(context, targetType, attributeProperty, taskSymbol!, genericTaskSymbol!);
-
+                
                 if (success)
                 {
                     context.AddSource(hintName, source);
@@ -73,7 +84,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static (INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(GeneratorExecutionContext context)
+        private static (INamedTypeSymbol? task, INamedTypeSymbol? genericTask) GetSpecialSymbols(in GeneratorExecutionContext context)
         {
             var taskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var genericTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
@@ -81,7 +92,7 @@ namespace TypedSignalR.Client.SourceGenerator
             return (taskSymbol, genericTaskSymbol);
         }
 
-        private static (bool isValid, string hintName, string source) GenerateSource(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)
+        private static (bool isValid, string hintName, string source) GenerateSource(in GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeProperty attributeProperty, INamedTypeSymbol taskTypeSymbol, INamedTypeSymbol genericTaskTypeSymbol)
         {
             INamedTypeSymbol? typeSymbol = context.Compilation.GetSemanticModel(targetType.SyntaxTree).GetDeclaredSymbol(targetType);
 
@@ -116,7 +127,7 @@ namespace TypedSignalR.Client.SourceGenerator
             }
         }
 
-        private static AttributeProperty ExtractAttributeProperty(GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
+        private static AttributeProperty ExtractAttributeProperty(in GeneratorExecutionContext context, ClassDeclarationSyntax targetType, AttributeSyntax attributeSyntax)
         {
             bool isValid = true;
             var semanticModel = context.Compilation.GetSemanticModel(targetType.SyntaxTree);

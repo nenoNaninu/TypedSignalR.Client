@@ -12,3 +12,4 @@ TypedSiRCA002 |  Usage   |  Error   | TypedSignalR.Client.Analyzer.002: Only def
 TypedSiRCA003 |  Usage   |  Error   | TypedSignalR.Client.Analyzer.003: The return type of the method in the interface used for Hub/HubProxy must be Task or Task<T>.
 TypedSiRCA004 |  Usage   |  Error   | TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Receiver/Client-side must be Task.
 TypedSiRCA005 |  Usage   |  Error   | TypedSignalR.Client.Analyzer.005: Argument of HubClientBaseAttribute must be an interface.
+TypedSiRCA006 |  Usage   |  Error   | TypedSignalR.Client.Analyzer.006: The class that annotates HubClientBaseAttribute must be a partial class.

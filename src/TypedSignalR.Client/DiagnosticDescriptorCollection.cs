@@ -48,5 +48,14 @@ namespace TypedSignalR.Client
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
             description: "Argument of HubClientBaseAttribute must be typeof(interface).");
+
+        public static readonly DiagnosticDescriptor AttributeAnnotationTargetTypeRule = new(
+            id: "TypedSiRCA006",
+            title: "TypedSignalR.Client.Analyzer.006: The class that annotates HubClientBaseAttribute must be a partial class",
+            messageFormat: "[The class that annotates HubClientBaseAttribute must be a partial class] {0} is not partial class",
+            category: "Usage",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            description: " The class that annotates HubClientBaseAttribute must be a partial class.");
     }
 }

@@ -189,5 +189,18 @@ namespace TypedSignalR.Client
 
             return false;
         }
+
+        public static bool Any(this SyntaxTokenList source, string modifier)
+        {
+            foreach (var it in source)
+            {
+                if (it.ValueText == modifier)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
