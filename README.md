@@ -34,14 +34,8 @@ Therefore, if you change the code on the server-side, the modification on the cl
 This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
 
 # API
-There are two types of APIs.
-1. Extension method pattern.
-   - Generate a `HubProxy` from an interface and register a `Receiver` (callback).
-2. A pattern to annotate an attribute. 
-   - Generate a base class that can be written in the same way as inheriting Hub <T> on the server side. 
+This Source Generator provides three extension methods and one interface. 
 
-## Extension method pattern
-There are three extension methods and one interface. 
 ```cs
 static class Ex
 {
@@ -59,16 +53,15 @@ interface IHubConnectionObserver
     Task OnReconnected(string connectionId);
     Task OnReconnecting(Exception e);
 }
-
 ```
 
-## A pattern to annotate an attribute
-Only one Attribute is provided.
+Use it as follows. 
+
 ```cs
-public class HubClientBaseAttribute : Attribute
-{
-    public HubClientBaseAttribute(Type hub, Type client){ }
-}
+HubConnection connection = ...;
+
+var hub = connection.CreateHubProxy<IHub>();
+var subscription = connection.Register<IReceiver>(new Receiver);
 ```
 
 # Usage
@@ -105,33 +98,8 @@ class Receiver2 : IClientContract, IHubConnectionObserver
     // impl
 }
 ```
-I recommend that these interfaces be shared between the client and server sides, for example, by project references.
 
-```
-server.csproj => shared.csproj <= client.csproj
-```
-
-By the way, using these definitions, you can write as follows on the server side (ASP.NET Core). 
-```cs
-using Microsoft.AspNetCore.SignalR;
-
-public class SomeHub : Hub<IClientContract>, IHubContract
-{
-    public async Task<string> SomeHubMethod1(string user, string message)
-    {
-        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
-        return "OK!";
-    }
-
-    public async Task SomeHubMethod2()
-    {
-        await this.Clients.Caller.SomeClientMethod2();
-    }
-}
-```
-
-
-## Extension method pattern
+## Client
 It's very easy to use. 
 ```cs
 HubConnection connection = ...;
@@ -153,154 +121,49 @@ hub.SomeHubMethod1("user", "message");
 subscription.Dispose();
 ```
 
-## A pattern to annotate an attribute
-Define a base class that annotates HubClientBaseAttribute. 
-Then just define a class that inherits from that base class. 
-
-The HubClientBaseAttribute constructor takes the type of the interface. 
+## Server
+By the way, using these definitions, you can write as follows on the server side (ASP.NET Core). 
+`TypedSignalR.Client` is not nessesary.
 
 ```cs
-// The base class must be a partial class. 
-[HubClientBase(typeof(IHubContract), typeof(IClientContract))]
-partial class ClientBase
+using Microsoft.AspNetCore.SignalR;
+
+public class SomeHub : Hub<IClientContract>, IHubContract
 {
-}
-
-// inherit base class
-// If you type "ctrl + ." or "override", visual studio will generate the function for you. 
-class HubClient : ClientBase
-{
-    // HubConnection is required for the base class constructor. 
-    public HubClient(HubConnection connection) : base(connection)
+    public async Task<string> SomeHubMethod1(string user, string message)
     {
+        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
+        return "OK!";
     }
 
-    // override and impl!
-    // These methods are automatically registered for connection. 
-    public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
+    public async Task SomeHubMethod2()
     {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // override and impl!
-    public override Task SomeClientMethod2()
-    {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // SignalR events can also be implemented without callbacks. 
-    // OnClosed, OnReconnected, OnReconnecting are supported.
-    public override Task OnClosed(Exception e)
-    {
-        Console.WriteLine($"[On Closed!]");
-        return Task.CompletedTask;
+        await this.Clients.Caller.SomeClientMethod2();
     }
 }
 ```
+## Recommend
+I recommend that these interfaces be shared between the client and server sides, for example, by project references.
 
-Usage is simple. 
-
-```cs
-HubConnection connection = ...;
-
-var client = new HubClient(connection);
-
-await client.Connection.StartAsync();
-
-// Invoke hub methods
-var response = await client.Hub.SomeHubMethod1("user", "message");
-Console.WriteLine(response);
-
-// client-side function is invoke from hub(server).
-
-await client.Connection.StopAsync();
-await client.DisposeAsync();
+```
+server.csproj => shared.csproj <= client.csproj
 ```
 
 # Compile-time error support
 This source generator has some restrictions, including those that come from the server side. 
 
 - Type argument of `CreateHubProxy/CreateHubProxyWith/Register` must be an interface.
-- Only define methods in the interface used for `HubProxy/Receiver/HubClientBase`. 
+- Only define methods in the interface used for `HubProxy/Receiver`. 
   - Properties should not be defined. 
-- The return type of the method in the interface used for `Hub/HubProxy` must be `Task` or `Task<T>`.
-- The return type of the method in the interface used for `Receiver/Client-side` must be `Task`.
-- Argument of `HubClientBaseAttribute` must be interface type.
+- The return type of the method in the interface used for `HubProxy` must be `Task` or `Task<T>`.
+- The return type of the method in the interface used for `Receiver` must be `Task`.
 
 It is very difficult for humans to properly comply with these restrictions. Therefore, it is designed so that the compiler (Roslyn) looks for the part where the constraint is not observed at compile time and reports a detailed error. Therefore, no run-time error occurs. 
 
 ![compile-time-error](img/compile-time-error.png)
 
 # What kind of source code will be generated?
-By annotating the `[HubClientBase(typeof(IHubContract), typeof(IClientContract))]` Attribute, the following code will be generated (simplified here). 
-
 ```cs
-partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, IAsyncDisposable
-{
-    private class HubInvoker : IHubContract
-    {
-        private readonly HubConnection _connection;
-
-        public HubInvoker(HubConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public Task<string> SomeHubMethod1(string user,string message)
-        {
-            return _connection.InvokeAsync<string>(nameof(SomeHubMethod1), user, message);
-        }
-
-        public Task SomeHubMethod2()
-        {
-            return _connection.InvokeAsync(nameof(SomeHubMethod2));
-        }
-    } // class HubInvoker
-
-    public HubConnection Connection { get; }
-    public IHubContract Hub { get; }
-    protected List<IDisposable> disposableList = new();
-
-    public ClientBase(HubConnection connection)
-    {
-        Connection = connection;
-        Hub = new HubInvoker(connection);
-
-        Connection.Closed += OnClosed;
-        Connection.Reconnected += OnReconnected;
-        Connection.Reconnecting += OnReconnecting;
-
-        var d1 = Connection.On<string, string, UserDefineClass>(nameof(SomeClientMethod1), SomeClientMethod1);
-        var d2 = Connection.On(nameof(SomeClientMethod2), SomeClientMethod2);
-
-        disposableList.Add(d1);
-        disposableList.Add(d2);
-    }
-
-    public abstract Task SomeClientMethod1(string user,string message, UserDefineClass userDefine);
-
-    public abstract Task SomeClientMethod2();
-
-    public async ValueTask DisposeAsync()
-    {
-        Connection.Closed -= OnClosed;
-        Connection.Reconnected -= OnReconnected;
-        Connection.Reconnecting -= OnReconnecting;
-
-        await Connection.DisposeAsync();
-
-        foreach(var d in disposableList)
-        {
-            d.Dispose();
-        }
-    }
-
-    public virtual Task OnClosed(Exception e) => Task.CompletedTask;
-    public virtual Task OnReconnected(string connectionId) => Task.CompletedTask;
-    public virtual Task OnReconnecting(Exception e) => Task.CompletedTask;
-} // class ClientBase
 
 ```
 
