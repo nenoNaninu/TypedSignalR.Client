@@ -62,9 +62,9 @@ namespace TypedSignalR.Client.SourceGenerator
 
             var specialSymbols = GetSpecialSymbols(context);
 
-            ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, in specialSymbols, invokerList);
-            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, in specialSymbols, invokerList, receiverList);
-            ExtractFromRegisterMethods(context, receiver.RegisterMethods, in specialSymbols, receiverList);
+            ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, specialSymbols, invokerList);
+            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, specialSymbols, invokerList, receiverList);
+            ExtractFromRegisterMethods(context, receiver.RegisterMethods, specialSymbols, receiverList);
 
             return (invokerList, receiverList);
         }
