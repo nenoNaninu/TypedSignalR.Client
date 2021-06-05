@@ -37,40 +37,40 @@ namespace TypedSignalR.Client
 #pragma warning restore CS0649
         }
 
-        public static THub CreateHubProxy<THub>(this HubConnection source)
+        public static THub CreateHubProxy<THub>(this HubConnection connection)
         {
-            return source.CreateHubProxyCore<THub>();
+            return connection.CreateHubProxyCore<THub>();
         }
 
-        public static IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver)
+        public static IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver)
         {
-            return source.RegisterCore<TReceiver>(receiver);
+            return connection.RegisterCore<TReceiver>(receiver);
         }
 
-        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver)
+        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection connection, TReceiver receiver)
         {
-            var hubProxy = source.CreateHubProxyCore<THub>();
-            var subscription = source.RegisterCore<TReceiver>(receiver);
+            var hubProxy = connection.CreateHubProxyCore<THub>();
+            var subscription = connection.RegisterCore<TReceiver>(receiver);
             return (hubProxy, subscription);
         }
 
-        private static THub CreateHubProxyCore<THub>(this HubConnection source)
+        private static THub CreateHubProxyCore<THub>(this HubConnection connection)
         {
-            return HubInvokerConstructorCache<THub>.Construct(source);
+            return HubInvokerConstructorCache<THub>.Construct(connection);
         }
 
-        private static IDisposable RegisterCore<TReceiver>(this HubConnection source, TReceiver receiver)
+        private static IDisposable RegisterCore<TReceiver>(this HubConnection connection, TReceiver receiver)
         {
             if(typeof(TReceiver) == typeof(IHubConnectionObserver))
             {
-                return new HubConnectionObserverSubscription(source, receiver as IHubConnectionObserver);;
+                return new HubConnectionObserverSubscription(connection, receiver as IHubConnectionObserver);;
             }
 
-            var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(source, receiver);
+            var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(connection, receiver);
 
             if (receiver is IHubConnectionObserver hubConnectionObserver)
             {
-                var subscription = new HubConnectionObserverSubscription(source, hubConnectionObserver);
+                var subscription = new HubConnectionObserverSubscription(connection, hubConnectionObserver);
                 compositeDisposable.Add(subscription);
             }
 

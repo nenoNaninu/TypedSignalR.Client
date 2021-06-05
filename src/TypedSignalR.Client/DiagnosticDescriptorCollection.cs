@@ -6,12 +6,12 @@ namespace TypedSignalR.Client
     {
         public static readonly DiagnosticDescriptor TypeArgumentRule = new(
             id: "TypedSiRCA001",
-            title: "TypedSignalR.Client.Analyzer.001: Type argument must be an interface",
-            messageFormat: "[Type argument of {0} must be an interface] {1} is not interface",
+            title: "TypedSignalR.Client.Analyzer.001: Type argument of the CreateHubProxy/CreateHubProxyWith/Register method must be an interface",
+            messageFormat: "[Type argument of {0} method must be an interface] {1} is not interface",
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "Type argument must be an interface.");
+            description: "Type argument of the CreateHubProxy/CreateHubProxyWith/Register method must be an interface.");
 
         public static readonly DiagnosticDescriptor InterfaceDefineRule = new(
             id: "TypedSiRCA002",

@@ -37,62 +37,62 @@ namespace TypedSignalR.Client.T4
                     "rivate static class ReceiverBinderCache<T>\r\n        {\r\n#pragma warning disable C" +
                     "S0649\r\n            public static Func<HubConnection, T, CompositeDisposable> Bin" +
                     "d;\r\n#pragma warning restore CS0649\r\n        }\r\n\r\n        public static THub Crea" +
-                    "teHubProxy<THub>(this HubConnection source)\r\n        {\r\n            return sourc" +
-                    "e.CreateHubProxyCore<THub>();\r\n        }\r\n\r\n        public static IDisposable Re" +
-                    "gister<TReceiver>(this HubConnection source, TReceiver receiver)\r\n        {\r\n   " +
-                    "         return source.RegisterCore<TReceiver>(receiver);\r\n        }\r\n\r\n        " +
-                    "public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub," +
-                    " TReceiver>(this HubConnection source, TReceiver receiver)\r\n        {\r\n         " +
-                    "   var hubProxy = source.CreateHubProxyCore<THub>();\r\n            var subscripti" +
-                    "on = source.RegisterCore<TReceiver>(receiver);\r\n            return (hubProxy, su" +
-                    "bscription);\r\n        }\r\n\r\n        private static THub CreateHubProxyCore<THub>(" +
-                    "this HubConnection source)\r\n        {\r\n            return HubInvokerConstructorC" +
-                    "ache<THub>.Construct(source);\r\n        }\r\n\r\n        private static IDisposable R" +
-                    "egisterCore<TReceiver>(this HubConnection source, TReceiver receiver)\r\n        {" +
-                    "\r\n            if(typeof(TReceiver) == typeof(IHubConnectionObserver))\r\n         " +
-                    "   {\r\n                return new HubConnectionObserverSubscription(source, recei" +
-                    "ver as IHubConnectionObserver);;\r\n            }\r\n\r\n            var compositeDisp" +
-                    "osable = ReceiverBinderCache<TReceiver>.Bind(source, receiver);\r\n\r\n            i" +
-                    "f (receiver is IHubConnectionObserver hubConnectionObserver)\r\n            {\r\n   " +
-                    "             var subscription = new HubConnectionObserverSubscription(source, hu" +
-                    "bConnectionObserver);\r\n                compositeDisposable.Add(subscription);\r\n " +
-                    "           }\r\n\r\n            return compositeDisposable;\r\n        }\r\n\r\n        pr" +
-                    "ivate sealed class CompositeDisposable : IDisposable\r\n        {\r\n            pri" +
-                    "vate readonly object _gate = new();\r\n            private readonly List<IDisposab" +
-                    "le> _disposables;\r\n\r\n            private bool _disposed;\r\n\r\n            public C" +
-                    "ompositeDisposable()\r\n            {\r\n                _disposables = new List<IDi" +
-                    "sposable>();\r\n            }\r\n\r\n            public CompositeDisposable(int capaci" +
-                    "ty)\r\n            {\r\n                _disposables = new List<IDisposable>(capacit" +
-                    "y < 0 ? 0 : capacity);\r\n            }\r\n\r\n            public void Add(IDisposable" +
-                    " item)\r\n            {\r\n                var shouldDispose = false;\r\n\r\n           " +
-                    "     lock (_gate)\r\n                {\r\n                    shouldDispose = _dispo" +
-                    "sed;\r\n\r\n                    if (!_disposed)\r\n                    {\r\n            " +
-                    "            _disposables.Add(item);\r\n                    }\r\n                }\r\n\r" +
-                    "\n                if (shouldDispose)\r\n                {\r\n                    item" +
-                    ".Dispose();\r\n                }\r\n            }\r\n\r\n            public void Dispose" +
-                    "()\r\n            {\r\n                var currentDisposables = default(List<IDispos" +
-                    "able>);\r\n\r\n                lock (_gate)\r\n                {\r\n                    " +
-                    "if (!_disposed)\r\n                    {\r\n                        _disposed = true" +
-                    ";\r\n                        currentDisposables = _disposables;\r\n                 " +
-                    "   }\r\n                }\r\n\r\n                if (currentDisposables is not null)\r\n" +
-                    "                {\r\n                    foreach (var item in currentDisposables)\r" +
-                    "\n                    {\r\n                        if (item is not null)\r\n         " +
-                    "               {\r\n                            item.Dispose();\r\n                 " +
-                    "       }\r\n                    }\r\n\r\n                    currentDisposables.Clear(" +
-                    ");\r\n                }\r\n            }\r\n        }\r\n\r\n        private class HubConn" +
-                    "ectionObserverSubscription : IDisposable\r\n        {\r\n            private readonl" +
-                    "y HubConnection _connection;\r\n            private readonly IHubConnectionObserve" +
-                    "r _hubConnectionEvent;\r\n\r\n            public HubConnectionObserverSubscription(H" +
-                    "ubConnection connection, IHubConnectionObserver hubConnectionEvent)\r\n           " +
-                    " {\r\n                _connection = connection;\r\n                _hubConnectionEve" +
-                    "nt = hubConnectionEvent;\r\n                _connection.Closed += _hubConnectionEv" +
-                    "ent.OnClosed;\r\n                _connection.Reconnected += _hubConnectionEvent.On" +
-                    "Reconnected;\r\n                _connection.Reconnecting += _hubConnectionEvent.On" +
-                    "Reconnecting;\r\n            }\r\n\r\n            public void Dispose()\r\n            {" +
-                    "\r\n                _connection.Closed -= _hubConnectionEvent.OnClosed;\r\n         " +
-                    "       _connection.Reconnected -= _hubConnectionEvent.OnReconnected;\r\n          " +
-                    "      _connection.Reconnecting -= _hubConnectionEvent.OnReconnecting;\r\n         " +
-                    "   }\r\n        }\r\n    }\r\n}");
+                    "teHubProxy<THub>(this HubConnection connection)\r\n        {\r\n            return c" +
+                    "onnection.CreateHubProxyCore<THub>();\r\n        }\r\n\r\n        public static IDispo" +
+                    "sable Register<TReceiver>(this HubConnection connection, TReceiver receiver)\r\n  " +
+                    "      {\r\n            return connection.RegisterCore<TReceiver>(receiver);\r\n     " +
+                    "   }\r\n\r\n        public static (THub HubProxy, IDisposable Subscription) CreateHu" +
+                    "bProxyWith<THub, TReceiver>(this HubConnection connection, TReceiver receiver)\r\n" +
+                    "        {\r\n            var hubProxy = connection.CreateHubProxyCore<THub>();\r\n  " +
+                    "          var subscription = connection.RegisterCore<TReceiver>(receiver);\r\n    " +
+                    "        return (hubProxy, subscription);\r\n        }\r\n\r\n        private static TH" +
+                    "ub CreateHubProxyCore<THub>(this HubConnection connection)\r\n        {\r\n         " +
+                    "   return HubInvokerConstructorCache<THub>.Construct(connection);\r\n        }\r\n\r\n" +
+                    "        private static IDisposable RegisterCore<TReceiver>(this HubConnection co" +
+                    "nnection, TReceiver receiver)\r\n        {\r\n            if(typeof(TReceiver) == ty" +
+                    "peof(IHubConnectionObserver))\r\n            {\r\n                return new HubConn" +
+                    "ectionObserverSubscription(connection, receiver as IHubConnectionObserver);;\r\n  " +
+                    "          }\r\n\r\n            var compositeDisposable = ReceiverBinderCache<TReceiv" +
+                    "er>.Bind(connection, receiver);\r\n\r\n            if (receiver is IHubConnectionObs" +
+                    "erver hubConnectionObserver)\r\n            {\r\n                var subscription = " +
+                    "new HubConnectionObserverSubscription(connection, hubConnectionObserver);\r\n     " +
+                    "           compositeDisposable.Add(subscription);\r\n            }\r\n\r\n            " +
+                    "return compositeDisposable;\r\n        }\r\n\r\n        private sealed class Composite" +
+                    "Disposable : IDisposable\r\n        {\r\n            private readonly object _gate =" +
+                    " new();\r\n            private readonly List<IDisposable> _disposables;\r\n\r\n       " +
+                    "     private bool _disposed;\r\n\r\n            public CompositeDisposable()\r\n      " +
+                    "      {\r\n                _disposables = new List<IDisposable>();\r\n            }\r" +
+                    "\n\r\n            public CompositeDisposable(int capacity)\r\n            {\r\n        " +
+                    "        _disposables = new List<IDisposable>(capacity < 0 ? 0 : capacity);\r\n    " +
+                    "        }\r\n\r\n            public void Add(IDisposable item)\r\n            {\r\n     " +
+                    "           var shouldDispose = false;\r\n\r\n                lock (_gate)\r\n         " +
+                    "       {\r\n                    shouldDispose = _disposed;\r\n\r\n                    " +
+                    "if (!_disposed)\r\n                    {\r\n                        _disposables.Add" +
+                    "(item);\r\n                    }\r\n                }\r\n\r\n                if (shouldD" +
+                    "ispose)\r\n                {\r\n                    item.Dispose();\r\n               " +
+                    " }\r\n            }\r\n\r\n            public void Dispose()\r\n            {\r\n         " +
+                    "       var currentDisposables = default(List<IDisposable>);\r\n\r\n                l" +
+                    "ock (_gate)\r\n                {\r\n                    if (!_disposed)\r\n           " +
+                    "         {\r\n                        _disposed = true;\r\n                        c" +
+                    "urrentDisposables = _disposables;\r\n                    }\r\n                }\r\n\r\n " +
+                    "               if (currentDisposables is not null)\r\n                {\r\n         " +
+                    "           foreach (var item in currentDisposables)\r\n                    {\r\n    " +
+                    "                    if (item is not null)\r\n                        {\r\n          " +
+                    "                  item.Dispose();\r\n                        }\r\n                  " +
+                    "  }\r\n\r\n                    currentDisposables.Clear();\r\n                }\r\n     " +
+                    "       }\r\n        }\r\n\r\n        private class HubConnectionObserverSubscription :" +
+                    " IDisposable\r\n        {\r\n            private readonly HubConnection _connection;" +
+                    "\r\n            private readonly IHubConnectionObserver _hubConnectionEvent;\r\n\r\n  " +
+                    "          public HubConnectionObserverSubscription(HubConnection connection, IHu" +
+                    "bConnectionObserver hubConnectionEvent)\r\n            {\r\n                _connect" +
+                    "ion = connection;\r\n                _hubConnectionEvent = hubConnectionEvent;\r\n  " +
+                    "              _connection.Closed += _hubConnectionEvent.OnClosed;\r\n             " +
+                    "   _connection.Reconnected += _hubConnectionEvent.OnReconnected;\r\n              " +
+                    "  _connection.Reconnecting += _hubConnectionEvent.OnReconnecting;\r\n            }" +
+                    "\r\n\r\n            public void Dispose()\r\n            {\r\n                _connectio" +
+                    "n.Closed -= _hubConnectionEvent.OnClosed;\r\n                _connection.Reconnect" +
+                    "ed -= _hubConnectionEvent.OnReconnected;\r\n                _connection.Reconnecti" +
+                    "ng -= _hubConnectionEvent.OnReconnecting;\r\n            }\r\n        }\r\n    }\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }

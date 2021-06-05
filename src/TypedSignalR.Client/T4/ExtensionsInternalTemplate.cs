@@ -56,7 +56,7 @@ namespace TypedSignalR.Client.T4
             this.Write("        }\r\n\r\n");
  } 
  foreach(var receiver in ReceiverList){ 
-            this.Write("        private static CompositeDisposable Connect");
+            this.Write("        private static CompositeDisposable Bind");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.CollisionFreeName));
             this.Write("(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, ");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceFullName));
@@ -86,7 +86,7 @@ namespace TypedSignalR.Client.T4
  foreach(var receiver in ReceiverList){ 
             this.Write("            ReceiverBinderCache<");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.InterfaceFullName));
-            this.Write(">.Bind = Connect");
+            this.Write(">.Bind = Bind");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiver.CollisionFreeName));
             this.Write(";\r\n");
  } 

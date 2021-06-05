@@ -33,7 +33,7 @@ namespace TypedSignalR.Client
 
 <# } #>
 <# foreach(var receiver in ReceiverList){ #>
-        private static CompositeDisposable Connect<#= receiver.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
+        private static CompositeDisposable Bind<#= receiver.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
         {
             var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count + 1 #>);
 <# foreach(var method in receiver.ClientMethods) { #>
@@ -49,7 +49,7 @@ namespace TypedSignalR.Client
             HubInvokerConstructorCache<<#= invoker.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= invoker.CollisionFreeName #>(connection);
 <# } #>
 <# foreach(var receiver in ReceiverList){ #>
-            ReceiverBinderCache<<#= receiver.InterfaceFullName #>>.Bind = Connect<#= receiver.CollisionFreeName #>;
+            ReceiverBinderCache<<#= receiver.InterfaceFullName #>>.Bind = Bind<#= receiver.CollisionFreeName #>;
 <# } #>
         }
     }

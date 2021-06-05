@@ -142,7 +142,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     }
 }
 ```
-## Recommend
+## Recommendation
 I recommend that these interfaces be shared between the client and server sides, for example, by project references.
 
 ```
@@ -152,7 +152,7 @@ server.csproj => shared.csproj <= client.csproj
 # Compile-time error support
 This source generator has some restrictions, including those that come from the server side. 
 
-- Type argument of `CreateHubProxy/CreateHubProxyWith/Register` must be an interface.
+- Type argument of `CreateHubProxy/CreateHubProxyWith/Register` method must be an interface.
 - Only define methods in the interface used for `HubProxy/Receiver`. 
   - Properties should not be defined. 
 - The return type of the method in the interface used for `HubProxy` must be `Task` or `Task<T>`.
@@ -163,8 +163,91 @@ It is very difficult for humans to properly comply with these restrictions. Ther
 ![compile-time-error](img/compile-time-error.png)
 
 # What kind of source code will be generated?
-```cs
+The source generator checks the type argument of a method such as'CreateHubProxy/Register' and generates the following code based on it.
 
+If we call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
+
+```cs
+public static partial class Extensions
+{
+    private class HubInvoker : IHubContract
+    {
+        private readonly HubConnection _connection;
+
+        public HubInvoker(HubConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public Task<string> SomeHubMethod1(string user, string message)
+        {
+            return _connection.InvokeCoreAsync<string>(nameof(SomeHubMethod1), new object[] { user, message });
+        }
+
+        public Task SomeHubMethod2()
+        {
+            return _connection.InvokeCoreAsync(nameof(SomeHubMethod2), System.Array.Empty<object>());
+        }
+    }
+
+    private static CompositeDisposable BindIClientContract(HubConnection connection, IClientContract receiver)
+    {
+        var d1 = connection.On<string, string UserDefine>(nameof(receiver.SomeClientMethod1), receiver.SomeClientMethod1);
+        var d2 = connection.On(nameof(receiver.SomeClientMethod2), receiver.SomeClientMethod2);
+
+        var compositeDisposable = new CompositeDisposable();
+        compositeDisposable.Add(d1);
+        compositeDisposable.Add(d2);
+        return compositeDisposable;
+    }
+
+    static Extensions()
+    {
+        HubInvokerCache<IHubContract>.Construct = static connection => new HubInvoker(connection);
+        ReceiverBinderCache<IClientContract>.Bind = BindIClientContract;
+    }
+}
+```
+The generated code is used through the API as follows. 
+```cs
+public static partial class Extensions
+{
+    // static type caching
+    private static class HubInvokerConstructorCache<T>
+    {
+        public static Func<HubConnection, T> Construct;
+    }
+
+    // static type caching
+    private static class ReceiverBinderCache<T>
+    {
+        public static Func<HubConnection, T, CompositeDisposable> Bind;
+    }
+
+    public static THub CreateHubProxy<THub>(this HubConnection connection)
+    {
+        return HubInvokerConstructorCache<THub>.Construct(connection);
+    }
+
+    public static IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver)
+    {
+        if(typeof(TReceiver) == typeof(IHubConnectionObserver))
+        {
+            // special subscription
+            return new HubConnectionObserverSubscription(connection, receiver as IHubConnectionObserver);;
+        }
+
+        var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(connection, receiver);
+
+        if (receiver is IHubConnectionObserver hubConnectionObserver)
+        {
+            var subscription = new HubConnectionObserverSubscription(connection, hubConnectionObserver);
+            compositeDisposable.Add(subscription);
+        }
+
+        return compositeDisposable;
+    }
+}
 ```
 
 # Demo
