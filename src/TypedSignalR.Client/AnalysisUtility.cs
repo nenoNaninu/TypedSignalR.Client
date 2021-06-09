@@ -22,7 +22,7 @@ namespace TypedSignalR.Client
                         var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                         context.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                            DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
                             location,
                             methodSymbol.ToDisplayString()));
 
@@ -72,7 +72,7 @@ namespace TypedSignalR.Client
                         var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                         context.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                            DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
                             location,
                             methodSymbol.ToDisplayString()));
 
@@ -111,7 +111,7 @@ namespace TypedSignalR.Client
                     var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                     context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                        DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
                         location,
                         methodSymbol.ToDisplayString()));
 
@@ -125,7 +125,7 @@ namespace TypedSignalR.Client
                     var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                     context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptorCollection.HubMethodReturnValueTypeRule,
+                        DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
                         location,
                         methodSymbol.ToDisplayString()));
 
@@ -141,7 +141,7 @@ namespace TypedSignalR.Client
                 var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                    DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
                     location,
                     methodSymbol.ToDisplayString()));
 
@@ -155,7 +155,7 @@ namespace TypedSignalR.Client
                     var location = methodSymbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation() ?? Location.None;
 
                     context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptorCollection.ReceiverMethodReturnValueTypeRule,
+                        DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
                         location,
                         methodSymbol.ToDisplayString()));
 

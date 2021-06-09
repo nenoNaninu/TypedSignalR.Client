@@ -16,7 +16,7 @@
         <AssemblyName>TypedSignalR.Client</AssemblyName>
         <Title>TypedSignalR.Client</Title>
         <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
-        <Version>1.2.0</Version>
+        <Version>2.0.0</Version>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
@@ -47,20 +47,20 @@
             <AutoGen>True</AutoGen>
         </Compile>
         <Compile Update="T4\ExtensionsInternalTemplate.cs">
+            <DependentUpon>ExtensionsInternalTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>ExtensionsInternalTemplate.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="T4\ExtensionsTemplate.tt">
+            <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
+            <Generator>TextTemplatingFilePreprocessor</Generator>
+        </None>
         <None Update="T4\ExtensionsInternalTemplate.tt">
             <LastGenOutput>ExtensionsInternalTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
-        <None Update="T4\ExtensionsTemplate.tt">
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
         </None>
     </ItemGroup>
 
@@ -68,4 +68,5 @@
         <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
         <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
+
 </Project>

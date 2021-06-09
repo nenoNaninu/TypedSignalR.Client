@@ -22,8 +22,8 @@ namespace TypedSignalR.Client
             isEnabledByDefault: true,
             description: "Only define methods in the interface used for HubProxy/Receiver.");
 
-        public static readonly DiagnosticDescriptor HubMethodReturnValueTypeRule = new(
-            id: "TypedSiRAC003",
+        public static readonly DiagnosticDescriptor HubMethodReturnTypeRule = new(
+            id: "TypedSiRCA003",
             title: "TypedSignalR.Client.Analyzer.003: The return type of the method in the interface used for HubProxy must be Task or Task<T>",
             messageFormat: "[The return type of the method in the interface used for HubProxy must be Task or Task<T>] Return type of {0} is not Task or Task<T>",
             category: "Usage",
@@ -31,7 +31,7 @@ namespace TypedSignalR.Client
             isEnabledByDefault: true,
             description: "The return type of the method in the interface used for HubProxy must be Task or Task<T>.");
 
-        public static readonly DiagnosticDescriptor ReceiverMethodReturnValueTypeRule = new(
+        public static readonly DiagnosticDescriptor ReceiverMethodReturnTypeRule = new(
             id: "TypedSiRCA004",
             title: "TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Receiver must be Task",
             messageFormat: "[The return type of the method in the interface used for Receiver must be Task] Return type of {0} is not Task",
