@@ -16,7 +16,7 @@
         <AssemblyName>TypedSignalR.Client</AssemblyName>
         <Title>TypedSignalR.Client</Title>
         <Description>C# Source Generator to create strongly typed SignalR Client.</Description>
-        <Version>1.1.0</Version>
+        <Version>2.0.0</Version>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
@@ -41,27 +41,32 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="ClientBaseTemplate.cs">
+        <Compile Update="T4\ExtensionsTemplate.cs">
+            <DependentUpon>ExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>ClientBaseTemplate.tt</DependentUpon>
         </Compile>
-        <Compile Update="EssentialComponent.cs">
+        <Compile Update="T4\ExtensionsInternalTemplate.cs">
+            <DependentUpon>ExtensionsInternalTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
-            <DependentUpon>EssentialComponent.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="EssentialComponent.tt">
+        <None Update="T4\ExtensionsTemplate.tt">
+            <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>EssentialComponent.cs</LastGenOutput>
         </None>
-        <None Update="ClientBaseTemplate.tt">
+        <None Update="T4\ExtensionsInternalTemplate.tt">
+            <LastGenOutput>ExtensionsInternalTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
-            <LastGenOutput>ClientBaseTemplate.cs</LastGenOutput>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+        <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
 
 </Project>

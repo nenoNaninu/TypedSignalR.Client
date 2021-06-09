@@ -33,11 +33,41 @@ Therefore, if you change the code on the server-side, the modification on the cl
 
 This TypedSignalR.Client (Source Generator) aims to generate a strongly typed SignalR Client by sharing the server and client function definitions as an interface. 
 
-# Quick Start
-First, we define the interface of the client-side and hub-side(server).
+# API
+This Source Generator provides three extension methods and one interface. 
 
 ```cs
-public class UserDefineClass
+static class Ex
+{
+    THub CreateHubProxy<THub>(this HubConnection source);
+
+    IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
+
+    (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
+}
+
+// An interface for observing SigalR events.
+interface IHubConnectionObserver
+{
+    Task OnClosed(Exception e);
+    Task OnReconnected(string connectionId);
+    Task OnReconnecting(Exception e);
+}
+```
+
+Use it as follows. 
+
+```cs
+HubConnection connection = ...;
+
+var hub = connection.CreateHubProxy<IHub>();
+var subscription = connection.Register<IReceiver>(new Receiver);
+```
+
+# Usage
+Suppose you have the following interface defined:
+```cs
+public class UserDefine
 {
     public Guid RandomId { get; set; }
     public DateTime Datetime { get; set; }
@@ -47,7 +77,7 @@ public class UserDefineClass
 public interface IClientContract
 {
     // Of course, user defined type is OK. 
-    Task SomeClientMethod1(string user, string message, UserDefineClass userDefine);
+    Task SomeClientMethod1(string user, string message, UserDefine userDefine);
     Task SomeClientMethod2();
 }
 
@@ -57,153 +87,43 @@ public interface IHubContract
     Task<string> SomeHubMethod1(string user, string message);
     Task SomeHubMethod2();
 }
-```
 
-Next, define the partial class and annotate the HubClientBase Attribute. 
-```cs
-using TypedSignalR.Client;
-
-[HubClientBase(typeof(IHubContract), typeof(IClientContract))]
-partial class ClientBase
+class Receiver1 : IClientContract
 {
+    // impl
+}
+
+class Receiver2 : IClientContract, IHubConnectionObserver
+{
+    // impl
 }
 ```
 
-By annotating the HubClientBase Attribute, the following code will be generated (simplified here). 
-
-```cs
-partial abstract class ClientBase : IHubClient<IHubContract>, IClientContract, IAsyncDisposable
-{
-    private class HubInvoker : IHubContract
-    {
-        private readonly HubConnection _connection;
-
-        public HubInvoker(HubConnection connection)
-        {
-            _connection = connection;
-        }
-
-        public Task<string> SomeHubMethod1(string user,string message)
-        {
-            return _connection.InvokeAsync<string>(nameof(SomeHubMethod1), user, message);
-        }
-
-        public Task SomeHubMethod2()
-        {
-            return _connection.InvokeAsync(nameof(SomeHubMethod2));
-        }
-    } // class HubInvoker
-
-    public HubConnection Connection { get; }
-    public IHubContract Hub { get; }
-    protected List<IDisposable> disposableList = new();
-
-    public ClientBase(HubConnection connection)
-    {
-        Connection = connection;
-        Hub = new HubInvoker(connection);
-
-        Connection.Closed += OnClosed;
-        Connection.Reconnected += OnReconnected;
-        Connection.Reconnecting += OnReconnecting;
-
-        var d1 = Connection.On<string, string, UserDefineClass>(nameof(SomeClientMethod1), SomeClientMethod1);
-        var d2 = Connection.On(nameof(SomeClientMethod2), SomeClientMethod2);
-
-        disposableList.Add(d1);
-        disposableList.Add(d2);
-    }
-
-    public abstract Task SomeClientMethod1(string user,string message, UserDefineClass userDefine);
-
-    public abstract Task SomeClientMethod2();
-
-    public async ValueTask DisposeAsync()
-    {
-        Connection.Closed -= OnClosed;
-        Connection.Reconnected -= OnReconnected;
-        Connection.Reconnecting -= OnReconnecting;
-
-        await Connection.DisposeAsync();
-
-        foreach(var d in disposableList)
-        {
-            d.Dispose();
-        }
-    }
-
-    public virtual Task OnClosed(Exception e) => Task.CompletedTask;
-    public virtual Task OnReconnected(string connectionId) => Task.CompletedTask;
-    public virtual Task OnReconnecting(Exception e) => Task.CompletedTask;
-} // class ClientBase
-
-```
-Then, extend the class annotated with HubClientBase and implement the client-side function. 
-
-```cs
-class HubClient : ClientBase
-{
-    // HubConnection is required for the base class constructor. 
-    public HubClient(HubConnection connection) : base(connection)
-    {
-    }
-
-    // override and impl!
-    public override Task SomeClientMethod1(string user, string message, UserDefineClass userDefine)
-    {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // override and impl!
-    public override Task SomeClientMethod2()
-    {
-        Console.WriteLine("Call SomeClientMethod1!");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnClosed(Exception e)
-    {
-        Console.WriteLine($"[On Closed!]");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnReconnected(string connectionId)
-    {
-        Console.WriteLine($"[On Reconnected!]");
-        return Task.CompletedTask;
-    }
-
-    // SignalR event
-    public override Task OnReconnecting(Exception e)
-    {
-        Console.WriteLine($"[On Reconnecting!]");
-        return Task.CompletedTask;
-    }
-}
-```
-Let's use it!
-
+## Client
+It's very easy to use. 
 ```cs
 HubConnection connection = ...;
 
-var client = new HubClient(connection);
+var hub = connection.CreateHubProxy<IHubContract>();
+var subscription1 = connection.Register<IClientContract>(new Receiver1());
 
-await client.Connection.StartAsync();
+// When an instance of a class that implements IHubConnectionObserver is registered (Receiver2 in this case), 
+//the method defined in IHubConnectionObserver is automatically registered regardless of the type argument. 
+var subscription2 = connection.Register<IClientContract>(new Receiver2());
+
+// or
+var (hub2, subscription3) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
 // Invoke hub methods
-var response = await client.Hub.SomeHubMethod1("user", "message");
-Console.WriteLine(response);
+hub.SomeHubMethod1("user", "message");
 
-// client-side function is invoke from hub(server).
-
-await client.Connection.StopAsync();
-await client.DisposeAsync();
+// Unregister the receiver
+subscription.Dispose();
 ```
 
-On the server side (ASP.NET Core), it can be strongly typed as follows:
+## Server
+By the way, using these definitions, you can write as follows on the server side (ASP.NET Core). 
+`TypedSignalR.Client` is not nessesary.
 
 ```cs
 using Microsoft.AspNetCore.SignalR;
@@ -222,9 +142,117 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     }
 }
 ```
+## Recommendation
+I recommend that these interfaces be shared between the client and server sides, for example, by project references.
 
-# Example
-First, launch server. 
+```
+server.csproj => shared.csproj <= client.csproj
+```
+
+# Compile-time error support
+This source generator has some restrictions, including those that come from the server side. 
+
+- Type argument of `CreateHubProxy/CreateHubProxyWith/Register` method must be an interface.
+- Only define methods in the interface used for `HubProxy/Receiver`. 
+  - Properties should not be defined. 
+- The return type of the method in the interface used for `HubProxy` must be `Task` or `Task<T>`.
+- The return type of the method in the interface used for `Receiver` must be `Task`.
+
+It is very difficult for humans to properly comply with these restrictions. Therefore, it is designed so that the compiler (Roslyn) looks for the part where the constraint is not observed at compile time and reports a detailed error. Therefore, no run-time error occurs. 
+
+![compile-time-error](img/compile-time-error.png)
+
+# What kind of source code will be generated?
+The source generator checks the type argument of a method such as'CreateHubProxy/Register' and generates the following code based on it.
+
+If we call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
+
+```cs
+public static partial class Extensions
+{
+    private class HubInvoker : IHubContract
+    {
+        private readonly HubConnection _connection;
+
+        public HubInvoker(HubConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public Task<string> SomeHubMethod1(string user, string message)
+        {
+            return _connection.InvokeCoreAsync<string>(nameof(SomeHubMethod1), new object[] { user, message });
+        }
+
+        public Task SomeHubMethod2()
+        {
+            return _connection.InvokeCoreAsync(nameof(SomeHubMethod2), System.Array.Empty<object>());
+        }
+    }
+
+    private static CompositeDisposable BindIClientContract(HubConnection connection, IClientContract receiver)
+    {
+        var d1 = connection.On<string, string UserDefine>(nameof(receiver.SomeClientMethod1), receiver.SomeClientMethod1);
+        var d2 = connection.On(nameof(receiver.SomeClientMethod2), receiver.SomeClientMethod2);
+
+        var compositeDisposable = new CompositeDisposable();
+        compositeDisposable.Add(d1);
+        compositeDisposable.Add(d2);
+        return compositeDisposable;
+    }
+
+    static Extensions()
+    {
+        HubInvokerCache<IHubContract>.Construct = static connection => new HubInvoker(connection);
+        ReceiverBinderCache<IClientContract>.Bind = BindIClientContract;
+    }
+}
+```
+The generated code is used through the API as follows. 
+```cs
+public static partial class Extensions
+{
+    // static type caching
+    private static class HubInvokerConstructorCache<T>
+    {
+        public static Func<HubConnection, T> Construct;
+    }
+
+    // static type caching
+    private static class ReceiverBinderCache<T>
+    {
+        public static Func<HubConnection, T, CompositeDisposable> Bind;
+    }
+
+    public static THub CreateHubProxy<THub>(this HubConnection connection)
+    {
+        return HubInvokerConstructorCache<THub>.Construct(connection);
+    }
+
+    public static IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver)
+    {
+        if(typeof(TReceiver) == typeof(IHubConnectionObserver))
+        {
+            // special subscription
+            return new HubConnectionObserverSubscription(connection, receiver as IHubConnectionObserver);;
+        }
+
+        var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(connection, receiver);
+
+        if (receiver is IHubConnectionObserver hubConnectionObserver)
+        {
+            var subscription = new HubConnectionObserverSubscription(connection, hubConnectionObserver);
+            compositeDisposable.Add(subscription);
+        }
+
+        return compositeDisposable;
+    }
+}
+```
+
+# Demo
+First, launch server.
+Then access it from your browser and open the console(F12). 
 
 ```
 git clone https://github.com/nenoNaninu/TypedSignalR.Client.git
