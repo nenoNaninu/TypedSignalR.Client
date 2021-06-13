@@ -6,7 +6,7 @@ namespace TypedSignalR.Client
 {
     public static class AnalysisUtility
     {
-        public static (IReadOnlyList<MethodInfo> HubMethods, bool IsValid) ExtractHubMethods(GeneratorExecutionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractHubMethods(GeneratorExecutionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
         {
             var hubMethods = new List<MethodInfo>();
             bool isValid = true;
@@ -66,7 +66,7 @@ namespace TypedSignalR.Client
             return (hubMethods, isValid);
         }
 
-        public static (IReadOnlyList<MethodInfo> ClientMethos, bool IsValid) ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
         {
             var clientMethods = new List<MethodInfo>();
             bool isValid = true;

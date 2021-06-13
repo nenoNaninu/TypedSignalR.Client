@@ -72,14 +72,13 @@ namespace ConsoleApp
             {
                 // error pattern!
 
-                //var hub4 = connection.CreateHubProxy<Receiver>(); // error
-                //var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
-                //var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
-                //var hub7 = connection.CreateHubProxy<IErrorProxy3>(); // error
+                var hub4 = connection.CreateHubProxy<Receiver>(); // error
+                var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
+                var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
+                var hub7 = connection.CreateHubProxy<IErrorProxy3>(); // error
 
-
-                //var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
-                //var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
+                var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
+                var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
             }
         }
     }
