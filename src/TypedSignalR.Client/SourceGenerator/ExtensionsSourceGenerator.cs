@@ -115,17 +115,12 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!invokerList.Any(hubType))
                     {
-                        try
-                        {
-                            var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
+                        var (hubMethods, isValid) = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, target.GetLocation());
 
+                        if (isValid)
+                        {
                             var invoker = new InvokerTypeInfo(hubType, hubMethods);
-
                             invokerList.Add(invoker);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e);
                         }
                     }
                 }
@@ -133,7 +128,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromCreateHubProxyWithMethods(
-            in GeneratorExecutionContext context,
+            GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyWithMethods,
             in SpecialSymbols specialSymbols,
             List<InvokerTypeInfo> invokerList,
@@ -179,17 +174,12 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!invokerList.Any(hubType))
                     {
-                        try
-                        {
-                            var hubMethods = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask);
+                        var (hubMethods, isValid) = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, target.GetLocation());
 
+                        if (isValid)
+                        {
                             var invoker = new InvokerTypeInfo(hubType, hubMethods);
-
                             invokerList.Add(invoker);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e);
                         }
                     }
 
@@ -208,17 +198,12 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!receiverList.Any(receiverType))
                     {
-                        try
-                        {
-                            var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
+                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, target.GetLocation());
 
+                        if (isValid)
+                        {
                             var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
-
                             receiverList.Add(receiverInfo);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e);
                         }
                     }
                 }
@@ -226,7 +211,7 @@ namespace TypedSignalR.Client.SourceGenerator
         }
 
         private static void ExtractFromRegisterMethods(
-            in GeneratorExecutionContext context,
+            GeneratorExecutionContext context,
             IReadOnlyList<MemberAccessExpressionSyntax> registerMethods,
             in SpecialSymbols specialSymbols,
             List<ReceiverTypeInfo> receiverList)
@@ -276,17 +261,12 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!receiverList.Any(receiverType))
                     {
-                        try
-                        {
-                            var receiverMethods = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task);
+                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, target.GetLocation());
 
+                        if (isValid)
+                        {
                             var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
-
                             receiverList.Add(receiverInfo);
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e);
                         }
                     }
                 }
