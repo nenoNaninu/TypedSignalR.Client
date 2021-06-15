@@ -175,31 +175,5 @@ namespace TypedSignalR.Client
 
             return true;
         }
-
-        public static bool Any(this List<InvokerTypeInfo> source, ITypeSymbol typeSymbol)
-        {
-            foreach (var item in source)
-            {
-                if (item.TypeSymbol.Equals(typeSymbol, SymbolEqualityComparer.Default))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static bool Any(this List<ReceiverTypeInfo> source, ITypeSymbol typeSymbol)
-        {
-            foreach (var item in source)
-            {
-                if (item.TypeSymbol.Equals(typeSymbol, SymbolEqualityComparer.Default))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 }

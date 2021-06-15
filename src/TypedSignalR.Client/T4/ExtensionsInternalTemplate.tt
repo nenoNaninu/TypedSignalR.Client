@@ -13,16 +13,16 @@ namespace TypedSignalR.Client
 {
     public static partial class Extensions
     {
-<# foreach(var invoker in InvokerList) {#>
-        private class HubInvokerFor<#= invoker.CollisionFreeName #> : <#= invoker.InterfaceFullName  #>
+<# foreach(var hubProxyType in HubProxyTypeList) {#>
+        private class HubInvokerFor<#= hubProxyType.CollisionFreeName #> : <#= hubProxyType.InterfaceFullName  #>
         {
             private readonly Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
 
-            public HubInvokerFor<#= invoker.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection)
+            public HubInvokerFor<#= hubProxyType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection)
             {
                 _connection = connection;
             }
-<# foreach(var method in invoker.HubMethods) { #>
+<# foreach(var method in hubProxyType.Methods) { #>
 
             public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
             {
@@ -32,11 +32,11 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-<# foreach(var receiver in ReceiverList){ #>
-        private static CompositeDisposable Bind<#= receiver.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiver.InterfaceFullName #> receiver)
+<# foreach(var receiverType in ReceiverTypeList){ #>
+        private static CompositeDisposable Bind<#= receiverType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
         {
-            var compositeDisposable = new CompositeDisposable(<#= receiver.ClientMethods.Count + 1 #>);
-<# foreach(var method in receiver.ClientMethods) { #>
+            var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
+<# foreach(var method in receiverType.Methods) { #>
             compositeDisposable.Add(connection.On<#= method.TypeArgsToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
 <# } #>
             return compositeDisposable;
@@ -45,11 +45,11 @@ namespace TypedSignalR.Client
 <# } #>
         static Extensions()
         {
-<# foreach(var invoker in InvokerList) {#>
-            HubInvokerConstructorCache<<#= invoker.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= invoker.CollisionFreeName #>(connection);
+<# foreach(var hubProxyType in HubProxyTypeList) {#>
+            HubInvokerConstructorCache<<#= hubProxyType.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= hubProxyType.CollisionFreeName #>(connection);
 <# } #>
-<# foreach(var receiver in ReceiverList){ #>
-            ReceiverBinderCache<<#= receiver.InterfaceFullName #>>.Bind = Bind<#= receiver.CollisionFreeName #>;
+<# foreach(var receiverType in ReceiverTypeList){ #>
+            ReceiverBinderCache<<#= receiverType.InterfaceFullName #>>.Bind = Bind<#= receiverType.CollisionFreeName #>;
 <# } #>
         }
     }
