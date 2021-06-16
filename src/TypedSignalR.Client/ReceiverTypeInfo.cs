@@ -10,15 +10,15 @@ namespace TypedSignalR.Client
         public string InterfaceName { get; }
         public string InterfaceFullName { get; }
         public string CollisionFreeName { get; }
-        public IReadOnlyList<MethodInfo> ClientMethods { get; }
+        public IReadOnlyList<MethodInfo> Methods { get; }
 
-        public ReceiverTypeInfo(ITypeSymbol typeSymbol, IReadOnlyList<MethodInfo> clientMethods)
+        public ReceiverTypeInfo(ITypeSymbol typeSymbol, IReadOnlyList<MethodInfo> methods)
         {
             TypeSymbol = typeSymbol;
             InterfaceName = typeSymbol.Name;
             InterfaceFullName = typeSymbol.ToDisplayString();
             CollisionFreeName = InterfaceFullName.Replace(".", null);
-            ClientMethods = clientMethods;
+            Methods = methods;
         }
 
 #pragma warning disable RS1024

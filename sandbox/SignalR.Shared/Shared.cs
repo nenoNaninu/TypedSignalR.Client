@@ -25,4 +25,29 @@ namespace SignalR.Shared
         Task<Status> SendMessage(string user, string message);
         Task SomeHubMethod();
     }
+
+    public interface IErrorReceiver
+    {
+        Task<string> Hoge(); // must Task. not Task<T>
+    }
+
+    public class ErrorReceiver : IErrorReceiver
+    {
+        public Task<string> Hoge()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public interface IErrorProxy
+    {
+        Task<string> Hoge();
+        int Id { get; } // forbidden property
+    }
+
+    public interface IErrorProxy2
+    {
+        Task<string> Hoge();
+        int Id(); // must Task or Task<T>
+    }
 }
