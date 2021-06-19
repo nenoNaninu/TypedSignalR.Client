@@ -203,7 +203,7 @@ public static partial class Extensions
 
     static Extensions()
     {
-        HubInvokerCache<IHubContract>.Construct = static connection => new HubInvoker(connection);
+        HubInvokerConstructorCache<IHubContract>.Construct = static connection => new HubInvoker(connection);
         ReceiverBinderCache<IClientContract>.Bind = BindIClientContract;
     }
 }
