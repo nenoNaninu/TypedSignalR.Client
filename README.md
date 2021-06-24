@@ -37,13 +37,11 @@ This TypedSignalR.Client (Source Generator) aims to generate a strongly typed Si
 This Source Generator provides three extension methods and one interface. 
 
 ```cs
-static class Ex
+static class Extensions
 {
-    THub CreateHubProxy<THub>(this HubConnection source);
-
-    IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver);
-
-    (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver);
+    THub CreateHubProxy<THub>(this HubConnection source){...}
+    IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver){...}
+    (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection source, TReceiver receiver){...}
 }
 
 // An interface for observing SigalR events.
