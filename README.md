@@ -58,8 +58,8 @@ Use it as follows.
 ```cs
 HubConnection connection = ...;
 
-var hub = connection.CreateHubProxy<IHub>();
-var subscription = connection.Register<IReceiver>(new Receiver);
+IHub hub = connection.CreateHubProxy<IHub>();
+IDisposable  subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
 # Usage
