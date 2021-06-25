@@ -160,7 +160,7 @@ It is very difficult for humans to properly comply with these restrictions. Ther
 
 ![compile-time-error](img/compile-time-error.png)
 
-# What kind of source code will be generated?
+# Generated code
 The source generator checks the type argument of a method such as'CreateHubProxy/Register' and generates the following code based on it.
 
 If we call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
