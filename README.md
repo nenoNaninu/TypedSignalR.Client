@@ -59,7 +59,7 @@ Use it as follows.
 HubConnection connection = ...;
 
 IHub hub = connection.CreateHubProxy<IHub>();
-IDisposable  subscription = connection.Register<IReceiver>(new Receiver());
+IDisposable subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
 # Usage
