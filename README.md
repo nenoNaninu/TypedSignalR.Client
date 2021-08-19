@@ -3,6 +3,7 @@
 C# Source Generator to create strongly typed SignalR Client.
 
 # Install
+NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
 ```
 dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
