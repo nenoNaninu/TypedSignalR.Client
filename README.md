@@ -8,7 +8,7 @@ dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
 ```
 
-# Introduction
+# Why TypedSignalR.Client?
 
 The C # SignalR Client is untyped.
 To call a Hub (server-side) function, you must specify the function defined in Hub as a string.
@@ -161,6 +161,11 @@ It is very difficult for humans to properly comply with these restrictions. Ther
 ![compile-time-error](img/compile-time-error.png)
 
 # Generated code
+In this section, we will briefly explain what kind of code will be generated.
+The actual generated code can be seen in the Visual Studio dependencies.
+
+![generated-code-in-dependencies](img/generated-code-in-dependencies.png)
+
 The source generator checks the type argument of a method such as'CreateHubProxy/Register' and generates the following code based on it.
 
 If we call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
