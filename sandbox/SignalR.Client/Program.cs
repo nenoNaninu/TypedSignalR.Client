@@ -4,187 +4,186 @@ using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
 using TypedSignalR.Client;
 
-namespace SignalR.Client
+namespace SignalR.Client;
+
+class Receiver : IClientContract, IHubConnectionObserver
 {
-    class Receiver : IClientContract, IHubConnectionObserver
+    public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
     {
-        public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
-        {
-            Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
+        Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
 
-            return Task.CompletedTask;
-        }
-
-        public Task SomeClientMethod()
-        {
-            Console.WriteLine($"{Environment.NewLine}[Call SomeClientMethod]");
-
-            return Task.CompletedTask;
-        }
-
-        public Task OnClosed(Exception e)
-        {
-            Console.WriteLine($"[On Closed!]");
-            return Task.CompletedTask;
-        }
-
-        public Task OnReconnected(string connectionId)
-        {
-            Console.WriteLine($"[On Reconnected!]");
-            return Task.CompletedTask;
-        }
-
-        public Task OnReconnecting(Exception e)
-        {
-            Console.WriteLine($"[On Reconnecting!]");
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 
-    class Client : IClientContract, IHubConnectionObserver, IDisposable
+    public Task SomeClientMethod()
     {
-        private readonly IHubContract _hub;
-        private readonly IDisposable _subscription;
+        Console.WriteLine($"{Environment.NewLine}[Call SomeClientMethod]");
 
-        public Client(HubConnection connection)
-        {
-            _hub = connection.CreateHubProxy<IHubContract>();
-            _subscription = connection.Register<IClientContract>(this);
-        }
-
-        Task IClientContract.ReceiveMessage(string user, string message, UserDefineClass userDefine)
-        {
-            Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
-            return Task.CompletedTask;
-        }
-
-        Task IClientContract.SomeClientMethod()
-        {
-            Console.WriteLine($"{Environment.NewLine}[Call SomeClientMethod]");
-            return Task.CompletedTask;
-        }
-
-        public Task OnClosed(Exception e)
-        {
-            Console.WriteLine($"[On Closed!]");
-            return Task.CompletedTask;
-        }
-
-        public Task OnReconnected(string connectionId)
-        {
-            Console.WriteLine($"[On Reconnected!]");
-            return Task.CompletedTask;
-        }
-
-        public Task OnReconnecting(Exception e)
-        {
-            Console.WriteLine($"[On Reconnecting!]");
-            return Task.CompletedTask;
-        }
-
-        public Task<Status> SendMessage(string user, string message)
-        {
-            return _hub.SendMessage(user, message);
-        }
-
-        public Task SomeHubMethod()
-        {
-            return _hub.SomeHubMethod();
-        }
-
-        public void Dispose()
-        {
-            _subscription?.Dispose();
-        }
+        return Task.CompletedTask;
     }
 
-    class Program
+    public Task OnClosed(Exception e)
     {
-        static async Task Sample1(HubConnection connection)
+        Console.WriteLine($"[On Closed!]");
+        return Task.CompletedTask;
+    }
+
+    public Task OnReconnected(string connectionId)
+    {
+        Console.WriteLine($"[On Reconnected!]");
+        return Task.CompletedTask;
+    }
+
+    public Task OnReconnecting(Exception e)
+    {
+        Console.WriteLine($"[On Reconnecting!]");
+        return Task.CompletedTask;
+    }
+}
+
+class Client : IClientContract, IHubConnectionObserver, IDisposable
+{
+    private readonly IHubContract _hub;
+    private readonly IDisposable _subscription;
+
+    public Client(HubConnection connection)
+    {
+        _hub = connection.CreateHubProxy<IHubContract>();
+        _subscription = connection.Register<IClientContract>(this);
+    }
+
+    Task IClientContract.ReceiveMessage(string user, string message, UserDefineClass userDefine)
+    {
+        Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
+        return Task.CompletedTask;
+    }
+
+    Task IClientContract.SomeClientMethod()
+    {
+        Console.WriteLine($"{Environment.NewLine}[Call SomeClientMethod]");
+        return Task.CompletedTask;
+    }
+
+    public Task OnClosed(Exception e)
+    {
+        Console.WriteLine($"[On Closed!]");
+        return Task.CompletedTask;
+    }
+
+    public Task OnReconnected(string connectionId)
+    {
+        Console.WriteLine($"[On Reconnected!]");
+        return Task.CompletedTask;
+    }
+
+    public Task OnReconnecting(Exception e)
+    {
+        Console.WriteLine($"[On Reconnecting!]");
+        return Task.CompletedTask;
+    }
+
+    public Task<Status> SendMessage(string user, string message)
+    {
+        return _hub.SendMessage(user, message);
+    }
+
+    public Task SomeHubMethod()
+    {
+        return _hub.SomeHubMethod();
+    }
+
+    public void Dispose()
+    {
+        _subscription?.Dispose();
+    }
+}
+
+class Program
+{
+    static async Task Sample1(HubConnection connection)
+    {
+        var hub = connection.CreateHubProxy<IHubContract>();
+        var subsc = connection.Register<IClientContract>(new Receiver());
+
+        await connection.StartAsync();
+
+        while (true)
         {
-            var hub = connection.CreateHubProxy<IHubContract>();
-            var subsc = connection.Register<IClientContract>(new Receiver());
+            Console.Write("UserName: ");
+            var user = Console.ReadLine();
 
-            await connection.StartAsync();
+            Console.Write("Message: ");
+            var message = Console.ReadLine();
 
-            while (true)
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(message))
             {
-                Console.Write("UserName: ");
-                var user = Console.ReadLine();
-
-                Console.Write("Message: ");
-                var message = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(message))
-                {
-                    break;
-                }
-
-                Console.WriteLine($"[Invoke SendMessage]");
-                var status = await hub.SendMessage(user, message);
-
-                Console.WriteLine($"[Return status] {status.StatusMessage}");
-
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                break;
             }
 
-            Console.WriteLine($"[Invoke SomeHubMethod]");
-            await hub.SomeHubMethod();
+            Console.WriteLine($"[Invoke SendMessage]");
+            var status = await hub.SendMessage(user, message);
 
-            await connection.StopAsync();
-            subsc.Dispose();
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            Console.WriteLine($"[Return status] {status.StatusMessage}");
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
         }
 
-        static async Task Sample2(HubConnection connection)
+        Console.WriteLine($"[Invoke SomeHubMethod]");
+        await hub.SomeHubMethod();
+
+        await connection.StopAsync();
+        subsc.Dispose();
+        await Task.Delay(TimeSpan.FromSeconds(1));
+    }
+
+    static async Task Sample2(HubConnection connection)
+    {
+        var client = new Client(connection);
+
+        await connection.StartAsync();
+
+        while (true)
         {
-            var client = new Client(connection);
+            Console.Write("UserName: ");
+            var user = Console.ReadLine();
 
-            await connection.StartAsync();
+            Console.Write("Message: ");
+            var message = Console.ReadLine();
 
-            while (true)
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(message))
             {
-                Console.Write("UserName: ");
-                var user = Console.ReadLine();
-
-                Console.Write("Message: ");
-                var message = Console.ReadLine();
-
-                if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(message))
-                {
-                    break;
-                }
-
-                Console.WriteLine($"[Invoke SendMessage]");
-                var status = await client.SendMessage(user, message);
-
-                Console.WriteLine($"[Return status] {status.StatusMessage}");
-
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                break;
             }
 
-            Console.WriteLine($"[Invoke SomeHubMethod]");
-            await client.SomeHubMethod();
+            Console.WriteLine($"[Invoke SendMessage]");
+            var status = await client.SendMessage(user, message);
 
-            await connection.StopAsync();
-            client.Dispose();
+            Console.WriteLine($"[Return status] {status.StatusMessage}");
 
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(2));
         }
 
+        Console.WriteLine($"[Invoke SomeHubMethod]");
+        await client.SomeHubMethod();
 
-        static async Task Main(string[] args)
-        {
-            var url = "https://localhost:5001/Realtime/ChatHub";
+        await connection.StopAsync();
+        client.Dispose();
 
-            HubConnection connection = new HubConnectionBuilder()
-                .WithUrl(url)
-                .WithAutomaticReconnect()
-                .Build();
+        await Task.Delay(TimeSpan.FromSeconds(1));
+    }
 
 
-            //await Sample1(connection);
-            await Sample2(connection);
-        }
+    static async Task Main(string[] args)
+    {
+        var url = "https://localhost:5001/Realtime/ChatHub";
+
+        HubConnection connection = new HubConnectionBuilder()
+            .WithUrl(url)
+            .WithAutomaticReconnect()
+            .Build();
+
+
+        //await Sample1(connection);
+        await Sample2(connection);
     }
 }

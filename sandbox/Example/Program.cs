@@ -5,118 +5,117 @@ using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
 using TypedSignalR.Client;
 
-namespace Example
+namespace Example;
+
+public class UserDefine
 {
-    public class UserDefine
+    public Guid RandomId { get; set; }
+    public DateTime Datetime { get; set; }
+}
+
+// The return type of the client-side method must be Task. 
+public interface IClientContract
+{
+    // Of course, user defined type is OK. 
+    Task SomeClientMethod1(string user, string message, UserDefine userDefine);
+    Task SomeClientMethod2();
+}
+
+// The return type of the method on the hub-side must be Task or Task <T>. 
+public interface IHubContract
+{
+    Task<string> SomeHubMethod1(string user, string message);
+    Task SomeHubMethod2();
+    Task<string> SomeHubMethod3(string user, string message, CancellationToken cancellationToken);
+}
+
+class Receiver : IClientContract, IHubConnectionObserver
+{
+    public Task SomeClientMethod1(string user, string message, UserDefine userDefine)
     {
-        public Guid RandomId { get; set; }
-        public DateTime Datetime { get; set; }
+        throw new NotImplementedException();
     }
 
-    // The return type of the client-side method must be Task. 
-    public interface IClientContract
+    public Task SomeClientMethod2()
     {
-        // Of course, user defined type is OK. 
-        Task SomeClientMethod1(string user, string message, UserDefine userDefine);
-        Task SomeClientMethod2();
+        throw new NotImplementedException();
     }
 
-    // The return type of the method on the hub-side must be Task or Task <T>. 
-    public interface IHubContract
+    public Task SomeClientMethod3()
     {
-        Task<string> SomeHubMethod1(string user, string message);
-        Task SomeHubMethod2();
-        Task<string> SomeHubMethod3(string user, string message, CancellationToken cancellationToken);
+        throw new NotImplementedException();
     }
 
-    class Receiver : IClientContract, IHubConnectionObserver
+    public Task OnClosed(Exception e)
     {
-        public Task SomeClientMethod1(string user, string message, UserDefine userDefine)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SomeClientMethod2()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SomeClientMethod3()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task OnClosed(Exception e)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task OnReconnected(string connectionId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task OnReconnecting(Exception e)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 
-    class Re2 : SignalR.Shared.IClientContract
+    public Task OnReconnected(string connectionId)
     {
-        public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SomeClientMethod()
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 
-    interface IErrorProxy
+    public Task OnReconnecting(Exception e)
     {
-        Task<string> Hoge();
-        int Id { get; }
+        throw new NotImplementedException();
+    }
+}
+
+class Re2 : SignalR.Shared.IClientContract
+{
+    public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
+    {
+        throw new NotImplementedException();
     }
 
-    public static class Ex
+    public Task SomeClientMethod()
     {
-        public static IDisposable Subscribe<T>(this HubConnection source, T o)
-        {
-            return null;
-        }
+        throw new NotImplementedException();
+    }
+}
 
+interface IErrorProxy
+{
+    Task<string> Hoge();
+    int Id { get; }
+}
+
+public static class Ex
+{
+    public static IDisposable Subscribe<T>(this HubConnection source, T o)
+    {
+        return null;
     }
 
-    class Program
+}
+
+class Program
+{
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            var connection = new HubConnectionBuilder()
-               .WithUrl("https://~~~")
-               .Build();
+        var connection = new HubConnectionBuilder()
+           .WithUrl("https://~~~")
+           .Build();
 
-            // var hub = connection.CreateHubProxy<IErrorProxy>();
+        // var hub = connection.CreateHubProxy<IErrorProxy>();
 
-            connection.Register<IClientContract>(new Receiver());
-            connection.Register<SignalR.Shared.IClientContract>(new Re2());
+        connection.Register<IClientContract>(new Receiver());
+        connection.Register<SignalR.Shared.IClientContract>(new Re2());
 
 
-            //hub.Hoge();
-            //{
-            //    var hub = connection.CreateHubProxy<IHubContract>();
-            //    var subscription = connection.Register<IClientContract>(new Receiver());
+        //hub.Hoge();
+        //{
+        //    var hub = connection.CreateHubProxy<IHubContract>();
+        //    var subscription = connection.Register<IClientContract>(new Receiver());
 
-            //    hub.SomeHubMethod1("user", "message");
+        //    hub.SomeHubMethod1("user", "message");
 
-            //    subscription.Dispose();
-            //}
+        //    subscription.Dispose();
+        //}
 
-            //{
-            //    var (hub, subscription) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
-            //}
-        }
+        //{
+        //    var (hub, subscription) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
+        //}
     }
 }
