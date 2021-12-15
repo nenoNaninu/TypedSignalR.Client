@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace SignalR.Shared
@@ -39,15 +39,5 @@ namespace SignalR.Shared
         }
     }
 
-    public interface IErrorProxy
-    {
-        Task<string> Hoge();
-        int Id { get; } // forbidden property
-    }
 
-    public interface IErrorProxy2
-    {
-        Task<string> Hoge();
-        int Id(); // must Task or Task<T>
-    }
 }

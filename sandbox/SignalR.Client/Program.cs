@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
@@ -159,7 +159,7 @@ namespace SignalR.Client
                 var status = await client.SendMessage(user, message);
 
                 Console.WriteLine($"[Return status] {status.StatusMessage}");
-                
+
                 await Task.Delay(TimeSpan.FromSeconds(2));
             }
 
@@ -168,7 +168,7 @@ namespace SignalR.Client
 
             await connection.StopAsync();
             client.Dispose();
-            
+
             await Task.Delay(TimeSpan.FromSeconds(1));
         }
 

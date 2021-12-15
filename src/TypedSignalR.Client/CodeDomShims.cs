@@ -1,4 +1,4 @@
-﻿namespace System.CodeDom.Compiler
+namespace System.CodeDom.Compiler
 {
     public class CompilerError
     {

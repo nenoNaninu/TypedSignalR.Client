@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Threading;
-using TypedSignalR.Client;
-using SignalR.Shared;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
+using SignalR.Shared;
+using TypedSignalR.Client;
 
 namespace ConsoleApp
 {
@@ -30,6 +30,18 @@ namespace ConsoleApp
     {
     }
 
+    interface IErrorProxy
+    {
+        Task<string> Hoge(Guid guid, DateTime dateTime);
+        int Id { get; } // forbidden property
+    }
+
+    interface IErrorProxy2
+    {
+        Task<string> Hoge();
+        int Id(); // must Task or Task<T>
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -38,8 +50,8 @@ namespace ConsoleApp
                 .WithUrl("https://~~~")
                 .Build();
 
-            //connection.CreateHubProxy<IErrorProxy>();
-            //connection.CreateHubProxy<IErrorProxy2>();
+            connection.CreateHubProxy<IErrorProxy>();
+            connection.CreateHubProxy<IErrorProxy2>();
 
 
             var id = connection.ConnectionId;
@@ -49,7 +61,7 @@ namespace ConsoleApp
                 var (hub3, subscription1) = connection.CreateHubProxyWith<SignalR.Shared.IHubContract, SignalR.Shared.IClientContract>(new Receiver());
 
                 var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
-                
+
                 SignalR.Shared.IClientContract receiver = new Receiver();
                 var subscription3 = connection.Register(receiver);
 
@@ -72,13 +84,13 @@ namespace ConsoleApp
             {
                 // error pattern!
 
-                var hub4 = connection.CreateHubProxy<Receiver>(); // error
-                var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
-                var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
-                var hub7 = connection.CreateHubProxy<IErrorProxy3>(); // error
+                //var hub4 = connection.CreateHubProxy<Receiver>(); // error
+                //var hub5 = connection.CreateHubProxy<IErrorProxy>(); // error
+                //var hub6 = connection.CreateHubProxy<IErrorProxy2>(); // error
+                //var hub7 = connection.CreateHubProxy<IErrorProxy3>(); // error
 
-                var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
-                var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
+                //var subscription4 = connection.Register<IErrorReceiver>(new ErrorReceiver()); // error
+                //var subscription5 = connection.Register(new Receiver()); // error. type argument must be interface
             }
         }
     }
