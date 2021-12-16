@@ -14,13 +14,14 @@ public class UserDefineClass2
 
 public class Status2
 {
-    public string StatusMessage { get; set; }
+    public string? StatusMessage { get; set; }
 }
 
 public interface IClientContract
 {
     Task ReceiveMessage(string user, string message, UserDefineClass2 userDefine);
     Task SomeClientMethod();
+    Task ReceiveMessage2(string user, string message, UserDefineClass2 userDefine, int a0, int a1, int a2, int a3, int a4, int a5, int a6);
 }
 
 public interface IHubContract
@@ -32,6 +33,11 @@ public interface IHubContract
 class Receiver2 : IClientContract
 {
     public Task ReceiveMessage(string user, string message, UserDefineClass2 userDefine)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ReceiveMessage2(string user, string message, UserDefineClass2 userDefine, int a0, int a1, int a2, int a3, int a4, int a5, int a6)
     {
         throw new NotImplementedException();
     }
