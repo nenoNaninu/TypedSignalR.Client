@@ -43,9 +43,11 @@ namespace TypedSignalR.Client
 
 <# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
+
 <# foreach(var method in receiverType.Methods) { #>
             compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.ArgsTypeArrayToString() #>, CastHandlerFor<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
+
             return compositeDisposable;
         }
 
@@ -55,6 +57,7 @@ namespace TypedSignalR.Client
 <# foreach(var hubProxyType in HubProxyTypeList) {#>
             HubInvokerConstructorCache<<#= hubProxyType.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= hubProxyType.CollisionFreeName #>(connection);
 <# } #>
+
 <# foreach(var receiverType in ReceiverTypeList){ #>
             ReceiverBinderCache<<#= receiverType.InterfaceFullName #>>.Bind = Bind<#= receiverType.CollisionFreeName #>;
 <# } #>

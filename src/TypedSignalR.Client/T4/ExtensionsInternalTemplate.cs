@@ -73,7 +73,7 @@ namespace TypedSignalR.Client.T4
  } 
             this.Write("            var compositeDisposable = new CompositeDisposable(");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.Methods.Count + 1));
-            this.Write(");\r\n");
+            this.Write(");\r\n\r\n");
  foreach(var method in receiverType.Methods) { 
             this.Write("            compositeDisposable.Add(connection.On(nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
@@ -85,7 +85,7 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write(")));\r\n");
  } 
-            this.Write("            return compositeDisposable;\r\n        }\r\n\r\n");
+            this.Write("\r\n            return compositeDisposable;\r\n        }\r\n\r\n");
  } 
             this.Write("        static Extensions()\r\n        {\r\n");
  foreach(var hubProxyType in HubProxyTypeList) {
@@ -95,6 +95,7 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(hubProxyType.CollisionFreeName));
             this.Write("(connection);\r\n");
  } 
+            this.Write("\r\n");
  foreach(var receiverType in ReceiverTypeList){ 
             this.Write("            ReceiverBinderCache<");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.InterfaceFullName));
