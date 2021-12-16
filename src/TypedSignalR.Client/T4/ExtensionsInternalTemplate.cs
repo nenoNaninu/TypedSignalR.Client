@@ -44,13 +44,13 @@ namespace TypedSignalR.Client.T4
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgParameterToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgParameterString()));
             this.Write(")\r\n            {\r\n                return _connection.InvokeCoreAsync");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnGenericTypeArgToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateReturnGenericTypeArgString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("),");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgNamesToStringForInvokeCoreAsync()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgNamesStringForInvokeCoreAsync()));
             this.Write(");\r\n            }\r\n");
  } 
             this.Write("        }\r\n\r\n");
@@ -66,9 +66,9 @@ namespace TypedSignalR.Client.T4
                     "ndlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(System.Func");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.TypeArgsConcatenatedTaskToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromArgTypesConcatenatedTaskString()));
             this.Write(" method)\r\n            {\r\n                return args => method(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.CastedArgsToString("args")));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateCastedArgsString("args")));
             this.Write(");\r\n            }\r\n\r\n");
  } 
             this.Write("            var compositeDisposable = new CompositeDisposable(");
@@ -78,7 +78,7 @@ namespace TypedSignalR.Client.T4
             this.Write("            compositeDisposable.Add(connection.On(nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgsTypeArrayToString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgTypeArrayString()));
             this.Write(", ConvertToHandlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(receiver.");

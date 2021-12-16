@@ -23,7 +23,7 @@ namespace TypedSignalR.Client
             ReturnTypeGenericArg = returnTypeGenericArg;
         }
 
-        public string ArgParameterToString()
+        public string GenerateArgParameterString()
         {
             if (Args.Count == 0)
             {
@@ -52,7 +52,7 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string ArgNamesToStringForInvokeCoreAsync()
+        public string GenerateArgNamesStringForInvokeCoreAsync()
         {
             if (Args.Count == 0)
             {
@@ -61,7 +61,7 @@ namespace TypedSignalR.Client
 
             var sb = new StringBuilder();
 
-            sb.Append("new object[]{");
+            sb.Append("new object[] {");
             sb.Append(Args[0].argName);
 
             for (int i = 1; i < Args.Count; i++)
@@ -75,7 +75,7 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string TypeArgsToString()
+        public string GenerateTypeArgsFromArgTypesString()
         {
             if (Args.Count == 0)
             {
@@ -102,7 +102,7 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string TypeArgsConcatenatedTaskToString()
+        public string GenerateTypeArgsFromArgTypesConcatenatedTaskString()
         {
             if (Args.Count == 0)
             {
@@ -117,19 +117,18 @@ namespace TypedSignalR.Client
             var sb = new StringBuilder();
 
             sb.Append('<');
-            sb.Append(Args[0].typeName);
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 0; i < Args.Count; i++)
             {
-                sb.Append(',');
                 sb.Append(Args[i].typeName);
+                sb.Append(',');
             }
 
-            sb.Append(",System.Threading.Tasks.Task>");
+            sb.Append("System.Threading.Tasks.Task>");
             return sb.ToString();
         }
 
-        public string CastedArgsToString(string argName)
+        public string GenerateCastedArgsString(string argName)
         {
             if (Args.Count == 0)
             {
@@ -164,7 +163,7 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string ArgsTypeArrayToString()
+        public string GenerateArgTypeArrayString()
         {
             if (Args.Count == 0)
             {
@@ -173,12 +172,12 @@ namespace TypedSignalR.Client
 
             if (Args.Count == 1)
             {
-                return $"new[]{{typeof({Args[0].typeName})}}";
+                return $"new[] {{typeof({Args[0].typeName})}}";
             }
 
             var sb = new StringBuilder();
 
-            sb.Append("new[]{");
+            sb.Append("new[] {");
             sb.Append($"typeof({Args[0].typeName})");
 
             for (int i = 1; i < Args.Count; i++)
@@ -191,7 +190,7 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string ReturnGenericTypeArgToString()
+        public string GenerateReturnGenericTypeArgString()
         {
             return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
         }

@@ -24,9 +24,9 @@ namespace TypedSignalR.Client
             }
 <# foreach(var method in hubProxyType.Methods) { #>
 
-            public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.ArgParameterToString() #>)
+            public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.GenerateArgParameterString() #>)
             {
-                return _connection.InvokeCoreAsync<#= method.ReturnGenericTypeArgToString() #>(nameof(<#= method.MethodName #>),<#= method.ArgNamesToStringForInvokeCoreAsync() #>);
+                return _connection.InvokeCoreAsync<#= method.GenerateReturnGenericTypeArgString() #>(nameof(<#= method.MethodName #>),<#= method.GenerateArgNamesStringForInvokeCoreAsync() #>);
             }
 <# } #>
         }
@@ -36,16 +36,16 @@ namespace TypedSignalR.Client
         private static CompositeDisposable Bind<#= receiverType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
         {
 <# foreach(var method in receiverType.Methods) { #>
-            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.TypeArgsConcatenatedTaskToString() #> method)
+            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.GenerateTypeArgsFromArgTypesConcatenatedTaskString() #> method)
             {
-                return args => method(<#= method.CastedArgsToString("args") #>);
+                return args => method(<#= method.GenerateCastedArgsString("args") #>);
             }
 
 <# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
 
 <# foreach(var method in receiverType.Methods) { #>
-            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.ArgsTypeArrayToString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
+            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.GenerateArgTypeArrayString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
 
             return compositeDisposable;
