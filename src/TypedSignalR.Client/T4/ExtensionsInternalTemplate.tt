@@ -36,16 +36,16 @@ namespace TypedSignalR.Client
         private static CompositeDisposable Bind<#= receiverType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
         {
 <# foreach(var method in receiverType.Methods) { #>
-            static System.Func<object[], System.Threading.Tasks.Task> CastHandlerFor<#= method.MethodName #>(System.Func<#= method.TypeArgsConcatenatedTaskToString() #> handler)
+            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.TypeArgsConcatenatedTaskToString() #> method)
             {
-                return args => handler(<#= method.CastedArgsToString("args") #>);
+                return args => method(<#= method.CastedArgsToString("args") #>);
             }
 
 <# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
 
 <# foreach(var method in receiverType.Methods) { #>
-            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.ArgsTypeArrayToString() #>, CastHandlerFor<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
+            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.ArgsTypeArrayToString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
 
             return compositeDisposable;

@@ -62,12 +62,12 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.InterfaceFullName));
             this.Write(" receiver)\r\n        {\r\n");
  foreach(var method in receiverType.Methods) { 
-            this.Write("            static System.Func<object[], System.Threading.Tasks.Task> CastHandler" +
-                    "For");
+            this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
+                    "ndlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(System.Func");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.TypeArgsConcatenatedTaskToString()));
-            this.Write(" handler)\r\n            {\r\n                return args => handler(");
+            this.Write(" method)\r\n            {\r\n                return args => method(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.CastedArgsToString("args")));
             this.Write(");\r\n            }\r\n\r\n");
  } 
@@ -79,7 +79,7 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ArgsTypeArrayToString()));
-            this.Write(", CastHandlerFor");
+            this.Write(", ConvertToHandlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
