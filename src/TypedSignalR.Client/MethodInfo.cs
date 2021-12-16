@@ -64,7 +64,6 @@ namespace TypedSignalR.Client
             sb.Append("new object[]{");
             sb.Append(Args[0].argName);
 
-
             for (int i = 1; i < Args.Count; i++)
             {
                 sb.Append(',');
@@ -100,6 +99,95 @@ namespace TypedSignalR.Client
             }
 
             sb.Append('>');
+            return sb.ToString();
+        }
+
+        public string TypeArgsConcatenatedTaskToString()
+        {
+            if (Args.Count == 0)
+            {
+                return "<System.Threading.Tasks.Task>";
+            }
+
+            if (Args.Count == 1)
+            {
+                return $"<{Args[0].typeName},System.Threading.Tasks.Task>";
+            }
+
+            var sb = new StringBuilder();
+
+            sb.Append('<');
+            sb.Append(Args[0].typeName);
+
+            for (int i = 1; i < Args.Count; i++)
+            {
+                sb.Append(',');
+                sb.Append(Args[i].typeName);
+            }
+
+            sb.Append(",System.Threading.Tasks.Task>");
+            return sb.ToString();
+        }
+
+        public string CastedArgsToString(string argName)
+        {
+            if (Args.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (Args.Count == 1)
+            {
+                return $"({Args[0].typeName}){argName}[0]";
+            }
+
+            var sb = new StringBuilder();
+
+            sb.Append('(');
+            sb.Append(Args[0].typeName);
+            sb.Append(')');
+            sb.Append(argName);
+            sb.Append("[0]");
+
+            for (int i = 1; i < Args.Count; i++)
+            {
+                sb.Append(',');
+                sb.Append('(');
+                sb.Append(Args[i].typeName);
+                sb.Append(')');
+                sb.Append(argName);
+                sb.Append('[');
+                sb.Append(i.ToString());
+                sb.Append(']');
+            }
+
+            return sb.ToString();
+        }
+
+        public string ArgsTypeArrayToString()
+        {
+            if (Args.Count == 0)
+            {
+                return "System.Type.EmptyTypes";
+            }
+
+            if (Args.Count == 1)
+            {
+                return $"new[]{{typeof({Args[0].typeName})}}";
+            }
+
+            var sb = new StringBuilder();
+
+            sb.Append("new[]{");
+            sb.Append($"typeof({Args[0].typeName})");
+
+            for (int i = 1; i < Args.Count; i++)
+            {
+                sb.Append(',');
+                sb.Append($"typeof({Args[i].typeName})");
+            }
+
+            sb.Append('}');
             return sb.ToString();
         }
 

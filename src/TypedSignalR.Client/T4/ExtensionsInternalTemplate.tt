@@ -1,4 +1,4 @@
-﻿<#@ template language="C#" linePragmas="false" debug="false" hostspecific="false"#>
+<#@ template language="C#" linePragmas="false" debug="false" hostspecific="false"#>
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
@@ -35,9 +35,16 @@ namespace TypedSignalR.Client
 <# foreach(var receiverType in ReceiverTypeList){ #>
         private static CompositeDisposable Bind<#= receiverType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
         {
+<# foreach(var method in receiverType.Methods) { #>
+            static System.Func<object[], System.Threading.Tasks.Task> CastHandlerFor<#= method.MethodName #>(System.Func<#= method.TypeArgsConcatenatedTaskToString() #> handler)
+            {
+                return args => handler(<#= method.CastedArgsToString("args") #>);
+            }
+
+<# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
 <# foreach(var method in receiverType.Methods) { #>
-            compositeDisposable.Add(connection.On<#= method.TypeArgsToString() #>(nameof(receiver.<#= method.MethodName #>),receiver.<#= method.MethodName #>));
+            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.ArgsTypeArrayToString() #>, CastHandlerFor<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
             return compositeDisposable;
         }
