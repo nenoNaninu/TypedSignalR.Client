@@ -7,46 +7,46 @@ namespace TypedSignalR.Client
     {
         public string MethodName { get; }
         public string ReturnValueType { get; }
-        public IReadOnlyList<(string typeName, string argName)> Args { get; }
+        public IReadOnlyList<MethodParameter> Parameters { get; }
 
-        public bool IsGenericTypeReturn { get; }
-        public string? ReturnTypeGenericArg { get; }
+        public bool IsGenericReturnType { get; }
+        public string? GenericReturnTypeArg { get; }
 
-        /// <param name="isGenericTypeReturn">if return type is Task<T>, must be true. if return type is Task, must be false. </param>
+        /// <param name="isGenericReturnType">if return type is Task<T>, must be true. if return type is Task, must be false. </param>
         /// <param name="returnTypeGenericArg">e.g. if return type is Task<Datetime>, you must be input System.Datetime. if not generics, you must be input null. </param>
-        public MethodInfo(string methodName, string returnValueType, IReadOnlyList<(string typeName, string argName)> args, bool isGenericTypeReturn, string? returnTypeGenericArg)
+        public MethodInfo(string methodName, string returnValueType, IReadOnlyList<MethodParameter> parameters, bool isGenericReturnType, string? returnTypeGenericArg)
         {
             MethodName = methodName;
             ReturnValueType = returnValueType;
-            Args = args;
-            IsGenericTypeReturn = isGenericTypeReturn;
-            ReturnTypeGenericArg = returnTypeGenericArg;
+            Parameters = parameters;
+            IsGenericReturnType = isGenericReturnType;
+            GenericReturnTypeArg = returnTypeGenericArg;
         }
 
         public string GenerateArgParameterString()
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return string.Empty;
             }
 
-            if (Args.Count == 1)
+            if (Parameters.Count == 1)
             {
-                return $"{Args[0].typeName} {Args[0].argName}";
+                return $"{Parameters[0].TypeName} {Parameters[0].Name}";
             }
 
             var sb = new StringBuilder();
 
-            sb.Append(Args[0].typeName);
+            sb.Append(Parameters[0].TypeName);
             sb.Append(' ');
-            sb.Append(Args[0].argName);
+            sb.Append(Parameters[0].Name);
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 1; i < Parameters.Count; i++)
             {
                 sb.Append(',');
-                sb.Append(Args[i].typeName);
+                sb.Append(Parameters[i].TypeName);
                 sb.Append(' ');
-                sb.Append(Args[i].argName);
+                sb.Append(Parameters[i].Name);
             }
 
             return sb.ToString();
@@ -54,7 +54,7 @@ namespace TypedSignalR.Client
 
         public string GenerateArgNamesStringForInvokeCoreAsync()
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return "System.Array.Empty<object>()";
             }
@@ -62,12 +62,12 @@ namespace TypedSignalR.Client
             var sb = new StringBuilder();
 
             sb.Append("new object[] {");
-            sb.Append(Args[0].argName);
+            sb.Append(Parameters[0].Name);
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 1; i < Parameters.Count; i++)
             {
                 sb.Append(',');
-                sb.Append(Args[i].argName);
+                sb.Append(Parameters[i].Name);
             }
 
             sb.Append("}");
@@ -75,52 +75,52 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string GenerateTypeArgsFromArgTypesString()
+        public string GenerateTypeArgsFromParameterTypesString()
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return string.Empty;
             }
 
-            if (Args.Count == 1)
+            if (Parameters.Count == 1)
             {
-                return $"<{Args[0].typeName}>";
+                return $"<{Parameters[0].TypeName}>";
             }
 
             var sb = new StringBuilder();
 
             sb.Append('<');
-            sb.Append(Args[0].typeName);
+            sb.Append(Parameters[0].TypeName);
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 1; i < Parameters.Count; i++)
             {
                 sb.Append(',');
-                sb.Append(Args[i].typeName);
+                sb.Append(Parameters[i].TypeName);
             }
 
             sb.Append('>');
             return sb.ToString();
         }
 
-        public string GenerateTypeArgsFromArgTypesConcatenatedTaskString()
+        public string GenerateTypeArgsFromParameterTypesConcatenatedTaskString()
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return "<System.Threading.Tasks.Task>";
             }
 
-            if (Args.Count == 1)
+            if (Parameters.Count == 1)
             {
-                return $"<{Args[0].typeName},System.Threading.Tasks.Task>";
+                return $"<{Parameters[0].TypeName},System.Threading.Tasks.Task>";
             }
 
             var sb = new StringBuilder();
 
             sb.Append('<');
 
-            for (int i = 0; i < Args.Count; i++)
+            for (int i = 0; i < Parameters.Count; i++)
             {
-                sb.Append(Args[i].typeName);
+                sb.Append(Parameters[i].TypeName);
                 sb.Append(',');
             }
 
@@ -130,29 +130,29 @@ namespace TypedSignalR.Client
 
         public string GenerateCastedArgsString(string argName)
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return string.Empty;
             }
 
-            if (Args.Count == 1)
+            if (Parameters.Count == 1)
             {
-                return $"({Args[0].typeName}){argName}[0]";
+                return $"({Parameters[0].TypeName}){argName}[0]";
             }
 
             var sb = new StringBuilder();
 
             sb.Append('(');
-            sb.Append(Args[0].typeName);
+            sb.Append(Parameters[0].TypeName);
             sb.Append(')');
             sb.Append(argName);
             sb.Append("[0]");
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 1; i < Parameters.Count; i++)
             {
                 sb.Append(',');
                 sb.Append('(');
-                sb.Append(Args[i].typeName);
+                sb.Append(Parameters[i].TypeName);
                 sb.Append(')');
                 sb.Append(argName);
                 sb.Append('[');
@@ -163,36 +163,36 @@ namespace TypedSignalR.Client
             return sb.ToString();
         }
 
-        public string GenerateArgTypeArrayString()
+        public string GenerateParameterTypeArrayString()
         {
-            if (Args.Count == 0)
+            if (Parameters.Count == 0)
             {
                 return "System.Type.EmptyTypes";
             }
 
-            if (Args.Count == 1)
+            if (Parameters.Count == 1)
             {
-                return $"new[] {{typeof({Args[0].typeName})}}";
+                return $"new[] {{typeof({Parameters[0].TypeName})}}";
             }
 
             var sb = new StringBuilder();
 
             sb.Append("new[] {");
-            sb.Append($"typeof({Args[0].typeName})");
+            sb.Append($"typeof({Parameters[0].TypeName})");
 
-            for (int i = 1; i < Args.Count; i++)
+            for (int i = 1; i < Parameters.Count; i++)
             {
                 sb.Append(',');
-                sb.Append($"typeof({Args[i].typeName})");
+                sb.Append($"typeof({Parameters[i].TypeName})");
             }
 
             sb.Append('}');
             return sb.ToString();
         }
 
-        public string GenerateReturnGenericTypeArgString()
+        public string GenerateGenericReturnTypeArgString()
         {
-            return IsGenericTypeReturn ? $"<{ReturnTypeGenericArg}>" : string.Empty;
+            return IsGenericReturnType ? $"<{GenericReturnTypeArg}>" : string.Empty;
         }
     }
 }

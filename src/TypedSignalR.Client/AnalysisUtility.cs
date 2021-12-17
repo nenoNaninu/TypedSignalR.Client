@@ -20,7 +20,7 @@ namespace TypedSignalR.Client
                         continue;
                     }
 
-                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                    var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
                     INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
                     if (returnTypeSymbol is null)
@@ -66,7 +66,7 @@ namespace TypedSignalR.Client
             return (hubMethods, isValid);
         }
 
-        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol voidSymbol, Location memberAccessLocation)
         {
             var clientMethods = new List<MethodInfo>();
             bool isValid = true;
@@ -80,7 +80,7 @@ namespace TypedSignalR.Client
                         continue;
                     }
 
-                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // only Task. not Task<T>.
+                    INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or void. not Task<T>.
 
                     if (returnTypeSymbol is null)
                     {
@@ -93,13 +93,13 @@ namespace TypedSignalR.Client
                         continue;
                     }
 
-                    if (!ValidateClientMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, memberAccessLocation))
+                    if (!ValidateClientMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, voidSymbol, memberAccessLocation))
                     {
                         isValid = false;
                         continue;
                     }
 
-                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                    var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
                     var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
 
                     clientMethods.Add(methodInfo);
@@ -149,7 +149,7 @@ namespace TypedSignalR.Client
             return true;
         }
 
-        private static bool ValidateClientMethodReturnTypeRule(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        private static bool ValidateClientMethodReturnTypeRule(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol voidSymbol, Location memberAccessLocation)
         {
             if (returnTypeSymbol.IsGenericType)
             {
@@ -162,7 +162,7 @@ namespace TypedSignalR.Client
             }
             else
             {
-                if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default))
+                if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default) && !returnTypeSymbol.Equals(voidSymbol, SymbolEqualityComparer.Default))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,

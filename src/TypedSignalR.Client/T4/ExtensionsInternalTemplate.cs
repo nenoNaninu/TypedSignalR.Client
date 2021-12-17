@@ -46,7 +46,7 @@ namespace TypedSignalR.Client.T4
             this.Write("(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgParameterString()));
             this.Write(")\r\n            {\r\n                return _connection.InvokeCoreAsync");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateReturnGenericTypeArgString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateGenericReturnTypeArgString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("),");
@@ -60,16 +60,31 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.CollisionFreeName));
             this.Write("(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, ");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.InterfaceFullName));
-            this.Write(" receiver)\r\n        {\r\n");
+            this.Write(" receiver)\r\n        {\r\n            // It is not possible to avoid boxing.\r\n      " +
+                    "      // This is a limitation caused by the SignalR implementation.\r\n");
  foreach(var method in receiverType.Methods) { 
+ if (method.ReturnValueType == "void") {
+            this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
+                    "ndlerForm");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
+            this.Write("(System.Action");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromParameterTypesString()));
+            this.Write(" method)\r\n            {\r\n                return args => \r\n                {\r\n    " +
+                    "                method(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateCastedArgsString("args")));
+            this.Write(");\r\n                    return System.Threading.Tasks.Task.CompletedTask;\r\n      " +
+                    "          };\r\n            }\r\n");
+ } else { 
             this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
                     "ndlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(System.Func");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromArgTypesConcatenatedTaskString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromParameterTypesConcatenatedTaskString()));
             this.Write(" method)\r\n            {\r\n                return args => method(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateCastedArgsString("args")));
-            this.Write(");\r\n            }\r\n\r\n");
+            this.Write(");\r\n            }\r\n");
+ } 
+            this.Write("\r\n");
  } 
             this.Write("            var compositeDisposable = new CompositeDisposable(");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.Methods.Count + 1));
@@ -78,7 +93,7 @@ namespace TypedSignalR.Client.T4
             this.Write("            compositeDisposable.Add(connection.On(nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgTypeArrayString()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateParameterTypeArrayString()));
             this.Write(", ConvertToHandlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(receiver.");

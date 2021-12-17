@@ -26,7 +26,7 @@ namespace TypedSignalR.Client
 
             public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.GenerateArgParameterString() #>)
             {
-                return _connection.InvokeCoreAsync<#= method.GenerateReturnGenericTypeArgString() #>(nameof(<#= method.MethodName #>),<#= method.GenerateArgNamesStringForInvokeCoreAsync() #>);
+                return _connection.InvokeCoreAsync<#= method.GenerateGenericReturnTypeArgString() #>(nameof(<#= method.MethodName #>),<#= method.GenerateArgNamesStringForInvokeCoreAsync() #>);
             }
 <# } #>
         }
@@ -35,17 +35,30 @@ namespace TypedSignalR.Client
 <# foreach(var receiverType in ReceiverTypeList){ #>
         private static CompositeDisposable Bind<#= receiverType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
         {
+            // It is not possible to avoid boxing.
+            // This is a limitation caused by the SignalR implementation.
 <# foreach(var method in receiverType.Methods) { #>
-            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.GenerateTypeArgsFromArgTypesConcatenatedTaskString() #> method)
+<# if (method.ReturnValueType == "void") {#>
+            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Action<#= method.GenerateTypeArgsFromParameterTypesString() #> method)
+            {
+                return args => 
+                {
+                    method(<#= method.GenerateCastedArgsString("args") #>);
+                    return System.Threading.Tasks.Task.CompletedTask;
+                };
+            }
+<# } else { #>
+            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.GenerateTypeArgsFromParameterTypesConcatenatedTaskString() #> method)
             {
                 return args => method(<#= method.GenerateCastedArgsString("args") #>);
             }
+<# } #>
 
 <# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
 
 <# foreach(var method in receiverType.Methods) { #>
-            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.GenerateArgTypeArrayString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
+            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.GenerateParameterTypeArrayString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
 
             return compositeDisposable;
