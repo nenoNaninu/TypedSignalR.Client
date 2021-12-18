@@ -9,6 +9,7 @@
 // </auto-generated>
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -26,7 +27,7 @@ namespace TypedSignalR.Client
         private static class HubInvokerConstructorCache<T>
         {
 #pragma warning disable CS0649
-            public static Func<HubConnection, T> Construct;
+            public static Func<HubConnection, CancellationToken, T> Construct;
 #pragma warning restore CS0649 
         }
 
@@ -37,9 +38,9 @@ namespace TypedSignalR.Client
 #pragma warning restore CS0649
         }
 
-        public static THub CreateHubProxy<THub>(this HubConnection connection)
+        public static THub CreateHubProxy<THub>(this HubConnection connection, CancellationToken cancellationToken = default)
         {
-            return connection.CreateHubProxyCore<THub>();
+            return connection.CreateHubProxyCore<THub>(cancellationToken);
         }
 
         public static IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver)
@@ -47,16 +48,16 @@ namespace TypedSignalR.Client
             return connection.RegisterCore<TReceiver>(receiver);
         }
 
-        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection connection, TReceiver receiver)
+        public static (THub HubProxy, IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this HubConnection connection, TReceiver receiver, CancellationToken cancellationToken = default)
         {
-            var hubProxy = connection.CreateHubProxyCore<THub>();
+            var hubProxy = connection.CreateHubProxyCore<THub>(cancellationToken);
             var subscription = connection.RegisterCore<TReceiver>(receiver);
             return (hubProxy, subscription);
         }
 
-        private static THub CreateHubProxyCore<THub>(this HubConnection connection)
+        private static THub CreateHubProxyCore<THub>(this HubConnection connection, CancellationToken cancellationToken)
         {
-            return HubInvokerConstructorCache<THub>.Construct(connection);
+            return HubInvokerConstructorCache<THub>.Construct(connection, cancellationToken);
         }
 
         private static IDisposable RegisterCore<TReceiver>(this HubConnection connection, TReceiver receiver)

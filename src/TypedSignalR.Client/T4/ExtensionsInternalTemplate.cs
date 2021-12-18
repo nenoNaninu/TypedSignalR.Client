@@ -34,10 +34,13 @@ namespace TypedSignalR.Client.T4
             this.Write(" : ");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubProxyType.InterfaceFullName));
             this.Write("\r\n        {\r\n            private readonly Microsoft.AspNetCore.SignalR.Client.Hub" +
-                    "Connection _connection;\r\n\r\n            public HubInvokerFor");
+                    "Connection _connection;\r\n            private readonly System.Threading.Cancellat" +
+                    "ionToken _cancellationToken;\r\n\r\n            public HubInvokerFor");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubProxyType.CollisionFreeName));
-            this.Write("(Microsoft.AspNetCore.SignalR.Client.HubConnection connection)\r\n            {\r\n  " +
-                    "              _connection = connection;\r\n            }\r\n");
+            this.Write("(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, System.Threading.C" +
+                    "ancellationToken cancellationToken)\r\n            {\r\n                _connection " +
+                    "= connection;\r\n                _cancellationToken = cancellationToken;\r\n        " +
+                    "    }\r\n");
  foreach(var method in hubProxyType.Methods) { 
             this.Write("\r\n            public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType));
@@ -49,9 +52,9 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateGenericReturnTypeArgString()));
             this.Write("(nameof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write("),");
+            this.Write("), ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateArgNamesStringForInvokeCoreAsync()));
-            this.Write(");\r\n            }\r\n");
+            this.Write(", _cancellationToken);\r\n            }\r\n");
  } 
             this.Write("        }\r\n\r\n");
  } 
@@ -90,7 +93,8 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.Methods.Count + 1));
             this.Write(");\r\n\r\n");
  foreach(var method in receiverType.Methods) { 
-            this.Write("            compositeDisposable.Add(connection.On(nameof(receiver.");
+            this.Write("            compositeDisposable.Add(Microsoft.AspNetCore.SignalR.Client.HubConnec" +
+                    "tionExtensions.On(connection, nameof(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("), ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateParameterTypeArrayString()));
@@ -106,9 +110,9 @@ namespace TypedSignalR.Client.T4
  foreach(var hubProxyType in HubProxyTypeList) {
             this.Write("            HubInvokerConstructorCache<");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubProxyType.InterfaceFullName));
-            this.Write(">.Construct = static connection => new HubInvokerFor");
+            this.Write(">.Construct = static (connection, cancellationToken) => new HubInvokerFor");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubProxyType.CollisionFreeName));
-            this.Write("(connection);\r\n");
+            this.Write("(connection, cancellationToken);\r\n");
  } 
             this.Write("\r\n");
  foreach(var receiverType in ReceiverTypeList){ 

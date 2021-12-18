@@ -17,16 +17,18 @@ namespace TypedSignalR.Client
         private class HubInvokerFor<#= hubProxyType.CollisionFreeName #> : <#= hubProxyType.InterfaceFullName  #>
         {
             private readonly Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
+            private readonly System.Threading.CancellationToken _cancellationToken;
 
-            public HubInvokerFor<#= hubProxyType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection)
+            public HubInvokerFor<#= hubProxyType.CollisionFreeName #>(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, System.Threading.CancellationToken cancellationToken)
             {
                 _connection = connection;
+                _cancellationToken = cancellationToken;
             }
 <# foreach(var method in hubProxyType.Methods) { #>
 
             public <#= method.ReturnType #> <#= method.MethodName #>(<#= method.GenerateArgParameterString() #>)
             {
-                return _connection.InvokeCoreAsync<#= method.GenerateGenericReturnTypeArgString() #>(nameof(<#= method.MethodName #>),<#= method.GenerateArgNamesStringForInvokeCoreAsync() #>);
+                return _connection.InvokeCoreAsync<#= method.GenerateGenericReturnTypeArgString() #>(nameof(<#= method.MethodName #>), <#= method.GenerateArgNamesStringForInvokeCoreAsync() #>, _cancellationToken);
             }
 <# } #>
         }
@@ -58,7 +60,7 @@ namespace TypedSignalR.Client
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
 
 <# foreach(var method in receiverType.Methods) { #>
-            compositeDisposable.Add(connection.On(nameof(receiver.<#= method.MethodName #>), <#= method.GenerateParameterTypeArrayString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
+            compositeDisposable.Add(Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.<#= method.MethodName #>), <#= method.GenerateParameterTypeArrayString() #>, ConvertToHandlerForm<#= method.MethodName #>(receiver.<#= method.MethodName #>)));
 <# } #>
 
             return compositeDisposable;
@@ -68,7 +70,7 @@ namespace TypedSignalR.Client
         static Extensions()
         {
 <# foreach(var hubProxyType in HubProxyTypeList) {#>
-            HubInvokerConstructorCache<<#= hubProxyType.InterfaceFullName #>>.Construct = static connection => new HubInvokerFor<#= hubProxyType.CollisionFreeName #>(connection);
+            HubInvokerConstructorCache<<#= hubProxyType.InterfaceFullName #>>.Construct = static (connection, cancellationToken) => new HubInvokerFor<#= hubProxyType.CollisionFreeName #>(connection, cancellationToken);
 <# } #>
 
 <# foreach(var receiverType in ReceiverTypeList){ #>
