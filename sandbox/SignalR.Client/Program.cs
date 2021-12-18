@@ -8,11 +8,9 @@ namespace SignalR.Client;
 
 class Receiver : IClientContract, IHubConnectionObserver
 {
-    public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
+    public void ReceiveMessage(string user, string message, UserDefineClass userDefine)
     {
         Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
-
-        return Task.CompletedTask;
     }
 
     public Task SomeClientMethod()
@@ -52,10 +50,9 @@ class Client : IClientContract, IHubConnectionObserver, IDisposable
         _subscription = connection.Register<IClientContract>(this);
     }
 
-    Task IClientContract.ReceiveMessage(string user, string message, UserDefineClass userDefine)
+    void IClientContract.ReceiveMessage(string user, string message, UserDefineClass userDefine)
     {
         Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
-        return Task.CompletedTask;
     }
 
     Task IClientContract.SomeClientMethod()
