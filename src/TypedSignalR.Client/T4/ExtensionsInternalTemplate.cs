@@ -40,7 +40,7 @@ namespace TypedSignalR.Client.T4
                     "              _connection = connection;\r\n            }\r\n");
  foreach(var method in hubProxyType.Methods) { 
             this.Write("\r\n            public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnValueType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType));
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write("(");
@@ -63,7 +63,7 @@ namespace TypedSignalR.Client.T4
             this.Write(" receiver)\r\n        {\r\n            // It is not possible to avoid boxing.\r\n      " +
                     "      // This is a limitation caused by the SignalR implementation.\r\n");
  foreach(var method in receiverType.Methods) { 
- if (method.ReturnValueType == "void") {
+ if (method.ReturnType == "void") {
             this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
                     "ndlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));

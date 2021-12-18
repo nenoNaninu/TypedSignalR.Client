@@ -24,7 +24,7 @@ namespace TypedSignalR.Client
             }
 <# foreach(var method in hubProxyType.Methods) { #>
 
-            public <#= method.ReturnValueType #> <#= method.MethodName #>(<#= method.GenerateArgParameterString() #>)
+            public <#= method.ReturnType #> <#= method.MethodName #>(<#= method.GenerateArgParameterString() #>)
             {
                 return _connection.InvokeCoreAsync<#= method.GenerateGenericReturnTypeArgString() #>(nameof(<#= method.MethodName #>),<#= method.GenerateArgNamesStringForInvokeCoreAsync() #>);
             }
@@ -38,7 +38,7 @@ namespace TypedSignalR.Client
             // It is not possible to avoid boxing.
             // This is a limitation caused by the SignalR implementation.
 <# foreach(var method in receiverType.Methods) { #>
-<# if (method.ReturnValueType == "void") {#>
+<# if (method.ReturnType == "void") {#>
             static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Action<#= method.GenerateTypeArgsFromParameterTypesString() #> method)
             {
                 return args => 

@@ -44,8 +44,8 @@ namespace TypedSignalR.Client
 
                     var methodInfo = new MethodInfo(
                         methodSymbol.Name,
-                        methodSymbol.ReturnType.ToDisplayString(),
                         parameters,
+                        methodSymbol.ReturnType.ToDisplayString(),
                         returnTypeSymbol.IsGenericType,
                         genericArg?.ToDisplayString());
 
@@ -100,7 +100,7 @@ namespace TypedSignalR.Client
                     }
 
                     var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
-                    var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
+                    var methodInfo = new MethodInfo(methodSymbol.Name, parameters, methodSymbol.ReturnType.ToDisplayString(), false, null);
 
                     clientMethods.Add(methodInfo);
                 }
