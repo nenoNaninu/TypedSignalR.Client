@@ -67,18 +67,6 @@ namespace TypedSignalR.Client.T4
             this.Write(" receiver)\r\n        {\r\n            // It is not possible to avoid boxing.\r\n      " +
                     "      // This is a limitation caused by the SignalR implementation.\r\n");
  foreach(var method in receiverType.Methods) { 
- if (method.ReturnType == "void") {
-            this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
-                    "ndlerForm");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write("(System.Action");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromParameterTypesString()));
-            this.Write(" method)\r\n            {\r\n                return args => \r\n                {\r\n    " +
-                    "                method(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateCastedArgsString("args")));
-            this.Write(");\r\n                    return System.Threading.Tasks.Task.CompletedTask;\r\n      " +
-                    "          };\r\n            }\r\n");
- } else { 
             this.Write("            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHa" +
                     "ndlerForm");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
@@ -86,9 +74,7 @@ namespace TypedSignalR.Client.T4
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateTypeArgsFromParameterTypesConcatenatedTaskString()));
             this.Write(" method)\r\n            {\r\n                return args => method(");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.GenerateCastedArgsString("args")));
-            this.Write(");\r\n            }\r\n");
- } 
-            this.Write("\r\n");
+            this.Write(");\r\n            }\r\n\r\n");
  } 
             this.Write("            var compositeDisposable = new CompositeDisposable(");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.Methods.Count + 1));

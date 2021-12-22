@@ -16,7 +16,7 @@ public class Status
 
 public interface IClientContract
 {
-    void ReceiveMessage(string user, string message, UserDefineClass userDefine);
+    Task ReceiveMessage(string user, string message, UserDefineClass userDefine);
     Task SomeClientMethod();
 }
 

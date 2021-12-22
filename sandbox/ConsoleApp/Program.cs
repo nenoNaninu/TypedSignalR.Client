@@ -9,7 +9,7 @@ namespace ConsoleApp;
 
 class Receiver : SignalR.Shared.IClientContract
 {
-    public void ReceiveMessage(string user, string message, UserDefineClass userDefine)
+    public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
     {
         throw new NotImplementedException();
     }
@@ -52,8 +52,6 @@ class Program
 
         //connection.CreateHubProxy<IErrorProxy>(); // error
         //connection.CreateHubProxy<IErrorProxy2>(); // error
-
-        connection.Register<IClientContract2>(new Receiver3());
 
         var id = connection.ConnectionId;
         {

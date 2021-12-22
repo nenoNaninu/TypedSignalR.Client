@@ -53,7 +53,7 @@ namespace TypedSignalR.Client.SourceGenerator
             var containingNamespace = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.ContainingNamespace;
             var voidSymbol = context.Compilation.GetSpecialType(SpecialType.System_Void);
 
-            return new SpecialSymbols(hubConnectionSymbol!, voidSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
+            return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
 
         private static (IReadOnlyList<HubProxyTypeInfo> HubProxyTypeList, IReadOnlyList<ReceiverTypeInfo> ReceiverTypeList) ExtractTargetTypes(GeneratorExecutionContext context, ExtensionMethodSyntaxReceiver receiver)
@@ -199,7 +199,7 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!receiverTypeList.Any(receiverType))
                     {
-                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, specialSymbols.Void, target.GetLocation());
+                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, target.GetLocation());
 
                         if (isValid)
                         {
@@ -262,7 +262,7 @@ namespace TypedSignalR.Client.SourceGenerator
 
                     if (!receiverTypeList.Any(receiverType))
                     {
-                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, specialSymbols.Void, target.GetLocation());
+                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, target.GetLocation());
 
                         if (isValid)
                         {
@@ -277,7 +277,6 @@ namespace TypedSignalR.Client.SourceGenerator
         private readonly struct SpecialSymbols
         {
             public readonly INamedTypeSymbol HubConnection;
-            public readonly INamedTypeSymbol Void;
             public readonly INamedTypeSymbol Task;
             public readonly INamedTypeSymbol GenericTask;
             public readonly INamedTypeSymbol HubConnectionObserver;
@@ -285,7 +284,6 @@ namespace TypedSignalR.Client.SourceGenerator
 
             public SpecialSymbols(
                 INamedTypeSymbol hubConnection,
-                INamedTypeSymbol voidSymbol,
                 INamedTypeSymbol task,
                 INamedTypeSymbol genericTask,
                 INamedTypeSymbol hubConnectionObserver,
@@ -293,7 +291,6 @@ namespace TypedSignalR.Client.SourceGenerator
                )
             {
                 HubConnection = hubConnection;
-                Void = voidSymbol;
                 Task = task;
                 GenericTask = genericTask;
                 HubConnectionObserver = hubConnectionObserver;

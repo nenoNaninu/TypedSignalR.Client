@@ -38,21 +38,10 @@ namespace TypedSignalR.Client
             // It is not possible to avoid boxing.
             // This is a limitation caused by the SignalR implementation.
 <# foreach(var method in receiverType.Methods) { #>
-<# if (method.ReturnType == "void") {#>
-            static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Action<#= method.GenerateTypeArgsFromParameterTypesString() #> method)
-            {
-                return args => 
-                {
-                    method(<#= method.GenerateCastedArgsString("args") #>);
-                    return System.Threading.Tasks.Task.CompletedTask;
-                };
-            }
-<# } else { #>
             static System.Func<object[], System.Threading.Tasks.Task> ConvertToHandlerForm<#= method.MethodName #>(System.Func<#= method.GenerateTypeArgsFromParameterTypesConcatenatedTaskString() #> method)
             {
                 return args => method(<#= method.GenerateCastedArgsString("args") #>);
             }
-<# } #>
 
 <# } #>
             var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count + 1 #>);
