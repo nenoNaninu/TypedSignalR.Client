@@ -1,6 +1,18 @@
-#  TypedSignalR.Client
+# TypedSignalR.Client
 
 C# Source Generator to create strongly typed SignalR Client.
+
+## Contents table
+- [Install](#install)
+- [Why TypedSignalR.Client?](#why-typedsignalrclient)
+- [API](#api)
+- [Usage](#usage)
+  - [Client](#client)
+  - [Server](#server)
+  - [Recommendation](#recommendation)
+- [Compile-time error support](#compile-time-error-support)
+- [Generated code](#generated-code)
+- [Demo](#demo)
 
 # Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
