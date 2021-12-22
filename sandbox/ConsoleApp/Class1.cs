@@ -24,12 +24,6 @@ public interface IClientContract
     Task ReceiveMessage2(string user, string message, UserDefineClass2 userDefine, int a0, int a1, int a2, int a3, int a4, int a5, int a6);
 }
 
-public interface IClientContract2
-{
-    void ReceiveMessage(string user, string message, UserDefineClass2 userDefine);
-}
-
-
 public interface IHubContract
 {
     Task<Status2> SendMessage(string user, string message);
@@ -49,14 +43,6 @@ class Receiver2 : IClientContract
     }
 
     public Task SomeClientMethod()
-    {
-        throw new NotImplementedException();
-    }
-}
-
-class Receiver3 : IClientContract2
-{
-    public void ReceiveMessage(string user, string message, UserDefineClass2 userDefine)
     {
         throw new NotImplementedException();
     }
