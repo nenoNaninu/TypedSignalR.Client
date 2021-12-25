@@ -26,7 +26,7 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
         _output = output;
 
         _connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7105/Hubs/ReceiverTestHub")
+            .WithUrl("http://localhost:5105/Hubs/ReceiverTestHub")
             .Build();
 
         _receiverTestHub = _connection.CreateHubProxy<IReceiverTestHub>(_cancellationTokenSource.Token);

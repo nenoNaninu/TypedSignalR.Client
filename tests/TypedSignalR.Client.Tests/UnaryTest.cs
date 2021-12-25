@@ -17,7 +17,7 @@ public class UnaryTest : IAsyncLifetime
     public UnaryTest()
     {
         _connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7105/Hubs/UnaryHub")
+            .WithUrl("http://localhost:5105/Hubs/UnaryHub")
             .Build();
 
         _unaryHub = _connection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);

@@ -18,7 +18,7 @@ public class PostTest : IAsyncLifetime
     public PostTest()
     {
         _connection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7105/Hubs/SideEffectHub")
+            .WithUrl("http://localhost:5105/Hubs/SideEffectHub")
             .Build();
 
         _sideEffectHub = _connection.CreateHubProxy<ISideEffectHub>(_cancellationTokenSource.Token);
