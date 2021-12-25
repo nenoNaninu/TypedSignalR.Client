@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32002.185
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{196DB73F-4D3E-4A90-AE48-40925CB33560}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypedSignalR.Client", "src\TypedSignalR.Client\TypedSignalR.Client.csproj", "{EDC5E6DA-4645-4464-B14E-CCC6F6479441}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Server", "sandbox\SignalR.Server\SignalR.Server.csproj", "{A16B2B54-E9CC-4ACF-A22E-82A1E8961B27}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sandbox", "sandbox", "{36823042-8A13-4AA5-BEEC-112F8DCF6FA9}"
@@ -13,19 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Shared", "sandbox\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Client", "sandbox\SignalR.Client\SignalR.Client.csproj", "{22892B6B-365A-4B41-8BB1-EFE08C08DC67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypedSignalR.Client", "src\TypedSignalR.Client\TypedSignalR.Client.csproj", "{EDC5E6DA-4645-4464-B14E-CCC6F6479441}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "sandbox\ConsoleApp\ConsoleApp.csproj", "{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "sandbox\Example\Example.csproj", "{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests", "tests\TypedSignalR.Client.Tests\TypedSignalR.Client.Tests.csproj", "{E474A97E-3AC5-4A78-B4E6-E387B871C95D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests", "tests\TypedSignalR.Client.Tests\TypedSignalR.Client.Tests.csproj", "{E474A97E-3AC5-4A78-B4E6-E387B871C95D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests.Server", "tests\TypedSignalR.Client.Tests.Server\TypedSignalR.Client.Tests.Server.csproj", "{850F9D0F-43C7-4605-B811-338BB36AE319}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests.Shared", "TypedSignalR.Client.Tests.Shared\TypedSignalR.Client.Tests.Shared.csproj", "{0628FEE3-2C6E-4C02-A398-4E55781A5A85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests.Shared", "tests\TypedSignalR.Client.Tests.Shared\TypedSignalR.Client.Tests.Shared.csproj", "{0628FEE3-2C6E-4C02-A398-4E55781A5A85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,8 +1,14 @@
+using TypedSignalR.Client.Tests.Server.Services;
+using TypedSignalR.Client.Tests.Server.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
+
+builder.Services.AddSingleton<IDataStore, DataStore>();
 
 var app = builder.Build();
 
@@ -13,5 +19,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<UnaryHub>("/Hubs/UnaryHub");
+app.MapHub<SideEffectHub>("/Hubs/SideEffectHub");
+app.MapHub<ReceiverTestHub>("/Hubs/ReceiverTestHub");
 
 app.Run();
