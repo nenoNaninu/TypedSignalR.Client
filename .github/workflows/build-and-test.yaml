@@ -1,0 +1,35 @@
+name: build-and-test
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches: [master]
+
+env:
+  DOTNET_VERSION: "6.0.x"
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-and-test:
+    name: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+      - name: Launch Server
+        run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
+
+      - name: Test
+        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore

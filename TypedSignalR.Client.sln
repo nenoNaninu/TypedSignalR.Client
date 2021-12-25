@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32002.185
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{196DB73F-4D3E-4A90-AE48-40925CB33560}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypedSignalR.Client", "src\TypedSignalR.Client\TypedSignalR.Client.csproj", "{EDC5E6DA-4645-4464-B14E-CCC6F6479441}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Server", "sandbox\SignalR.Server\SignalR.Server.csproj", "{A16B2B54-E9CC-4ACF-A22E-82A1E8961B27}"
 EndProject
@@ -13,11 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Shared", "sandbox\S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalR.Client", "sandbox\SignalR.Client\SignalR.Client.csproj", "{22892B6B-365A-4B41-8BB1-EFE08C08DC67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypedSignalR.Client", "src\TypedSignalR.Client\TypedSignalR.Client.csproj", "{EDC5E6DA-4645-4464-B14E-CCC6F6479441}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "sandbox\ConsoleApp\ConsoleApp.csproj", "{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "sandbox\Example\Example.csproj", "{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests", "tests\TypedSignalR.Client.Tests\TypedSignalR.Client.Tests.csproj", "{E474A97E-3AC5-4A78-B4E6-E387B871C95D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests.Server", "tests\TypedSignalR.Client.Tests.Server\TypedSignalR.Client.Tests.Server.csproj", "{850F9D0F-43C7-4605-B811-338BB36AE319}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.Tests.Shared", "tests\TypedSignalR.Client.Tests.Shared\TypedSignalR.Client.Tests.Shared.csproj", "{0628FEE3-2C6E-4C02-A398-4E55781A5A85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +57,18 @@ Global
 		{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E474A97E-3AC5-4A78-B4E6-E387B871C95D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E474A97E-3AC5-4A78-B4E6-E387B871C95D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E474A97E-3AC5-4A78-B4E6-E387B871C95D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E474A97E-3AC5-4A78-B4E6-E387B871C95D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{850F9D0F-43C7-4605-B811-338BB36AE319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{850F9D0F-43C7-4605-B811-338BB36AE319}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{850F9D0F-43C7-4605-B811-338BB36AE319}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{850F9D0F-43C7-4605-B811-338BB36AE319}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0628FEE3-2C6E-4C02-A398-4E55781A5A85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0628FEE3-2C6E-4C02-A398-4E55781A5A85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0628FEE3-2C6E-4C02-A398-4E55781A5A85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0628FEE3-2C6E-4C02-A398-4E55781A5A85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +80,9 @@ Global
 		{EDC5E6DA-4645-4464-B14E-CCC6F6479441} = {196DB73F-4D3E-4A90-AE48-40925CB33560}
 		{4281AD5C-C2E5-48AF-AA61-FC00416B8DD3} = {36823042-8A13-4AA5-BEEC-112F8DCF6FA9}
 		{FD57CDFE-D56F-4AF8-A31B-2AC0CFF186D7} = {36823042-8A13-4AA5-BEEC-112F8DCF6FA9}
+		{E474A97E-3AC5-4A78-B4E6-E387B871C95D} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
+		{850F9D0F-43C7-4605-B811-338BB36AE319} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
+		{0628FEE3-2C6E-4C02-A398-4E55781A5A85} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C64E712-2479-4BF8-9169-B21DC3E787EC}
