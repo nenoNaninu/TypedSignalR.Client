@@ -1,5 +1,7 @@
 # TypedSignalR.Client
 
+[![build-and-test](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml)
+
 C# Source Generator to create strongly typed SignalR Client.
 
 ## Contents table
