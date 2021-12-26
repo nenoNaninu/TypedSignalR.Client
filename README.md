@@ -4,7 +4,7 @@
 
 C# Source Generator to create strongly typed SignalR Client.
 
-## Contents table
+## Table of Contents
 - [Install](#install)
 - [Why TypedSignalR.Client?](#why-typedsignalrclient)
 - [API](#api)
