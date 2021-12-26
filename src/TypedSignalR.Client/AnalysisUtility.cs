@@ -20,7 +20,7 @@ namespace TypedSignalR.Client
                         continue;
                     }
 
-                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
+                    var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
                     INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
                     if (returnTypeSymbol is null)
@@ -44,8 +44,8 @@ namespace TypedSignalR.Client
 
                     var methodInfo = new MethodInfo(
                         methodSymbol.Name,
-                        methodSymbol.ReturnType.ToDisplayString(),
                         parameters,
+                        methodSymbol.ReturnType.ToDisplayString(),
                         returnTypeSymbol.IsGenericType,
                         genericArg?.ToDisplayString());
 
@@ -99,8 +99,8 @@ namespace TypedSignalR.Client
                         continue;
                     }
 
-                    var parameters = methodSymbol.Parameters.Select(x => (x.Type.ToDisplayString(), x.Name)).ToArray();
-                    var methodInfo = new MethodInfo(methodSymbol.Name, methodSymbol.ReturnType.ToDisplayString(), parameters, false, null);
+                    var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
+                    var methodInfo = new MethodInfo(methodSymbol.Name, parameters, methodSymbol.ReturnType.ToDisplayString(), false, null);
 
                     clientMethods.Add(methodInfo);
                 }

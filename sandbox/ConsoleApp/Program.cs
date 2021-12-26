@@ -53,7 +53,6 @@ class Program
         //connection.CreateHubProxy<IErrorProxy>(); // error
         //connection.CreateHubProxy<IErrorProxy2>(); // error
 
-
         var id = connection.ConnectionId;
         {
             var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
@@ -77,6 +76,7 @@ class Program
             var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
             var subscription3 = connection.Register(receiver);
         }
+
         {
             var empty = connection.CreateHubProxy<IEmptyProxy>();
         }

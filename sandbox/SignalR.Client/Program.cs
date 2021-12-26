@@ -11,7 +11,6 @@ class Receiver : IClientContract, IHubConnectionObserver
     public Task ReceiveMessage(string user, string message, UserDefineClass userDefine)
     {
         Console.WriteLine($"{Environment.NewLine}[Call ReceiveMessage] user: {user}, message: {message}, userDefine.RandomId: {userDefine.RandomId}");
-
         return Task.CompletedTask;
     }
 
