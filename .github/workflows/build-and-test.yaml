@@ -22,13 +22,13 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install dependencies
+      - name: Restore dependencies.
         run: dotnet restore
 
-      - name: Build
+      - name: Build TypedSignalR.Client.csproj
         run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
 
-      - name: Launch Server
+      - name: Launch test server
         run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
 
       - name: Test
