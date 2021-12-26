@@ -1,5 +1,5 @@
-using TypedSignalR.Client.Tests.Server.Services;
 using TypedSignalR.Client.Tests.Server.Hubs;
+using TypedSignalR.Client.Tests.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
