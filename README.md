@@ -10,6 +10,7 @@ C# Source Generator to create strongly typed SignalR Client.
 - [API](#api)
 - [Usage](#usage)
   - [Client](#client)
+    - [Cancellation](#cancellation)
   - [Server](#server)
   - [Recommendation](#recommendation)
 - [Compile-time error support](#compile-time-error-support)
@@ -90,15 +91,15 @@ public class UserDefine
 public interface IClientContract
 {
     // Of course, user defined type is OK. 
-    Task SomeClientMethod1(string user, string message, UserDefine userDefine);
-    Task SomeClientMethod2();
+    Task ClientMethod1(string user, string message, UserDefine userDefine);
+    Task ClientMethod2();
 }
 
 // The return type of the method on the hub-side must be Task or Task <T>. 
 public interface IHubContract
 {
-    Task<string> SomeHubMethod1(string user, string message);
-    Task SomeHubMethod2();
+    Task<string> HubMethod1(string user, string message);
+    Task HubMethod2();
 }
 
 class Receiver1 : IClientContract
@@ -115,23 +116,45 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 ## Client
 It's very easy to use. 
 ```cs
+
 HubConnection connection = ...;
 
 var hub = connection.CreateHubProxy<IHubContract>();
 var subscription1 = connection.Register<IClientContract>(new Receiver1());
 
 // When an instance of a class that implements IHubConnectionObserver is registered (Receiver2 in this case), 
-//the method defined in IHubConnectionObserver is automatically registered regardless of the type argument. 
+// the method defined in IHubConnectionObserver is automatically registered regardless of the type argument. 
 var subscription2 = connection.Register<IClientContract>(new Receiver2());
 
 // or
 var (hub2, subscription3) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
 
 // Invoke hub methods
-hub.SomeHubMethod1("user", "message");
+hub.HubMethod1("user", "message");
 
 // Unregister the receiver
 subscription.Dispose();
+```
+
+### Cancellation
+In pure SignalR, `CancellationToken` is passed for each invoke.
+
+On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating HubProxy.
+The passed `CancelationToken` will be used for each internal invoke.
+
+```cs
+var cts = new CancellationTokenSource();
+
+// The following two are equivalent.
+
+// pure SignalR
+var ret=  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
+await connection.InvokeAsync("HubMethod2", cts.Token);
+
+// TypedSignalR.Client
+var hubProxy = connection.CreateHubProxy<IHubContract>(cts.Token);
+var ret = await hubProxy.HubMethod1("user", "message");
+await hubProxy.HubMethod2();
 ```
 
 ## Server
@@ -143,15 +166,15 @@ using Microsoft.AspNetCore.SignalR;
 
 public class SomeHub : Hub<IClientContract>, IHubContract
 {
-    public async Task<string> SomeHubMethod1(string user, string message)
+    public async Task<string> HubMethod1(string user, string message)
     {
-        await this.Clients.All.SomeClientMethod1(user, message, new UserDefineClass());
+        await this.Clients.All.ClientMethod1(user, message, new UserDefineClass());
         return "OK!";
     }
 
-    public async Task SomeHubMethod2()
+    public async Task HubMethod2()
     {
-        await this.Clients.Caller.SomeClientMethod2();
+        await this.Clients.Caller.ClientMethod2();
     }
 }
 ```
@@ -197,21 +220,21 @@ public static partial class Extensions
             _connection = connection;
         }
 
-        public Task<string> SomeHubMethod1(string user, string message)
+        public Task<string> HubMethod1(string user, string message)
         {
-            return _connection.InvokeCoreAsync<string>(nameof(SomeHubMethod1), new object[] { user, message });
+            return _connection.InvokeCoreAsync<string>(nameof(HubMethod1), new object[] { user, message });
         }
 
-        public Task SomeHubMethod2()
+        public Task HubMethod2()
         {
-            return _connection.InvokeCoreAsync(nameof(SomeHubMethod2), System.Array.Empty<object>());
+            return _connection.InvokeCoreAsync(nameof(HubMethod2), System.Array.Empty<object>());
         }
     }
 
     private static CompositeDisposable BindIClientContract(HubConnection connection, IClientContract receiver)
     {
-        var d1 = connection.On<string, string UserDefine>(nameof(receiver.SomeClientMethod1), receiver.SomeClientMethod1);
-        var d2 = connection.On(nameof(receiver.SomeClientMethod2), receiver.SomeClientMethod2);
+        var d1 = connection.On<string, string UserDefine>(nameof(receiver.ClientMethod1), receiver.ClientMethod1);
+        var d2 = connection.On(nameof(receiver.ClientMethod2), receiver.ClientMethod2);
 
         var compositeDisposable = new CompositeDisposable();
         compositeDisposable.Add(d1);
