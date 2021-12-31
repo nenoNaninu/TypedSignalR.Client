@@ -51,7 +51,6 @@ namespace TypedSignalR.Client.SourceGenerator
             var genericTaskSymbol = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
             var hubConnectionObserverSymbol = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
             var containingNamespace = context.Compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.ContainingNamespace;
-            var voidSymbol = context.Compilation.GetSpecialType(SpecialType.System_Void);
 
             return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
         }
@@ -64,7 +63,6 @@ namespace TypedSignalR.Client.SourceGenerator
             var specialSymbols = GetSpecialSymbols(context);
 
             ExtractFromCreateHubProxyMethods(context, receiver.CreateHubProxyMethods, specialSymbols, hubProxyTypeList);
-            ExtractFromCreateHubProxyWithMethods(context, receiver.CreateHubProxyWithMethods, specialSymbols, hubProxyTypeList, receiverTypeList);
             ExtractFromRegisterMethods(context, receiver.RegisterMethods, specialSymbols, receiverTypeList);
 
             return (hubProxyTypeList, receiverTypeList);
@@ -122,89 +120,6 @@ namespace TypedSignalR.Client.SourceGenerator
                         {
                             var invoker = new HubProxyTypeInfo(hubType, hubMethods);
                             hubProxyTypeList.Add(invoker);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static void ExtractFromCreateHubProxyWithMethods(
-            GeneratorExecutionContext context,
-            IReadOnlyList<MemberAccessExpressionSyntax> createHubProxyWithMethods,
-            in SpecialSymbols specialSymbols,
-            List<HubProxyTypeInfo> hubProxyTypeList,
-            List<ReceiverTypeInfo> receiverTypeList)
-        {
-            foreach (var target in createHubProxyWithMethods)
-            {
-                var semanticModel = context.Compilation.GetSemanticModel(target.SyntaxTree);
-
-                var callerSymbol = semanticModel.GetTypeInfo(target.Expression).Type;
-                var createHubProxyWithSymbol = semanticModel.GetSymbolInfo(target).Symbol;
-
-                if (callerSymbol is null)
-                {
-                    continue;
-                }
-
-                if (createHubProxyWithSymbol is null)
-                {
-                    continue;
-                }
-
-                if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) ||
-                    !createHubProxyWithSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
-                {
-                    continue;
-                }
-
-                if (createHubProxyWithSymbol is IMethodSymbol methodSymbol)
-                {
-                    ITypeSymbol hubType = methodSymbol.TypeArguments[0];
-
-                    if (hubType.TypeKind != TypeKind.Interface)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptorCollection.TypeArgumentRule,
-                            target.GetLocation(),
-                            methodSymbol.OriginalDefinition.ToDisplayString(),
-                            hubType.ToDisplayString()));
-
-                        continue;
-                    }
-
-                    if (!hubProxyTypeList.Any(hubType))
-                    {
-                        var (hubMethods, isValid) = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, target.GetLocation());
-
-                        if (isValid)
-                        {
-                            var invoker = new HubProxyTypeInfo(hubType, hubMethods);
-                            hubProxyTypeList.Add(invoker);
-                        }
-                    }
-
-                    ITypeSymbol receiverType = methodSymbol.TypeArguments[1];
-
-                    if (receiverType.TypeKind != TypeKind.Interface)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(
-                            DiagnosticDescriptorCollection.TypeArgumentRule,
-                            target.GetLocation(),
-                            methodSymbol.OriginalDefinition.ToDisplayString(),
-                            receiverType.ToDisplayString()));
-
-                        continue;
-                    }
-
-                    if (!receiverTypeList.Any(receiverType))
-                    {
-                        var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, target.GetLocation());
-
-                        if (isValid)
-                        {
-                            var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
-                            receiverTypeList.Add(receiverInfo);
                         }
                     }
                 }

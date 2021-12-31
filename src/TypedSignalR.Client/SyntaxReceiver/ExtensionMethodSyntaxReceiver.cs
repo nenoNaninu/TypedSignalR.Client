@@ -7,11 +7,9 @@ namespace TypedSignalR.Client.SyntaxReceiver
     public class ExtensionMethodSyntaxReceiver : ISyntaxReceiver
     {
         public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyMethods => _createHubProxyMethods;
-        public IReadOnlyList<MemberAccessExpressionSyntax> CreateHubProxyWithMethods => _createHubProxyWithMethods;
         public IReadOnlyList<MemberAccessExpressionSyntax> RegisterMethods => _registerMethods;
 
         private readonly List<MemberAccessExpressionSyntax> _createHubProxyMethods = new();
-        private readonly List<MemberAccessExpressionSyntax> _createHubProxyWithMethods = new();
         private readonly List<MemberAccessExpressionSyntax> _registerMethods = new();
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
@@ -23,7 +21,6 @@ namespace TypedSignalR.Client.SyntaxReceiver
                     var list = memberAccessExpressionSyntax.Name.Identifier.ValueText switch
                     {
                         "CreateHubProxy" => _createHubProxyMethods,
-                        "CreateHubProxyWith" => _createHubProxyWithMethods,
                         "Register" => _registerMethods,
                         _ => null
                     };
