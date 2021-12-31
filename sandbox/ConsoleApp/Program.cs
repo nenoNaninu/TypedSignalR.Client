@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
@@ -57,7 +56,6 @@ class Program
         {
             var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
             var hub2 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
-            var (hub3, subscription1) = connection.CreateHubProxyWith<SignalR.Shared.IHubContract, SignalR.Shared.IClientContract>(new Receiver());
 
             var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
 
@@ -70,7 +68,6 @@ class Program
         {
             var hub1 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
             var hub2 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
-            var (hub3, subscription1) = connection.CreateHubProxyWith<ConsoleApp.IHubContract, ConsoleApp.IClientContract>(new Receiver2());
 
             ConsoleApp.IClientContract receiver = new Receiver2();
             var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
