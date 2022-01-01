@@ -80,21 +80,32 @@ namespace TypedSignalR.Client.SourceGenerator
 
             if (callerSymbol is null)
             {
-                return default;
+                return null;
             }
 
             if (extensionMethodSymbol is null)
             {
-                return default;
+                return null;
             }
 
-            if (!callerSymbol.Equals(specialSymbols.HubConnection, SymbolEqualityComparer.Default) ||
-                !extensionMethodSymbol.ContainingNamespace.Equals(specialSymbols.TypedSignalRNamespace, SymbolEqualityComparer.Default))
+            var sourceMethod = extensionMethodSymbol.ReducedFrom;
+
+            if (sourceMethod is null)
             {
-                return default;
+                return null;
             }
 
-            return new MethodSymbolWithLocation(extensionMethodSymbol, location);
+            if (sourceMethod.Equals(specialSymbols.CreateHubProxySymbol, SymbolEqualityComparer.Default))
+            {
+                return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.CreateHubProxy);
+            }
+
+            if (sourceMethod.Equals(specialSymbols.RegisterSymbol, SymbolEqualityComparer.Default))
+            {
+                return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.Register);
+            }
+
+            return null;
         }
 
         private static void GenerateSource(SourceProductionContext context, (ImmutableArray<MethodSymbolWithLocation?>, SpecialSymbols) data)
@@ -107,13 +118,16 @@ namespace TypedSignalR.Client.SourceGenerator
 
             foreach (var methodWithLocation in methodSymbolWithLocations)
             {
-                var method = methodWithLocation!.MethodSymbol;
+                if (methodWithLocation is null)
+                {
+                    continue;
+                }
 
-                if (method!.Name is "CreateHubProxy")
+                if (methodWithLocation.ExtensionMethod is ExtensionMethod.CreateHubProxy)
                 {
                     hubProxyMethodList.Add(methodWithLocation);
                 }
-                else if (method.Name is "Register")
+                else if (methodWithLocation.ExtensionMethod is ExtensionMethod.Register)
                 {
                     receiverMethodList.Add(methodWithLocation);
                 }
@@ -137,13 +151,33 @@ namespace TypedSignalR.Client.SourceGenerator
 
         private static SpecialSymbols GetSpecialSymbols(Compilation compilation)
         {
-            var hubConnectionSymbol = compilation.GetTypeByMetadataName("Microsoft.AspNetCore.SignalR.Client.HubConnection");
             var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var genericTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
             var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
-            var containingNamespace = compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.ContainingNamespace;
+            var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.GetMembers()!;
 
-            return new SpecialSymbols(hubConnectionSymbol!, taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, containingNamespace!);
+            IMethodSymbol? createHubProxySymbol = null;
+            IMethodSymbol? registerSymbol = null;
+
+            foreach (var symbol in membersSymbols)
+            {
+                if (symbol.Name is "CreateHubProxy")
+                {
+                    if (symbol is IMethodSymbol method)
+                    {
+                        createHubProxySymbol = method;
+                    }
+                }
+                else if (symbol.Name is "Register")
+                {
+                    if (symbol is IMethodSymbol method)
+                    {
+                        registerSymbol = method;
+                    }
+                }
+            }
+
+            return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxySymbol!, registerSymbol!);
         }
 
         private static IReadOnlyList<HubProxyTypeInfo> ExtractFromCreateHubProxyMethods(
@@ -232,15 +266,24 @@ namespace TypedSignalR.Client.SourceGenerator
             return receiverTypeList;
         }
 
+        private enum ExtensionMethod
+        {
+            None,
+            CreateHubProxy,
+            Register
+        }
+
         private class MethodSymbolWithLocation
         {
             public readonly IMethodSymbol? MethodSymbol;
             public readonly Location Location;
+            public readonly ExtensionMethod ExtensionMethod;
 
-            public MethodSymbolWithLocation(IMethodSymbol? methodSymbol, Location location)
+            public MethodSymbolWithLocation(IMethodSymbol? methodSymbol, Location location, ExtensionMethod extensionMethod)
             {
                 MethodSymbol = methodSymbol;
                 Location = location;
+                ExtensionMethod = extensionMethod;
             }
         }
 
@@ -260,25 +303,25 @@ namespace TypedSignalR.Client.SourceGenerator
 
         private class SpecialSymbols
         {
-            public readonly INamedTypeSymbol HubConnection;
             public readonly INamedTypeSymbol Task;
             public readonly INamedTypeSymbol GenericTask;
             public readonly INamedTypeSymbol HubConnectionObserver;
-            public readonly INamespaceSymbol TypedSignalRNamespace;
+            public readonly IMethodSymbol CreateHubProxySymbol;
+            public readonly IMethodSymbol RegisterSymbol;
 
             public SpecialSymbols(
-                INamedTypeSymbol hubConnection,
                 INamedTypeSymbol task,
                 INamedTypeSymbol genericTask,
                 INamedTypeSymbol hubConnectionObserver,
-                INamespaceSymbol typedSignalRNamespace
+                IMethodSymbol createHubProxySymbol,
+                IMethodSymbol registerSymbol
                )
             {
-                HubConnection = hubConnection;
                 Task = task;
                 GenericTask = genericTask;
                 HubConnectionObserver = hubConnectionObserver;
-                TypedSignalRNamespace = typedSignalRNamespace;
+                CreateHubProxySymbol = createHubProxySymbol;
+                RegisterSymbol = registerSymbol;
             }
         }
     }
