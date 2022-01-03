@@ -17,7 +17,6 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
   - [Client code format](#client-code-format)
 - [Compile-time error support](#compile-time-error-support)
 - [Generated code](#generated-code)
-- [Demo](#demo)
 
 # Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
@@ -71,8 +70,7 @@ var guid = await hubProxy.HubMethod2("message", 99);
 // The client's function registration is also strongly typed, so it's safe and easy.
 var subscription = connection.Register<IReceiver>(new Receiver());
 
-// Defining interfaces are useful not only for the client-side
-// but also for the server-side.
+// Defining interfaces are useful not only for the client-side but also for the server-side.
 // See Usage in this README.md for details.
 interface IHub
 {
@@ -105,9 +103,9 @@ static class Extensions
 // An interface for observing SignalR events.
 interface IHubConnectionObserver
 {
-    Task OnClosed(Exception e);
+    Task OnClosed(Exception exception);
     Task OnReconnected(string connectionId);
-    Task OnReconnecting(Exception e);
+    Task OnReconnecting(Exception exception);
 }
 ```
 
@@ -361,21 +359,4 @@ public static partial class Extensions
         return compositeDisposable;
     }
 }
-```
-
-# Demo
-First, launch server.
-Then access it from your browser and open the console(F12). 
-
-```
-git clone https://github.com/nenoNaninu/TypedSignalR.Client.git
-cd sandbox 
-dotnet run --project SignalR.Server/SignalR.Server.csproj
-```
-
-Execute the console app in another shell. 
-
-```
-cd sandbox 
-dotnet run --project SignalR.Client/SignalR.Client.csproj
 ```
