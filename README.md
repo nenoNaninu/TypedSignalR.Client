@@ -20,13 +20,13 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
 
 # Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
+
 ```
 dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
 ```
 
 # Why TypedSignalR.Client?
-
 The C# SignalR Client is untyped.
 To call a Hub (server-side) function, you must specify the function defined in Hub using a string.
 You also have to manually determine the return type.
@@ -119,7 +119,8 @@ IDisposable subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
 # Usage
-Suppose you have the following interface defined:
+For example, you have the following interface defined.
+
 ```cs
 public class UserDefinedType
 {
@@ -155,6 +156,7 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 
 ## Client
 It's very easy to use. 
+
 ```cs
 
 HubConnection connection = ...;
@@ -222,6 +224,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     }
 }
 ```
+
 # Recommendation
 ## Sharing a project
 I recommend that these interfaces be shared between the client-side and server-side project, for example, by project references.
@@ -249,7 +252,6 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
     // implementation
 }
 ```
-
 
 # Compile-time error support
 This library has some restrictions, including those that come from server-side implementations.
