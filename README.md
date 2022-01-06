@@ -124,7 +124,7 @@ For example, you have the following interface defined.
 ```cs
 public class UserDefinedType
 {
-    public Guid RandomId { get; set; }
+    public Guid Id { get; set; }
     public DateTime Datetime { get; set; }
 }
 
@@ -187,7 +187,7 @@ var cts = new CancellationTokenSource();
 // The following two are equivalent.
 
 // 1: pure SignalR
-var ret=  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
+var ret =  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
 await connection.InvokeAsync("HubMethod2", cts.Token);
 
 // 2: TypedSignalR.Client
@@ -209,7 +209,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     {
         var instance = new UserDefinedType()
         {
-            Guid = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             DateTime = DateTime.Now,
         };
 
