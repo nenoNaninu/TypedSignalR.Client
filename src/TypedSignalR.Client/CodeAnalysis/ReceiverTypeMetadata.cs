@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis
 {
-    public class ReceiverTypeMetadata : IEquatable<ReceiverTypeMetadata>
+    public sealed class ReceiverTypeMetadata : IEquatable<ReceiverTypeMetadata>
     {
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }

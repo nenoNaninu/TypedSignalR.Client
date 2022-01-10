@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace TypedSignalR.Client.CodeAnalysis
 {
-    public class MethodMetadata
+    public sealed class MethodMetadata
     {
         public string MethodName { get; }
 

@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis
 {
-    public class HubProxyTypeMetadata : IEquatable<HubProxyTypeMetadata>
+    public sealed class HubProxyTypeMetadata : IEquatable<HubProxyTypeMetadata>
     {
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }
