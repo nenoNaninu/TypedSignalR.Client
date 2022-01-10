@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TypedSignalR.Client.CodeAnalysis;
 using TypedSignalR.Client.T4;
 
-namespace TypedSignalR.Client.SourceGenerator
+namespace TypedSignalR.Client
 {
     [Generator]
-    public class ExtensionsSourceGenerator : IIncrementalGenerator
+    public sealed class SourceGenerator : IIncrementalGenerator
     {
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
