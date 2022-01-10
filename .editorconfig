@@ -39,6 +39,9 @@ indent_size = 4
 [*.tt]
 end_of_line = crlf
 
+[*.md]
+end_of_line = lf
+
 # Dotnet code style settings:
 [*.{cs,vb}]
 

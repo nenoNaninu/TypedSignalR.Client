@@ -94,9 +94,9 @@ class Receiver : IReceiver
 This Source Generator provides two extension methods and one interface. 
 
 ```cs
-static class Extensions
+static class HubConnectionExtensions
 {
-    THub CreateHubProxy<THub>(this HubConnection source){...}
+    THub CreateHubProxy<THub>(this HubConnection source, CancellationToken cancellationToken = default){...}
     IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver){...}
 }
 
@@ -279,7 +279,7 @@ TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `
 If you call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
 
 ```cs
-public static partial class Extensions
+public static partial class HubConnectionExtensions
 {
     private class HubInvoker : IHubContract
     {
@@ -323,7 +323,7 @@ public static partial class Extensions
 ```
 The generated code is used through the API as follows. 
 ```cs
-public static partial class Extensions
+public static partial class HubConnectionExtensions
 {
     // static type caching
     private static class HubInvokerConstructorCache<T>
