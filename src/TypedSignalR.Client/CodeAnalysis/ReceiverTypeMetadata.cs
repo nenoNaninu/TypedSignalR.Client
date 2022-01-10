@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.CodeAnalysis
 {
-    public class ReceiverTypeInfo : IEquatable<ReceiverTypeInfo>
+    public class ReceiverTypeMetadata : IEquatable<ReceiverTypeMetadata>
     {
         public ITypeSymbol TypeSymbol { get; }
         public string InterfaceName { get; }
         public string InterfaceFullName { get; }
         public string CollisionFreeName { get; }
-        public IReadOnlyList<MethodInfo> Methods { get; }
+        public IReadOnlyList<MethodMetadata> Methods { get; }
 
-        public ReceiverTypeInfo(ITypeSymbol typeSymbol, IReadOnlyList<MethodInfo> methods)
+        public ReceiverTypeMetadata(ITypeSymbol typeSymbol, IReadOnlyList<MethodMetadata> methods)
         {
             TypeSymbol = typeSymbol;
             InterfaceName = typeSymbol.Name;
@@ -25,14 +25,14 @@ namespace TypedSignalR.Client
         public override int GetHashCode() => TypeSymbol.GetHashCode();
 #pragma warning restore RS1024 
 
-        public bool Equals(ReceiverTypeInfo other)
+        public bool Equals(ReceiverTypeMetadata other)
         {
             return TypeSymbol.Equals(other.TypeSymbol, SymbolEqualityComparer.Default);
         }
 
         public override bool Equals(object other)
         {
-            if (other is ReceiverTypeInfo invokerInfo)
+            if (other is ReceiverTypeMetadata invokerInfo)
             {
                 return this.Equals(invokerInfo);
             }

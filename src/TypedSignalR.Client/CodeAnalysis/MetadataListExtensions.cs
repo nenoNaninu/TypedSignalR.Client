@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.CodeAnalysis
 {
-    public static class Extensions
+    public static class MetadataListExtensions
     {
-        public static bool Any(this List<HubProxyTypeInfo> source, ITypeSymbol typeSymbol)
+        public static bool Any(this List<HubProxyTypeMetadata> source, ITypeSymbol typeSymbol)
         {
             foreach (var item in source)
             {
@@ -18,7 +18,7 @@ namespace TypedSignalR.Client
             return false;
         }
 
-        public static bool Any(this List<ReceiverTypeInfo> source, ITypeSymbol typeSymbol)
+        public static bool Any(this List<ReceiverTypeMetadata> source, ITypeSymbol typeSymbol)
         {
             foreach (var item in source)
             {

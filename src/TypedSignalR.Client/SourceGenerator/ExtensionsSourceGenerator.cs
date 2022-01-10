@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TypedSignalR.Client.CodeAnalysis;
 using TypedSignalR.Client.T4;
 
 namespace TypedSignalR.Client.SourceGenerator
@@ -17,7 +18,8 @@ namespace TypedSignalR.Client.SourceGenerator
             {
                 ctx.CancellationToken.ThrowIfCancellationRequested();
 
-                ctx.AddSource("TypedSignalR.Client.Extensions.Generated.cs", new ExtensionsTemplate().TransformText());
+                ctx.AddSource("TypedSignalR.Client.Components.Generated.cs", new ComponentsTemplate().TransformText());
+                ctx.AddSource("TypedSignalR.Client.HubConnectionExtensions.Generated.cs", new HubConnectionExtensionsTemplate().TransformText());
             });
 
             var specialSymbols = context.CompilationProvider
@@ -136,7 +138,7 @@ namespace TypedSignalR.Client.SourceGenerator
             var hubProxyTypeList = ExtractFromCreateHubProxyMethods(context, hubProxyMethodList, specialSymbols);
             var receiverTypeList = ExtractFromRegisterMethods(context, receiverMethodList, specialSymbols);
 
-            var template = new ExtensionsInternalTemplate()
+            var template = new HubConnectionExtensionsCoreTemplate()
             {
                 HubProxyTypeList = hubProxyTypeList,
                 ReceiverTypeList = receiverTypeList
@@ -146,7 +148,7 @@ namespace TypedSignalR.Client.SourceGenerator
 
             Debug.WriteLine(source);
 
-            context.AddSource("TypedSignalR.Client.Extensions.Internal.Generated.cs", source);
+            context.AddSource("TypedSignalR.Client.HubConnectionExtensions.Core.Generated.cs", source);
         }
 
         private static SpecialSymbols GetSpecialSymbols(Compilation compilation)
@@ -154,7 +156,7 @@ namespace TypedSignalR.Client.SourceGenerator
             var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var genericTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
             var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
-            var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.Extensions")?.GetMembers()!;
+            var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")?.GetMembers()!;
 
             IMethodSymbol? createHubProxySymbol = null;
             IMethodSymbol? registerSymbol = null;
@@ -180,12 +182,12 @@ namespace TypedSignalR.Client.SourceGenerator
             return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxySymbol!, registerSymbol!);
         }
 
-        private static IReadOnlyList<HubProxyTypeInfo> ExtractFromCreateHubProxyMethods(
+        private static IReadOnlyList<HubProxyTypeMetadata> ExtractFromCreateHubProxyMethods(
             SourceProductionContext context,
             IReadOnlyList<MethodSymbolWithLocation> createHubProxyMethods,
             SpecialSymbols specialSymbols)
         {
-            var hubProxyTypeList = new List<HubProxyTypeInfo>(createHubProxyMethods.Count);
+            var hubProxyTypeList = new List<HubProxyTypeMetadata>(createHubProxyMethods.Count);
 
             foreach (var createHubProxyMethod in createHubProxyMethods)
             {
@@ -207,11 +209,11 @@ namespace TypedSignalR.Client.SourceGenerator
 
                 if (!hubProxyTypeList.Any(hubType))
                 {
-                    var (hubMethods, isValid) = AnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
+                    var (hubMethods, isValid) = TypeAnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
 
                     if (isValid)
                     {
-                        var invoker = new HubProxyTypeInfo(hubType, hubMethods);
+                        var invoker = new HubProxyTypeMetadata(hubType, hubMethods);
                         hubProxyTypeList.Add(invoker);
                     }
                 }
@@ -220,12 +222,12 @@ namespace TypedSignalR.Client.SourceGenerator
             return hubProxyTypeList;
         }
 
-        private static IReadOnlyList<ReceiverTypeInfo> ExtractFromRegisterMethods(
+        private static IReadOnlyList<ReceiverTypeMetadata> ExtractFromRegisterMethods(
             SourceProductionContext context,
             IReadOnlyList<MethodSymbolWithLocation> registerMethods,
             SpecialSymbols specialSymbols)
         {
-            var receiverTypeList = new List<ReceiverTypeInfo>(registerMethods.Count);
+            var receiverTypeList = new List<ReceiverTypeMetadata>(registerMethods.Count);
 
             foreach (var registerMethod in registerMethods)
             {
@@ -253,11 +255,11 @@ namespace TypedSignalR.Client.SourceGenerator
 
                 if (!receiverTypeList.Any(receiverType))
                 {
-                    var (receiverMethods, isValid) = AnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, location);
+                    var (receiverMethods, isValid) = TypeAnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, location);
 
                     if (isValid)
                     {
-                        var receiverInfo = new ReceiverTypeInfo(receiverType, receiverMethods);
+                        var receiverInfo = new ReceiverTypeMetadata(receiverType, receiverMethods);
                         receiverTypeList.Add(receiverInfo);
                     }
                 }

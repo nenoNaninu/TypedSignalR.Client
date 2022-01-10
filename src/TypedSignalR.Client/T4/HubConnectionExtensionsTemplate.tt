@@ -9,14 +9,7 @@
 // </auto-generated>
 namespace TypedSignalR.Client
 {
-    public interface IHubConnectionObserver
-    {
-        System.Threading.Tasks.Task OnClosed(System.Exception exception);
-        System.Threading.Tasks.Task OnReconnected(string connectionId);
-        System.Threading.Tasks.Task OnReconnecting(System.Exception exception);
-    }
-
-    public static partial class Extensions
+    public static partial class HubConnectionExtensions
     {
         private static class HubInvokerConstructorCache<T>
         {
@@ -138,22 +131,22 @@ namespace TypedSignalR.Client
         private class HubConnectionObserverSubscription : System.IDisposable
         {
             private readonly Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
-            private readonly IHubConnectionObserver _hubConnectionEvent;
+            private readonly IHubConnectionObserver _hubConnectionObserver;
 
-            public HubConnectionObserverSubscription(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, IHubConnectionObserver hubConnectionEvent)
+            public HubConnectionObserverSubscription(Microsoft.AspNetCore.SignalR.Client.HubConnection connection, IHubConnectionObserver hubConnectionObserver)
             {
                 _connection = connection;
-                _hubConnectionEvent = hubConnectionEvent;
-                _connection.Closed += _hubConnectionEvent.OnClosed;
-                _connection.Reconnected += _hubConnectionEvent.OnReconnected;
-                _connection.Reconnecting += _hubConnectionEvent.OnReconnecting;
+                _hubConnectionObserver = hubConnectionObserver;
+                _connection.Closed += hubConnectionObserver.OnClosed;
+                _connection.Reconnected += hubConnectionObserver.OnReconnected;
+                _connection.Reconnecting += hubConnectionObserver.OnReconnecting;
             }
 
             public void Dispose()
             {
-                _connection.Closed -= _hubConnectionEvent.OnClosed;
-                _connection.Reconnected -= _hubConnectionEvent.OnReconnected;
-                _connection.Reconnecting -= _hubConnectionEvent.OnReconnecting;
+                _connection.Closed -= _hubConnectionObserver.OnClosed;
+                _connection.Reconnected -= _hubConnectionObserver.OnReconnected;
+                _connection.Reconnecting -= _hubConnectionObserver.OnReconnecting;
             }
         }
     }

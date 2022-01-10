@@ -9,7 +9,7 @@
 // </auto-generated>
 namespace TypedSignalR.Client
 {
-    public static partial class Extensions
+    public static partial class HubConnectionExtensions
     {
 <# foreach(var hubProxyType in HubProxyTypeList) {#>
         private class HubInvokerFor<#= hubProxyType.CollisionFreeName #> : <#= hubProxyType.InterfaceFullName  #>
@@ -54,7 +54,7 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-        static Extensions()
+        static HubConnectionExtensions()
         {
 <# foreach(var hubProxyType in HubProxyTypeList) {#>
             HubInvokerConstructorCache<<#= hubProxyType.InterfaceFullName #>>.Construct = static (connection, cancellationToken) => new HubInvokerFor<#= hubProxyType.CollisionFreeName #>(connection, cancellationToken);

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -42,25 +42,34 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="T4\ExtensionsTemplate.cs">
-            <DependentUpon>ExtensionsTemplate.tt</DependentUpon>
+        <Compile Update="T4\ComponentsTemplate.cs">
+          <DependentUpon>ComponentsTemplate.tt</DependentUpon>
+          <DesignTime>True</DesignTime>
+          <AutoGen>True</AutoGen>
+        </Compile>
+        <Compile Update="T4\HubConnectionExtensionsTemplate.cs">
+            <DependentUpon>HubConnectionExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
-        <Compile Update="T4\ExtensionsInternalTemplate.cs">
-            <DependentUpon>ExtensionsInternalTemplate.tt</DependentUpon>
+        <Compile Update="T4\HubConnectionExtensionsCoreTemplate.cs">
+            <DependentUpon>HubConnectionExtensionsCoreTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="T4\ExtensionsTemplate.tt">
-            <LastGenOutput>ExtensionsTemplate.cs</LastGenOutput>
+        <None Update="T4\ComponentsTemplate.tt">
+          <LastGenOutput>ComponentsTemplate.cs</LastGenOutput>
+          <Generator>TextTemplatingFilePreprocessor</Generator>
+        </None>
+        <None Update="T4\HubConnectionExtensionsTemplate.tt">
+            <LastGenOutput>HubConnectionExtensionsTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
-        <None Update="T4\ExtensionsInternalTemplate.tt">
-            <LastGenOutput>ExtensionsInternalTemplate.cs</LastGenOutput>
+        <None Update="T4\HubConnectionExtensionsCoreTemplate.tt">
+            <LastGenOutput>HubConnectionExtensionsCoreTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
     </ItemGroup>

@@ -1,4 +1,4 @@
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.CodeAnalysis
 {
     public readonly struct MethodParameter
     {

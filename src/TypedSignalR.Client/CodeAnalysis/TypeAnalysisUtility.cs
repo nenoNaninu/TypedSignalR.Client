@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace TypedSignalR.Client
+namespace TypedSignalR.Client.CodeAnalysis
 {
-    public static class AnalysisUtility
+    public static class TypeAnalysisUtility
     {
-        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractHubMethods(SourceProductionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractHubMethods(SourceProductionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
         {
-            var hubMethods = new List<MethodInfo>();
+            var hubMethods = new List<MethodMetadata>();
             bool isValid = true;
 
             foreach (ISymbol symbol in hubTypeSymbol.GetMembers())
@@ -42,7 +42,7 @@ namespace TypedSignalR.Client
 
                     ITypeSymbol? genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
 
-                    var methodInfo = new MethodInfo(
+                    var methodInfo = new MethodMetadata(
                         methodSymbol.Name,
                         parameters,
                         methodSymbol.ReturnType.ToDisplayString(),
@@ -66,9 +66,9 @@ namespace TypedSignalR.Client
             return (hubMethods, isValid);
         }
 
-        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(SourceProductionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractClientMethods(SourceProductionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
         {
-            var clientMethods = new List<MethodInfo>();
+            var clientMethods = new List<MethodMetadata>();
             bool isValid = true;
 
             foreach (ISymbol symbol in clientTypeSymbol.GetMembers())
@@ -100,7 +100,7 @@ namespace TypedSignalR.Client
                     }
 
                     var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
-                    var methodInfo = new MethodInfo(methodSymbol.Name, parameters, methodSymbol.ReturnType.ToDisplayString(), false, null);
+                    var methodInfo = new MethodMetadata(methodSymbol.Name, parameters, methodSymbol.ReturnType.ToDisplayString(), false, null);
 
                     clientMethods.Add(methodInfo);
                 }
