@@ -1,15 +1,14 @@
-namespace System.CodeDom.Compiler
-{
-    public class CompilerError
-    {
-        public string? ErrorText { get; set; }
-        public bool IsWarning { get; set; }
-    }
+namespace System.CodeDom.Compiler;
 
-    public class CompilerErrorCollection
+public class CompilerError
+{
+    public string? ErrorText { get; set; }
+    public bool IsWarning { get; set; }
+}
+
+public class CompilerErrorCollection
+{
+    public void Add(CompilerError error)
     {
-        public void Add(CompilerError error)
-        {
-        }
     }
 }
