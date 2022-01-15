@@ -32,9 +32,9 @@ namespace TypedSignalR.Client
 {
     public interface IHubConnectionObserver
     {
-        System.Threading.Tasks.Task OnClosed(System.Exception exception);
-        System.Threading.Tasks.Task OnReconnected(string connectionId);
-        System.Threading.Tasks.Task OnReconnecting(System.Exception exception);
+        System.Threading.Tasks.Task OnClosed(System.Exception? exception);
+        System.Threading.Tasks.Task OnReconnected(string? connectionId);
+        System.Threading.Tasks.Task OnReconnecting(System.Exception? exception);
     }
 }
 ");
