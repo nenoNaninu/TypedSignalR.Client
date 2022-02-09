@@ -16,6 +16,20 @@ public class ReceiverTestHub : Hub<IReceiver>, IReceiverTestHub
         "c875a6f9-9ddb-440b-a7e4-6e893f59ab9e",
     };
 
+    private readonly string[] _guids = new[] {
+        "b2f626e5-b4d4-4713-891d-f6cb107e502e",
+        "22733524-2087-4701-a586-c6bf0ce36f74",
+        "b89324bf-daf2-422a-85f2-6843b9c09b6a",
+        "779769d1-0aee-4dba-82c7-9e1044836d75"
+    };
+
+    private readonly string[] _dateTimes = new[] {
+        "2017-04-17",
+        "2018-05-25",
+        "2019-03-31",
+        "2022-02-06",
+    };
+
     private readonly ILogger<ReceiverTestHub> _logger;
 
     public ReceiverTestHub(ILogger<ReceiverTestHub> logger)
@@ -35,6 +49,11 @@ public class ReceiverTestHub : Hub<IReceiver>, IReceiverTestHub
         for (int i = 0; i < _message.Length; i++)
         {
             await this.Clients.Caller.ReceiveMessage(_message[i], i);
+        }
+
+        for (int i = 0; i < _guids.Length; i++)
+        {
+            await this.Clients.Caller.ReceiveCustomMessage(new UserDefinedType() { Guid = Guid.Parse(_guids[i]), DateTime = DateTime.Parse(_dateTimes[i]) });
         }
     }
 }

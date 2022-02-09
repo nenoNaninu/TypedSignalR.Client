@@ -51,7 +51,7 @@ public class PostTest : IAsyncLifetime
 
         var result = await _sideEffectHub.Result();
 
-        Assert.True(result == 4);
+        Assert.Equal(4, result);
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public class PostTest : IAsyncLifetime
 
         for (int i = 0; i < data.Length; i++)
         {
-            Assert.True(data[i].DateTime == list[i].DateTime);
-            Assert.True(data[i].Guid == list[i].Guid);
+            Assert.Equal(data[i].DateTime, list[i].DateTime);
+            Assert.Equal(data[i].Guid, list[i].Guid);
         }
     }
 }

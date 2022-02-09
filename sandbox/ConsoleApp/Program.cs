@@ -49,8 +49,11 @@ class Program
             .WithUrl("https://~~~")
             .Build();
 
-        //connection.CreateHubProxy<IErrorProxy>(); // error
-        //connection.CreateHubProxy<IErrorProxy2>(); // error
+        connection.CreateHubProxy<System.Int32>(); // error
+        connection.Register<System.Int32>(0); // error
+
+        connection.CreateHubProxy<IErrorProxy>(); // error
+        connection.CreateHubProxy<IErrorProxy2>(); // error
 
         var id = connection.ConnectionId;
         {

@@ -77,7 +77,7 @@ class Client : IClientContract, IHubConnectionObserver, IDisposable
         return Task.CompletedTask;
     }
 
-    public Task OnReconnecting(Exception e)
+    public Task OnReconnecting(Exception exception)
     {
         Console.WriteLine($"[On Reconnecting!]");
         return Task.CompletedTask;

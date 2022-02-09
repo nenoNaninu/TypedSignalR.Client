@@ -48,8 +48,9 @@ public class UnaryTest : IAsyncLifetime
     public async Task Get()
     {
         var str = await _unaryHub.Get();
-        Assert.True(str == "TypedSignalR.Client");
+        Assert.Equal("TypedSignalR.Client", str);
     }
+
     [Fact]
     public async Task Add()
     {
@@ -58,7 +59,7 @@ public class UnaryTest : IAsyncLifetime
 
         var added = await _unaryHub.Add(x, y);
 
-        Assert.True(added == (x + y));
+        Assert.Equal(added, x + y);
     }
 
     [Fact]
@@ -69,7 +70,7 @@ public class UnaryTest : IAsyncLifetime
 
         var cat = await _unaryHub.Cat(x, y);
 
-        Assert.True(cat == (x + y));
+        Assert.Equal(cat, x + y);
     }
 
     /// <summary>
@@ -87,7 +88,7 @@ public class UnaryTest : IAsyncLifetime
 
         var ret = await _unaryHub.Echo(instance);
 
-        Assert.True(ret.DateTime == instance.DateTime);
-        Assert.True(ret.Guid == instance.Guid);
+        Assert.Equal(ret.DateTime, instance.DateTime);
+        Assert.Equal(ret.Guid, instance.Guid);
     }
 }

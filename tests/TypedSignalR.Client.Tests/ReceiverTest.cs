@@ -19,6 +19,7 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
 
     private int _notifyCallCount;
     private readonly List<(string, int)> _receiveMessage = new();
+    private readonly List<UserDefinedType> _userDefinedList = new();
 
     public ReceiverTest(ITestOutputHelper output)
     {
@@ -49,7 +50,7 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
         }
     }
 
-    private readonly string[] _answer = new[] {
+    private readonly string[] _answerMessages = new[] {
         "b1f7cd73-13b8-49bd-9557-ffb38859d18b",
         "3f5c3585-d01b-4f8f-8139-62a1241850e2",
         "92021a22-5823-4501-8cbd-c20d4ca6e54c",
@@ -60,28 +61,55 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
         "c875a6f9-9ddb-440b-a7e4-6e893f59ab9e",
     };
 
+    private readonly string[] _guids = new[] {
+        "b2f626e5-b4d4-4713-891d-f6cb107e502e",
+        "22733524-2087-4701-a586-c6bf0ce36f74",
+        "b89324bf-daf2-422a-85f2-6843b9c09b6a",
+        "779769d1-0aee-4dba-82c7-9e1044836d75"
+    };
+
+    private readonly string[] _dateTimes = new[] {
+        "2017-04-17",
+        "2018-05-25",
+        "2019-03-31",
+        "2022-02-06",
+    };
+
     [Fact]
-    public async Task TaskReceiver()
+    public async Task TestReceiver()
     {
         await _receiverTestHub.Start();
 
         _output.WriteLine($"_notifyCallCount: {_notifyCallCount}");
 
-        Assert.True(_notifyCallCount == 17);
+        Assert.Equal(17, _notifyCallCount);
 
         for (int i = 0; i < _receiveMessage.Count; i++)
         {
             _output.WriteLine($"_receiveMessage[{i}].Item1: {_receiveMessage[i].Item1}");
             _output.WriteLine($"_receiveMessage[{i}].Item2: {_receiveMessage[i].Item2}");
 
-            Assert.True(_receiveMessage[i].Item1 == _answer[i]);
-            Assert.True(_receiveMessage[i].Item2 == i);
+            Assert.Equal(_receiveMessage[i].Item1, _answerMessages[i]);
+            Assert.Equal(_receiveMessage[i].Item2, i);
+        }
+
+        for (int i = 0; i < _userDefinedList.Count; i++)
+        {
+            _output.WriteLine($"_userDefinedList[{i}].Guid: {_userDefinedList[i].Guid}");
+            _output.WriteLine($"_userDefinedList[{i}].DateTime: {_userDefinedList[i].DateTime}");
+
+            var guid = Guid.Parse(_guids[i]);
+            var dateTime = DateTime.Parse(_dateTimes[i]);
+
+            Assert.Equal(_userDefinedList[i].Guid, guid);
+            Assert.Equal(_userDefinedList[i].DateTime, dateTime);
         }
     }
 
     public Task ReceiveMessage(string message, int value)
     {
         _receiveMessage.Add((message, value));
+
         return Task.CompletedTask;
     }
 
@@ -91,19 +119,11 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
 
         return Task.CompletedTask;
     }
-}
 
-
-class Receiver : IReceiver
-{
-
-    public Task Nofity()
+    public Task ReceiveCustomMessage(UserDefinedType userDefined)
     {
-        throw new NotImplementedException();
-    }
+        _userDefinedList.Add(userDefined);
 
-    public Task ReceiveMessage(string message, int value)
-    {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 }
