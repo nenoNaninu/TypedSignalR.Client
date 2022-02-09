@@ -29,8 +29,8 @@ dotnet add package TypedSignalR.Client
 # Why TypedSignalR.Client?
 The C# SignalR Client is untyped.
 To call a Hub (server-side) function, you must specify the function defined in Hub using a string.
-You also have to manually determine the return type.
-Moreover, Registering a client function called from the server also requires a string, and the parameter types must be set manually.
+We also have to determine the return type manually.
+Moreover, registering a client function called from the server also requires a string, and we must set the parameter types manually.
 
 ```cs
 // pure SignalR Client
@@ -38,8 +38,8 @@ Moreover, Registering a client function called from the server also requires a s
 // Specify the hub method to invoke using string.
 await connection.InvokeAsync("HubMethod1");
 
-// manually determine the return type.
-// The parameter is cast to object.
+// Manually determine the return type.
+// The parameter is cast to object type.
 var guid = await connection.InvokeAsync<Guid>("HubMethod2", "message", 99);
 
 // Registering a client function requires a string, 
@@ -48,23 +48,23 @@ var subscription = connection.On<string, DateTime>("ClientMethod", (message, dat
 ```
 
 Therefore, if you change the code on the server-side, the modification on the client-side becomes very troublesome. 
-The main cause is that it is not strongly typed.
+The leading cause is that it is not strongly typed.
 
 TypedSignalR.Client aims to generate a strongly typed SignalR Client by sharing interfaces in which the server and client functions are defined. 
-Defining interfaces are useful not only for the client-side but also for the server-side.
+Defining interfaces are helpful not only for the client-side but also for the server-side.
 See [Usage](#usage) section for details.
 
 ```cs
 // TypedSignalR.Client
 
-// First, create a hubProxy.
+// First, create a hub proxy.
 IHub hubProxy = connection.CreateHubProxy<IHub>();
 
-// Invoke a hub method through hubProxy.
+// Invoke a hub method through hub proxy.
 // You no longer need to specify the function using a string.
 await hubProxy.HubMethod1();
 
-// Both parameters and return type are strongly typed.
+// Both parameters and return types are strongly typed.
 var guid = await hubProxy.HubMethod2("message", 99);
 
 // The client's function registration is also strongly typed, so it's safe and easy.
@@ -178,7 +178,7 @@ subscription.Dispose();
 ### Cancellation
 In pure SignalR, `CancellationToken` is passed for each invoke.
 
-On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating HubProxy.
+On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating hub proxy.
 The passed `CancelationToken` will be used for each invoke internally.
 
 ```cs
@@ -186,7 +186,7 @@ var cts = new CancellationTokenSource();
 
 // The following two are equivalent.
 
-// 1: pure SignalR
+// 1: Pure SignalR
 var ret =  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
 await connection.InvokeAsync("HubMethod2", cts.Token);
 
@@ -234,7 +234,7 @@ server.csproj => shared.csproj <= client.csproj
 ```
 
 ## Client code format
-I think it is easier to handle if you write the client code in the following format.
+It is easier to handle if you write the client code in the following format.
 
 ```cs
 class Client : IReceiver, IHubConnectionObserver, IDisposable
@@ -256,21 +256,21 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
 # Compile-time error support
 This library has some restrictions, including those that come from server-side implementations.
 
-- Type argument of `CreateHubProxy/Register` method must be an interface.
+- Type argument of the `CreateHubProxy/Register` method must be an interface.
 - Only methods must be defined in the interface used for `CreateHubProxy/Register`.
   - It is forbidden to define properties.
 - The return type of the method in the interface used for `CreateHubProxy` must be `Task` or `Task<T>`.
 - The return type of the method in the interface used for `Register` must be `Task`.
 
-It is very difficult for humans to properly comply with these restrictions.
+It is complicated for humans to comply with these restrictions properly.
 So, this library looks for parts that do not follow the restriction and report detailed errors at compile-time. 
 Therefore, no run-time error occurs. 
 
 ![compile-time-error](img/compile-time-error.png)
 
 # Generated code
-TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates code.
-Generated code can be seen in the Visual Studio. 
+TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
+Generated code can be seen in Visual Studio. 
 
 ![generated-code-in-dependencies](img/generated-code-in-dependencies.png)
 

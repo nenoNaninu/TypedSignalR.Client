@@ -49,37 +49,34 @@ class Program
             .WithUrl("https://~~~")
             .Build();
 
-        connection.CreateHubProxy<System.Int32>(); // error
-        connection.Register<System.Int32>(0); // error
-
         connection.CreateHubProxy<IErrorProxy>(); // error
         connection.CreateHubProxy<IErrorProxy2>(); // error
 
-        var id = connection.ConnectionId;
-        {
-            var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
-            var hub2 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
+        //var id = connection.ConnectionId;
+        //{
+        //    var hub1 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
+        //    var hub2 = connection.CreateHubProxy<SignalR.Shared.IHubContract>();
 
-            var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
+        //    var subscription2 = connection.Register<SignalR.Shared.IClientContract>(new Receiver());
 
-            SignalR.Shared.IClientContract receiver = new Receiver();
-            var subscription3 = connection.Register(receiver);
+        //    SignalR.Shared.IClientContract receiver = new Receiver();
+        //    var subscription3 = connection.Register(receiver);
 
-            hub1.SendMessage("a", "a");
-        }
+        //    hub1.SendMessage("a", "a");
+        //}
 
-        {
-            var hub1 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
-            var hub2 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
+        //{
+        //    var hub1 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
+        //    var hub2 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
 
-            ConsoleApp.IClientContract receiver = new Receiver2();
-            var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
-            var subscription3 = connection.Register(receiver);
-        }
+        //    ConsoleApp.IClientContract receiver = new Receiver2();
+        //    var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
+        //    var subscription3 = connection.Register(receiver);
+        //}
 
-        {
-            var empty = connection.CreateHubProxy<IEmptyProxy>();
-        }
+        //{
+        //    var empty = connection.CreateHubProxy<IEmptyProxy>();
+        //}
 
         {
             // error pattern!
