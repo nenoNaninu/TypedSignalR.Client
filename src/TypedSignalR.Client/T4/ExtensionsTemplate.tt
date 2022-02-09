@@ -42,13 +42,6 @@ namespace TypedSignalR.Client
             return connection.RegisterCore<TReceiver>(receiver);
         }
 
-        public static (THub HubProxy, System.IDisposable Subscription) CreateHubProxyWith<THub, TReceiver>(this Microsoft.AspNetCore.SignalR.Client.HubConnection connection, TReceiver receiver, System.Threading.CancellationToken cancellationToken = default)
-        {
-            var hubProxy = connection.CreateHubProxyCore<THub>(cancellationToken);
-            var subscription = connection.RegisterCore<TReceiver>(receiver);
-            return (hubProxy, subscription);
-        }
-
         private static THub CreateHubProxyCore<THub>(this Microsoft.AspNetCore.SignalR.Client.HubConnection connection, System.Threading.CancellationToken cancellationToken)
         {
             return HubInvokerConstructorCache<THub>.Construct(connection, cancellationToken);
@@ -86,7 +79,12 @@ namespace TypedSignalR.Client
 
             public CompositeDisposable(int capacity)
             {
-                _disposables = new System.Collections.Generic.List<System.IDisposable>(capacity < 0 ? 0 : capacity);
+                if (capacity < 0)
+                {
+                    throw new System.ArgumentOutOfRangeException(nameof(capacity));
+                }
+
+                _disposables = new System.Collections.Generic.List<System.IDisposable>(capacity);
             }
 
             public void Add(System.IDisposable item)

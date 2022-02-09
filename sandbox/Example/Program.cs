@@ -113,9 +113,5 @@ class Program
 
         //    subscription.Dispose();
         //}
-
-        //{
-        //    var (hub, subscription) = connection.CreateHubProxyWith<IHubContract, IClientContract>(new Receiver());
-        //}
     }
 }

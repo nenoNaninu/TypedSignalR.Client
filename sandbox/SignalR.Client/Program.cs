@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
@@ -44,10 +45,11 @@ class Client : IClientContract, IHubConnectionObserver, IDisposable
 {
     private readonly IHubContract _hub;
     private readonly IDisposable _subscription;
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public Client(HubConnection connection)
     {
-        _hub = connection.CreateHubProxy<IHubContract>();
+        _hub = connection.CreateHubProxy<IHubContract>(_cancellationTokenSource.Token);
         _subscription = connection.Register<IClientContract>(this);
     }
 
