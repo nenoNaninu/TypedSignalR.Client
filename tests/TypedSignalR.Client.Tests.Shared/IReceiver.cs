@@ -10,6 +10,7 @@ public interface IReceiver
 {
     Task ReceiveMessage(string message, int value);
     Task Nofity();
+    Task ReceiveCustomMessage(UserDefinedType userDefined);
 }
 
 public interface IReceiverTestHub
