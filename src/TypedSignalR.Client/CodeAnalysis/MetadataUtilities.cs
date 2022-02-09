@@ -4,9 +4,14 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public static class TypeAnalysisUtility
+public static class MetadataUtilities
 {
-    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractHubMethods(SourceProductionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractHubMethods(
+        SourceProductionContext context,
+        ITypeSymbol hubTypeSymbol,
+        INamedTypeSymbol taskSymbol,
+        INamedTypeSymbol genericsTaskSymbol,
+        Location memberAccessLocation)
     {
         var hubMethods = new List<MethodMetadata>();
         bool isValid = true;
@@ -20,13 +25,16 @@ public static class TypeAnalysisUtility
                     continue;
                 }
 
-                var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
+                var parameters = methodSymbol.Parameters
+                    .Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)))
+                    .ToArray();
+
                 INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
                 if (returnTypeSymbol is null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
+                        DiagnosticDescriptorItems.HubMethodReturnTypeRule,
                         memberAccessLocation,
                         methodSymbol.ToDisplayString()));
 
@@ -40,22 +48,23 @@ public static class TypeAnalysisUtility
                     continue;
                 }
 
-                ITypeSymbol? genericArg = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
+                ITypeSymbol? genericTypeArgument = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
 
-                var methodInfo = new MethodMetadata(
+                var methodMetadata = new MethodMetadata(
                     methodSymbol.Name,
                     parameters,
-                    methodSymbol.ReturnType.ToDisplayString(),
+                    methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                     returnTypeSymbol.IsGenericType,
-                    genericArg?.ToDisplayString());
+                    genericTypeArgument?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
 
-                hubMethods.Add(methodInfo);
+                hubMethods.Add(methodMetadata);
             }
             else
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.InterfaceDefineRule,
+                    DiagnosticDescriptorItems.InterfaceDefineRule,
                     memberAccessLocation,
+                    "hub proxy",
                     symbol.ToDisplayString()));
 
                 isValid = false;
@@ -66,7 +75,11 @@ public static class TypeAnalysisUtility
         return (hubMethods, isValid);
     }
 
-    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractClientMethods(SourceProductionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractReceiverMethods(
+        SourceProductionContext context,
+        ITypeSymbol clientTypeSymbol,
+        INamedTypeSymbol taskSymbol,
+        Location memberAccessLocation)
     {
         var clientMethods = new List<MethodMetadata>();
         bool isValid = true;
@@ -85,7 +98,7 @@ public static class TypeAnalysisUtility
                 if (returnTypeSymbol is null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
-                        DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
+                        DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
                         memberAccessLocation,
                         methodSymbol.ToDisplayString()));
 
@@ -99,16 +112,25 @@ public static class TypeAnalysisUtility
                     continue;
                 }
 
-                var parameters = methodSymbol.Parameters.Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString())).ToArray();
-                var methodInfo = new MethodMetadata(methodSymbol.Name, parameters, methodSymbol.ReturnType.ToDisplayString(), false, null);
+                var parameters = methodSymbol.Parameters
+                    .Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)))
+                    .ToArray();
 
-                clientMethods.Add(methodInfo);
+                var methodMetadata = new MethodMetadata(
+                    methodSymbol.Name,
+                    parameters,
+                    methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                    false,
+                    null);
+
+                clientMethods.Add(methodMetadata);
             }
             else
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.InterfaceDefineRule,
+                    DiagnosticDescriptorItems.InterfaceDefineRule,
                     memberAccessLocation,
+                    "receiver",
                     symbol.ToDisplayString()));
 
                 isValid = false;
@@ -119,14 +141,20 @@ public static class TypeAnalysisUtility
         return (clientMethods, isValid);
     }
 
-    private static bool ValidateHubMethodReturnTypeRule(SourceProductionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+    private static bool ValidateHubMethodReturnTypeRule(
+        SourceProductionContext context,
+        INamedTypeSymbol returnTypeSymbol,
+        IMethodSymbol methodSymbol,
+        INamedTypeSymbol taskSymbol,
+        INamedTypeSymbol genericsTaskSymbol,
+        Location memberAccessLocation)
     {
         if (returnTypeSymbol.IsGenericType)
         {
-            if (returnTypeSymbol.IsUnboundGenericType || !returnTypeSymbol.OriginalDefinition.Equals(genericsTaskSymbol, SymbolEqualityComparer.Default))
+            if (returnTypeSymbol.IsUnboundGenericType || !SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, genericsTaskSymbol))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
+                    DiagnosticDescriptorItems.HubMethodReturnTypeRule,
                     memberAccessLocation,
                     methodSymbol.ToDisplayString()));
 
@@ -135,10 +163,10 @@ public static class TypeAnalysisUtility
         }
         else
         {
-            if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default))
+            if (!SymbolEqualityComparer.Default.Equals(returnTypeSymbol, taskSymbol))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.HubMethodReturnTypeRule,
+                    DiagnosticDescriptorItems.HubMethodReturnTypeRule,
                     memberAccessLocation,
                     methodSymbol.ToDisplayString()));
 
@@ -149,12 +177,17 @@ public static class TypeAnalysisUtility
         return true;
     }
 
-    private static bool ValidateClientMethodReturnTypeRule(SourceProductionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+    private static bool ValidateClientMethodReturnTypeRule(
+        SourceProductionContext context,
+        INamedTypeSymbol returnTypeSymbol,
+        IMethodSymbol methodSymbol,
+        INamedTypeSymbol taskSymbol,
+        Location memberAccessLocation)
     {
         if (returnTypeSymbol.IsGenericType)
         {
             context.ReportDiagnostic(Diagnostic.Create(
-                DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
+                DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
                 memberAccessLocation,
                 methodSymbol.ToDisplayString()));
 
@@ -162,10 +195,10 @@ public static class TypeAnalysisUtility
         }
         else
         {
-            if (!returnTypeSymbol.Equals(taskSymbol, SymbolEqualityComparer.Default))
+            if (!SymbolEqualityComparer.Default.Equals(returnTypeSymbol, taskSymbol))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.ReceiverMethodReturnTypeRule,
+                    DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
                     memberAccessLocation,
                     methodSymbol.ToDisplayString()));
 

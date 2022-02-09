@@ -34,7 +34,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             .CreateSyntaxProvider(Predicate, Transform)
             .Combine(specialSymbols)
             .Select(PostTransform)
-            .Where(static x => x?.MethodSymbol is not null)
+            .Where(static x => x is not null)
             .Collect();
 
         context.RegisterSourceOutput(methods.Combine(specialSymbols), GenerateSource);
@@ -97,12 +97,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
             return null;
         }
 
-        if (sourceMethod.Equals(specialSymbols.CreateHubProxySymbol, SymbolEqualityComparer.Default))
+        if (SymbolEqualityComparer.Default.Equals(sourceMethod, specialSymbols.CreateHubProxySymbol))
         {
             return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.CreateHubProxy);
         }
 
-        if (sourceMethod.Equals(specialSymbols.RegisterSymbol, SymbolEqualityComparer.Default))
+        if (SymbolEqualityComparer.Default.Equals(sourceMethod, specialSymbols.RegisterSymbol))
         {
             return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.Register);
         }
@@ -156,7 +156,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
         var genericTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
-        var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")?.GetMembers()!;
+        var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers()!;
 
         IMethodSymbol? createHubProxySymbol = null;
         IMethodSymbol? registerSymbol = null;
@@ -168,6 +168,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 if (symbol is IMethodSymbol method)
                 {
                     createHubProxySymbol = method;
+
+                    if (registerSymbol is not null)
+                    {
+                        break;
+                    }
                 }
             }
             else if (symbol.Name is "Register")
@@ -175,6 +180,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 if (symbol is IMethodSymbol method)
                 {
                     registerSymbol = method;
+
+                    if (createHubProxySymbol is not null)
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -191,7 +201,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
         foreach (var createHubProxyMethod in createHubProxyMethods)
         {
-            var methodSymbol = createHubProxyMethod.MethodSymbol!;
+            var methodSymbol = createHubProxyMethod.MethodSymbol;
             var location = createHubProxyMethod.Location;
 
             ITypeSymbol hubType = methodSymbol.TypeArguments[0];
@@ -199,17 +209,17 @@ public sealed class SourceGenerator : IIncrementalGenerator
             if (hubType.TypeKind != TypeKind.Interface)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.TypeArgumentRule,
+                    DiagnosticDescriptorItems.TypeArgumentRule,
                     location,
-                    methodSymbol.OriginalDefinition.ToDisplayString(),
-                    hubType.ToDisplayString()));
+                    "CreateHubProxy",
+                    hubType.ToDisplayString())); ;
 
                 continue;
             }
 
             if (!hubProxyTypeList.Any(hubType))
             {
-                var (hubMethods, isValid) = TypeAnalysisUtility.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
+                var (hubMethods, isValid) = MetadataUtilities.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
 
                 if (isValid)
                 {
@@ -231,7 +241,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
         foreach (var registerMethod in registerMethods)
         {
-            var methodSymbol = registerMethod.MethodSymbol!;
+            var methodSymbol = registerMethod.MethodSymbol;
             var location = registerMethod.Location;
 
             ITypeSymbol receiverType = methodSymbol.TypeArguments[0];
@@ -240,22 +250,22 @@ public sealed class SourceGenerator : IIncrementalGenerator
             {
 
                 context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorCollection.TypeArgumentRule,
+                    DiagnosticDescriptorItems.TypeArgumentRule,
                     location,
-                    methodSymbol.OriginalDefinition.ToDisplayString(),
+                    "Register",
                     receiverType.ToDisplayString()));
 
                 continue;
             }
 
-            if (receiverType.Equals(specialSymbols.HubConnectionObserver, SymbolEqualityComparer.Default))
+            if (SymbolEqualityComparer.Default.Equals(receiverType, specialSymbols.HubConnectionObserver))
             {
                 continue;
             }
 
             if (!receiverTypeList.Any(receiverType))
             {
-                var (receiverMethods, isValid) = TypeAnalysisUtility.ExtractClientMethods(context, receiverType, specialSymbols.Task, location);
+                var (receiverMethods, isValid) = MetadataUtilities.ExtractReceiverMethods(context, receiverType, specialSymbols.Task, location);
 
                 if (isValid)
                 {
@@ -277,11 +287,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
     private class MethodSymbolWithLocation
     {
-        public readonly IMethodSymbol? MethodSymbol;
+        public readonly IMethodSymbol MethodSymbol;
         public readonly Location Location;
         public readonly ExtensionMethod ExtensionMethod;
 
-        public MethodSymbolWithLocation(IMethodSymbol? methodSymbol, Location location, ExtensionMethod extensionMethod)
+        public MethodSymbolWithLocation(IMethodSymbol methodSymbol, Location location, ExtensionMethod extensionMethod)
         {
             MethodSymbol = methodSymbol;
             Location = location;
@@ -289,7 +299,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
     }
 
-    private struct EssentialSymbols
+    private readonly struct EssentialSymbols
     {
         public readonly ITypeSymbol? CallerSymbol;
         public readonly IMethodSymbol? ExtensionMethodSymbol;
