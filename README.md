@@ -103,9 +103,9 @@ static class HubConnectionExtensions
 // An interface for observing SignalR events.
 interface IHubConnectionObserver
 {
-    Task OnClosed(Exception exception);
-    Task OnReconnected(string connectionId);
-    Task OnReconnecting(Exception exception);
+    Task OnClosed(Exception? exception);
+    Task OnReconnected(string? connectionId);
+    Task OnReconnecting(Exception? exception);
 }
 ```
 
@@ -269,96 +269,9 @@ Therefore, no run-time error occurs.
 ![compile-time-error](img/compile-time-error.png)
 
 # Generated code
-In this section, we will briefly explain generated code.
-The actual generated code can be seen in the Visual Studio.
+TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates code.
+Generated code can be seen in the Visual Studio. 
 
 ![generated-code-in-dependencies](img/generated-code-in-dependencies.png)
 
-TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates the following code based on it.
 
-If you call the methods `connection.CreateHubProxy<IHubContract>()` and `connection.Register<IClientContract>(new Receiver())`, the following code will be generated (simplified here). 
-
-```cs
-public static partial class HubConnectionExtensions
-{
-    private class HubInvoker : IHubContract
-    {
-        private readonly HubConnection _connection;
-        private readonly CancellationToken _cancellationToken;
-        
-        public HubInvoker(HubConnection connection, CancellationToken cancellationToken)
-        {
-            _connection = connection;
-            _cancellationToken = cancellationToken;
-        }
-
-        public Task<string> HubMethod1(string user, string message)
-        {
-            return _connection.InvokeCoreAsync<string>(nameof(HubMethod1), new object[] { user, message }, _cancellationToken);
-        }
-
-        public Task HubMethod2()
-        {
-            return _connection.InvokeCoreAsync(nameof(HubMethod2), Array.Empty<object>(), _cancellationToken);
-        }
-    }
-
-    private static CompositeDisposable BindIClientContract(HubConnection connection, IClientContract receiver)
-    {
-        var d1 = connection.On<string, string UserDefine>(nameof(receiver.ClientMethod1), receiver.ClientMethod1);
-        var d2 = connection.On(nameof(receiver.ClientMethod2), receiver.ClientMethod2);
-
-        var compositeDisposable = new CompositeDisposable();
-        compositeDisposable.Add(d1);
-        compositeDisposable.Add(d2);
-        return compositeDisposable;
-    }
-
-    static Extensions()
-    {
-        HubInvokerConstructorCache<IHubContract>.Construct = static (connection, cancellationToken) => new HubInvoker(connection, cancellationToken);
-        ReceiverBinderCache<IClientContract>.Bind = BindIClientContract;
-    }
-}
-```
-The generated code is used through the API as follows. 
-```cs
-public static partial class HubConnectionExtensions
-{
-    // static type caching
-    private static class HubInvokerConstructorCache<T>
-    {
-        public static Func<HubConnection, T> Construct;
-    }
-
-    // static type caching
-    private static class ReceiverBinderCache<T>
-    {
-        public static Func<HubConnection, T, CompositeDisposable> Bind;
-    }
-
-    public static THub CreateHubProxy<THub>(this HubConnection connection, CancellationToken cancellationToken = default)
-    {
-        return HubInvokerConstructorCache<THub>.Construct(connection, cancellationToken);
-    }
-
-    public static IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver)
-    {
-        if(typeof(TReceiver) == typeof(IHubConnectionObserver))
-        {
-            // special subscription
-            return new HubConnectionObserverSubscription(connection, receiver as IHubConnectionObserver);;
-        }
-
-        var compositeDisposable = ReceiverBinderCache<TReceiver>.Bind(connection, receiver);
-
-        if (receiver is IHubConnectionObserver hubConnectionObserver)
-        {
-            var subscription = new HubConnectionObserverSubscription(connection, hubConnectionObserver);
-            compositeDisposable.Add(subscription);
-        }
-
-        return compositeDisposable;
-    }
-}
-```
