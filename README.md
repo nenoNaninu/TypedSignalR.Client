@@ -266,12 +266,12 @@ It is complicated for humans to comply with these restrictions properly.
 So, this library looks for parts that do not follow the restriction and report detailed errors at compile-time. 
 Therefore, no run-time error occurs. 
 
-![compile-time-error](img/compile-time-error.png)
+![compile-time-error](https://user-images.githubusercontent.com/27144255/153228225-eec170ca-f047-4d4d-868e-f7091284f5ca.png)
 
 # Generated code
 TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
 Generated code can be seen in Visual Studio. 
 
-![generated-code-in-dependencies](img/generated-code-in-dependencies.png)
+![generated-code-in-dependencies](https://user-images.githubusercontent.com/27144255/153228062-08d56132-01d0-4015-9c2d-bb9cd34ea76f.png)
 
 
