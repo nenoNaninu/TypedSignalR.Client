@@ -33,11 +33,11 @@ namespace TypedSignalR.Client
 
         public static readonly DiagnosticDescriptor ReceiverMethodReturnTypeRule = new(
             id: "TypedSiRCA004",
-            title: "TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Receiver must be Task or void",
-            messageFormat: "[The return type of the method in the interface used for Receiver must be Task or void] Return type of {0} is not Task or void",
+            title: "TypedSignalR.Client.Analyzer.004: The return type of the method in the interface used for Receiver must be Task",
+            messageFormat: "[The return type of the method in the interface used for Receiver must be Task or void] Return type of {0} is not Task",
             category: "Usage",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
-            description: "The return type of the method in the interface used for Receiver must be Task or void.");
+            description: "The return type of the method in the interface used for Receiver must be Task.");
     }
 }

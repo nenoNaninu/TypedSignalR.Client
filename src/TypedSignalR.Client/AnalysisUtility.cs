@@ -6,7 +6,7 @@ namespace TypedSignalR.Client
 {
     public static class AnalysisUtility
     {
-        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractHubMethods(GeneratorExecutionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractHubMethods(SourceProductionContext context, ITypeSymbol hubTypeSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
         {
             var hubMethods = new List<MethodInfo>();
             bool isValid = true;
@@ -66,7 +66,7 @@ namespace TypedSignalR.Client
             return (hubMethods, isValid);
         }
 
-        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(GeneratorExecutionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        public static (IReadOnlyList<MethodInfo> Methods, bool IsValid) ExtractClientMethods(SourceProductionContext context, ITypeSymbol clientTypeSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
         {
             var clientMethods = new List<MethodInfo>();
             bool isValid = true;
@@ -119,7 +119,7 @@ namespace TypedSignalR.Client
             return (clientMethods, isValid);
         }
 
-        private static bool ValidateHubMethodReturnTypeRule(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
+        private static bool ValidateHubMethodReturnTypeRule(SourceProductionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, INamedTypeSymbol genericsTaskSymbol, Location memberAccessLocation)
         {
             if (returnTypeSymbol.IsGenericType)
             {
@@ -149,7 +149,7 @@ namespace TypedSignalR.Client
             return true;
         }
 
-        private static bool ValidateClientMethodReturnTypeRule(GeneratorExecutionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
+        private static bool ValidateClientMethodReturnTypeRule(SourceProductionContext context, INamedTypeSymbol returnTypeSymbol, IMethodSymbol methodSymbol, INamedTypeSymbol taskSymbol, Location memberAccessLocation)
         {
             if (returnTypeSymbol.IsGenericType)
             {

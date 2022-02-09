@@ -17,17 +17,16 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
   - [Client code format](#client-code-format)
 - [Compile-time error support](#compile-time-error-support)
 - [Generated code](#generated-code)
-- [Demo](#demo)
 
 # Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
+
 ```
 dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
 ```
 
 # Why TypedSignalR.Client?
-
 The C# SignalR Client is untyped.
 To call a Hub (server-side) function, you must specify the function defined in Hub using a string.
 You also have to manually determine the return type.
@@ -71,8 +70,7 @@ var guid = await hubProxy.HubMethod2("message", 99);
 // The client's function registration is also strongly typed, so it's safe and easy.
 var subscription = connection.Register<IReceiver>(new Receiver());
 
-// Defining interfaces are useful not only for the client-side
-// but also for the server-side.
+// Defining interfaces are useful not only for the client-side but also for the server-side.
 // See Usage in this README.md for details.
 interface IHub
 {
@@ -105,9 +103,9 @@ static class Extensions
 // An interface for observing SignalR events.
 interface IHubConnectionObserver
 {
-    Task OnClosed(Exception e);
+    Task OnClosed(Exception exception);
     Task OnReconnected(string connectionId);
-    Task OnReconnecting(Exception e);
+    Task OnReconnecting(Exception exception);
 }
 ```
 
@@ -121,11 +119,12 @@ IDisposable subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
 # Usage
-Suppose you have the following interface defined:
+For example, you have the following interface defined.
+
 ```cs
 public class UserDefinedType
 {
-    public Guid RandomId { get; set; }
+    public Guid Id { get; set; }
     public DateTime Datetime { get; set; }
 }
 
@@ -157,6 +156,7 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 
 ## Client
 It's very easy to use. 
+
 ```cs
 
 HubConnection connection = ...;
@@ -187,7 +187,7 @@ var cts = new CancellationTokenSource();
 // The following two are equivalent.
 
 // 1: pure SignalR
-var ret=  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
+var ret =  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
 await connection.InvokeAsync("HubMethod2", cts.Token);
 
 // 2: TypedSignalR.Client
@@ -209,7 +209,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     {
         var instance = new UserDefinedType()
         {
-            Guid = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             DateTime = DateTime.Now,
         };
 
@@ -224,6 +224,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
     }
 }
 ```
+
 # Recommendation
 ## Sharing a project
 I recommend that these interfaces be shared between the client-side and server-side project, for example, by project references.
@@ -251,7 +252,6 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
     // implementation
 }
 ```
-
 
 # Compile-time error support
 This library has some restrictions, including those that come from server-side implementations.
@@ -361,21 +361,4 @@ public static partial class Extensions
         return compositeDisposable;
     }
 }
-```
-
-# Demo
-First, launch server.
-Then access it from your browser and open the console(F12). 
-
-```
-git clone https://github.com/nenoNaninu/TypedSignalR.Client.git
-cd sandbox 
-dotnet run --project SignalR.Server/SignalR.Server.csproj
-```
-
-Execute the console app in another shell. 
-
-```
-cd sandbox 
-dotnet run --project SignalR.Client/SignalR.Client.csproj
 ```
