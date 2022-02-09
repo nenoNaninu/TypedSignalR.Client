@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
 using TypedSignalR.Client;
 
-namespace Example;
+//namespace Example;
 
 public class UserDefine
 {
@@ -83,7 +83,7 @@ interface IErrorProxy
 
 public static class Ex
 {
-    public static IDisposable Subscribe<T>(this HubConnection source, T o)
+    public static IDisposable? Subscribe<T>(this HubConnection source, T o)
     {
         return null;
     }
@@ -94,6 +94,13 @@ class Program
 {
     static void Main(string[] args)
     {
+        Func<string> f = () => Guid.NewGuid().ToString();
+        object o = f;
+
+        var f2 = o as Func<string>;
+        Console.WriteLine(f2.Invoke());
+
+
         var connection = new HubConnectionBuilder()
            .WithUrl("https://~~~")
            .Build();
@@ -103,10 +110,11 @@ class Program
         connection.Register<IClientContract>(new Receiver());
         connection.Register<SignalR.Shared.IClientContract>(new Re2());
 
+        connection.Register<IClientContract>(new Receiver());
 
         //hub.Hoge();
         //{
-        //    var hub = connection.CreateHubProxy<IHubContract>();
+        var hub = connection.CreateHubProxy<IHubContract>();
         //    var subscription = connection.Register<IClientContract>(new Receiver());
 
         //    hub.SomeHubMethod1("user", "message");
