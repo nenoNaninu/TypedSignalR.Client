@@ -16,7 +16,7 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
   - [Sharing a project](#sharing-a-project)
   - [Client code format](#client-code-format)
 - [Compile-time error support](#compile-time-error-support)
-- [Generated code](#generated-code)
+- [Generated source code](#generated-source-code)
 
 # Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
@@ -266,12 +266,10 @@ It is complicated for humans to comply with these restrictions properly.
 So, this library looks for parts that do not follow the restriction and report detailed errors at compile-time. 
 Therefore, no run-time error occurs. 
 
-![compile-time-error](https://user-images.githubusercontent.com/27144255/153228225-eec170ca-f047-4d4d-868e-f7091284f5ca.png)
+![compile-time-error](https://user-images.githubusercontent.com/27144255/153356331-3b4d9af6-b289-457c-8f45-2a4fcb8bb049.png)
 
-# Generated code
+# Generated source code
 TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
-Generated code can be seen in Visual Studio. 
+Generated source code can be seen in Visual Studio. 
 
-![generated-code-in-dependencies](https://user-images.githubusercontent.com/27144255/153228062-08d56132-01d0-4015-9c2d-bb9cd34ea76f.png)
-
-
+![generated-source-code-in-dependencies](https://user-images.githubusercontent.com/27144255/153228062-08d56132-01d0-4015-9c2d-bb9cd34ea76f.png)
