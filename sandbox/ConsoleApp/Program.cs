@@ -37,7 +37,7 @@ interface IErrorProxy
 
 interface IErrorProxy2
 {
-    Task<string> Hoge();
+    Task<Guid> Hoge();
     int Id(); // must Task or Task<T>
 }
 

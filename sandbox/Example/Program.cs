@@ -46,17 +46,17 @@ class Receiver : IClientContract, IHubConnectionObserver
         throw new NotImplementedException();
     }
 
-    public Task OnClosed(Exception e)
+    public Task OnClosed(Exception? e)
     {
         throw new NotImplementedException();
     }
 
-    public Task OnReconnected(string connectionId)
+    public Task OnReconnected(string? connectionId)
     {
         throw new NotImplementedException();
     }
 
-    public Task OnReconnecting(Exception e)
+    public Task OnReconnecting(Exception? e)
     {
         throw new NotImplementedException();
     }
