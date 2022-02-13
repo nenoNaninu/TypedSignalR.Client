@@ -128,7 +128,7 @@ public class UserDefinedType
     public DateTime Datetime { get; set; }
 }
 
-// The return type of the client-side method must be Task. 
+// The return type of methods on the client-side must be Task. 
 public interface IClientContract
 {
     // Of course, user defined type is OK. 
@@ -136,7 +136,7 @@ public interface IClientContract
     Task ClientMethod2();
 }
 
-// The return type of the method on the hub-side must be Task or Task <T>. 
+// The return type of methods on the hub-side must be Task or Task<T>. 
 public interface IHubContract
 {
     Task<string> HubMethod1(string user, string message);
