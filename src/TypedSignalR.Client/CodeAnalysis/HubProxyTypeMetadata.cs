@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public sealed class HubProxyTypeMetadata
+public sealed class HubProxyTypeMetadata : ITypeSymbolHolder
 {
     public ITypeSymbol TypeSymbol { get; }
 

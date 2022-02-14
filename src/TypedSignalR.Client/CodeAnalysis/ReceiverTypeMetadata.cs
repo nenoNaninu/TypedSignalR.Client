@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public sealed class ReceiverTypeMetadata
+public sealed class ReceiverTypeMetadata : ITypeSymbolHolder
 {
     public ITypeSymbol TypeSymbol { get; }
 
