@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
@@ -12,14 +15,24 @@ public sealed class MethodMetadata
     public bool IsGenericReturnType { get; }
     public string? GenericReturnTypeArgument { get; }
 
-    /// <param name="isGenericReturnType">if return type is Task<T>, must be true. if return type is Task or void, must be false. </param>
-    /// <param name="genericReturnTypeArgument">e.g. if return type is Task<Datetime>, you must be input System.Datetime. if not generics, you must be input null. </param>
-    public MethodMetadata(string methodName, IReadOnlyList<MethodParameter> parameters, string returnType, bool isGenericReturnType, string? genericReturnTypeArgument)
+    public MethodMetadata(IMethodSymbol methodSymbol)
     {
-        MethodName = methodName;
-        Parameters = parameters;
-        ReturnType = returnType;
-        IsGenericReturnType = isGenericReturnType;
-        GenericReturnTypeArgument = genericReturnTypeArgument;
+        INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
+
+        if (returnTypeSymbol is null)
+        {
+            throw new ArgumentException("Unable to cast methodSymbol.ReturnType to INamedTypeSymbol");
+        }
+
+        MethodName = methodSymbol.Name;
+
+        Parameters = methodSymbol.Parameters
+            .Select(x => new MethodParameter(x))
+            .ToArray();
+
+        ReturnType = returnTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        IsGenericReturnType = returnTypeSymbol.IsGenericType;
+        GenericReturnTypeArgument = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
     }
 }

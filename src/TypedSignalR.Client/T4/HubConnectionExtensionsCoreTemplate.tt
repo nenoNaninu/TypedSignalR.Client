@@ -12,7 +12,7 @@ namespace TypedSignalR.Client
 {
     public static partial class HubConnectionExtensions
     {
-<# foreach(var hubProxyType in HubProxyTypeList) {#>
+<# foreach(var hubProxyType in HubTypes) {#>
         private sealed class HubInvokerFor_<#= hubProxyType.CollisionFreeName #> : <#= hubProxyType.InterfaceFullName #>, IHubInvoker
         {
             private readonly global::Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
@@ -41,7 +41,7 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-<# foreach(var receiverType in ReceiverTypeList){ #>
+<# foreach(var receiverType in ReceiverTypes){ #>
         private sealed class BinderFor_<#= receiverType.CollisionFreeName #> : IReceiverBinder<<#= receiverType.InterfaceFullName #>>
         {
             public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
@@ -66,7 +66,7 @@ namespace TypedSignalR.Client
             {
                 var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
 
-<# foreach(var hubProxyType in HubProxyTypeList) {#>
+<# foreach(var hubProxyType in HubTypes) {#>
                 factories.Add(typeof(<#= hubProxyType.InterfaceFullName #>), new HubInvokerFactoryFor_<#= hubProxyType.CollisionFreeName #>());
 <# } #>
 
@@ -83,7 +83,7 @@ namespace TypedSignalR.Client
             {
                 var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
 
-<# foreach(var receiverType in ReceiverTypeList){ #>
+<# foreach(var receiverType in ReceiverTypes){ #>
                 binders.Add(typeof(<#= receiverType.InterfaceFullName #>), new BinderFor_<#= receiverType.CollisionFreeName #>());
 <# } #>
 

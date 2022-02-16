@@ -4,6 +4,15 @@ namespace TypedSignalR.Client.CodeAnalysis;
 
 public static class DiagnosticDescriptorItems
 {
+    public static readonly DiagnosticDescriptor UnexpectedException = new(
+        id: "TSRC000",
+        title: "Caught unexpected exception",
+        messageFormat: "[Caught unexpected exception] {0}",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Caught unexpected exception.");
+
     public static readonly DiagnosticDescriptor TypeArgumentRule = new(
         id: "TSRC001",
         title: "The type argument must be an interface",
