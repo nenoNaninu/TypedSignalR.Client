@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -17,22 +16,26 @@ public sealed class MethodMetadata
 
     public MethodMetadata(IMethodSymbol methodSymbol)
     {
-        INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
-
-        if (returnTypeSymbol is null)
-        {
-            throw new ArgumentException("Unable to cast methodSymbol.ReturnType to INamedTypeSymbol");
-        }
-
         MethodName = methodSymbol.Name;
 
         Parameters = methodSymbol.Parameters
             .Select(x => new MethodParameter(x))
             .ToArray();
 
-        ReturnType = returnTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        IsGenericReturnType = returnTypeSymbol.IsGenericType;
-        GenericReturnTypeArgument = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) : null;
+        INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
+
+        if (returnTypeSymbol is not null)
+        {
+            IsGenericReturnType = returnTypeSymbol.IsGenericType;
+
+            if (returnTypeSymbol.IsGenericType)
+            {
+                GenericReturnTypeArgument = returnTypeSymbol.TypeArguments.Length == 1
+                    ? returnTypeSymbol.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                    : string.Join(", ", returnTypeSymbol.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+            }
+        }
     }
 }
