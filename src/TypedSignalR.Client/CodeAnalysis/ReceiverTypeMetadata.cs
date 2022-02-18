@@ -20,6 +20,6 @@ public sealed class ReceiverTypeMetadata : ITypeSymbolHolder
 
         InterfaceName = typeSymbol.Name;
         InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        CollisionFreeName = InterfaceFullName.Replace(".", "_").Replace(":", "_");
+        CollisionFreeName = InterfaceFullName.Replace('.', '_').Replace(':', '_');
     }
 }
