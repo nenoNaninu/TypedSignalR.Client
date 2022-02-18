@@ -59,7 +59,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static EssentialSymbols Transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static SourceSymbols Transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -69,10 +69,10 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var callerSymbol = context.SemanticModel.GetTypeInfo(target.Expression).Type;
         var extensionMethodSymbol = context.SemanticModel.GetSymbolInfo(target).Symbol as IMethodSymbol;
 
-        return new EssentialSymbols(callerSymbol, extensionMethodSymbol, target.GetLocation());
+        return new SourceSymbols(callerSymbol, extensionMethodSymbol, target.GetLocation());
     }
 
-    private static MethodSymbolWithLocation? PostTransform((EssentialSymbols, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static MethodSymbolWithLocation? PostTransform((SourceSymbols, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -310,13 +310,13 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
     }
 
-    private readonly struct EssentialSymbols
+    private readonly struct SourceSymbols
     {
         public readonly ITypeSymbol? CallerSymbol;
         public readonly IMethodSymbol? ExtensionMethodSymbol;
         public readonly Location Location;
 
-        public EssentialSymbols(ITypeSymbol? callerSymbol, IMethodSymbol? extensionMethodSymbol, Location location)
+        public SourceSymbols(ITypeSymbol? callerSymbol, IMethodSymbol? extensionMethodSymbol, Location location)
         {
             CallerSymbol = callerSymbol;
             ExtensionMethodSymbol = extensionMethodSymbol;
