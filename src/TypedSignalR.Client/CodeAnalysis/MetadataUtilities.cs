@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
@@ -25,10 +24,6 @@ public static class MetadataUtilities
                     continue;
                 }
 
-                var parameters = methodSymbol.Parameters
-                    .Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)))
-                    .ToArray();
-
                 INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // Task or Task<T>
 
                 if (returnTypeSymbol is null)
@@ -48,14 +43,7 @@ public static class MetadataUtilities
                     continue;
                 }
 
-                ITypeSymbol? genericTypeArgument = returnTypeSymbol.IsGenericType ? returnTypeSymbol.TypeArguments[0] : null;
-
-                var methodMetadata = new MethodMetadata(
-                    methodSymbol.Name,
-                    parameters,
-                    methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                    returnTypeSymbol.IsGenericType,
-                    genericTypeArgument?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                var methodMetadata = new MethodMetadata(methodSymbol);
 
                 hubMethods.Add(methodMetadata);
             }
@@ -112,16 +100,7 @@ public static class MetadataUtilities
                     continue;
                 }
 
-                var parameters = methodSymbol.Parameters
-                    .Select(x => new MethodParameter(x.Name, x.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)))
-                    .ToArray();
-
-                var methodMetadata = new MethodMetadata(
-                    methodSymbol.Name,
-                    parameters,
-                    methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                    false,
-                    null);
+                var methodMetadata = new MethodMetadata(methodSymbol);
 
                 clientMethods.Add(methodMetadata);
             }

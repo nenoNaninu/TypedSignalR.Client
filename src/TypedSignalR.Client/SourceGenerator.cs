@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -135,20 +136,30 @@ public sealed class SourceGenerator : IIncrementalGenerator
             }
         }
 
-        var hubProxyTypeList = ExtractFromCreateHubProxyMethods(context, hubProxyMethodList, specialSymbols);
-        var receiverTypeList = ExtractFromRegisterMethods(context, receiverMethodList, specialSymbols);
-
-        var template = new HubConnectionExtensionsCoreTemplate()
+        try
         {
-            HubProxyTypeList = hubProxyTypeList,
-            ReceiverTypeList = receiverTypeList
-        };
+            var hubTypes = ExtractHubTypesFromCreateHubProxyMethods(context, hubProxyMethodList, specialSymbols);
+            var receiverTypes = ExtractReceiverTypesFromRegisterMethods(context, receiverMethodList, specialSymbols);
 
-        var source = template.TransformText();
+            var template = new HubConnectionExtensionsCoreTemplate()
+            {
+                HubTypes = hubTypes,
+                ReceiverTypes = receiverTypes
+            };
 
-        Debug.WriteLine(source);
+            var source = template.TransformText();
 
-        context.AddSource("TypedSignalR.Client.HubConnectionExtensions.Core.Generated.cs", source);
+            Debug.WriteLine(source);
+
+            context.AddSource("TypedSignalR.Client.HubConnectionExtensions.Core.Generated.cs", source);
+        }
+        catch (Exception exception)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptorItems.UnexpectedException,
+                Location.None,
+                exception));
+        }
     }
 
     private static SpecialSymbols GetSpecialSymbols(Compilation compilation)
@@ -192,12 +203,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxySymbol!, registerSymbol!);
     }
 
-    private static IReadOnlyList<HubProxyTypeMetadata> ExtractFromCreateHubProxyMethods(
+    private static IReadOnlyList<HubTypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
         SourceProductionContext context,
         IReadOnlyList<MethodSymbolWithLocation> createHubProxyMethods,
         SpecialSymbols specialSymbols)
     {
-        var hubProxyTypeList = new List<HubProxyTypeMetadata>(createHubProxyMethods.Count);
+        var hubTypeList = new List<HubTypeMetadata>(createHubProxyMethods.Count);
 
         foreach (var createHubProxyMethod in createHubProxyMethods)
         {
@@ -217,22 +228,22 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 continue;
             }
 
-            if (!hubProxyTypeList.Any(hubType))
+            if (!hubTypeList.Any(hubType))
             {
                 var (hubMethods, isValid) = MetadataUtilities.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
 
                 if (isValid)
                 {
-                    var invoker = new HubProxyTypeMetadata(hubType, hubMethods);
-                    hubProxyTypeList.Add(invoker);
+                    var invoker = new HubTypeMetadata(hubType, hubMethods);
+                    hubTypeList.Add(invoker);
                 }
             }
         }
 
-        return hubProxyTypeList;
+        return hubTypeList;
     }
 
-    private static IReadOnlyList<ReceiverTypeMetadata> ExtractFromRegisterMethods(
+    private static IReadOnlyList<ReceiverTypeMetadata> ExtractReceiverTypesFromRegisterMethods(
         SourceProductionContext context,
         IReadOnlyList<MethodSymbolWithLocation> registerMethods,
         SpecialSymbols specialSymbols)

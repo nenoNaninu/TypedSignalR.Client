@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public sealed class HubProxyTypeMetadata : ITypeSymbolHolder
+public sealed class HubTypeMetadata : ITypeSymbolHolder
 {
     public ITypeSymbol TypeSymbol { get; }
 
@@ -13,7 +13,7 @@ public sealed class HubProxyTypeMetadata : ITypeSymbolHolder
     public string InterfaceFullName { get; }
     public string CollisionFreeName { get; }
 
-    public HubProxyTypeMetadata(ITypeSymbol typeSymbol, IReadOnlyList<MethodMetadata> methods)
+    public HubTypeMetadata(ITypeSymbol typeSymbol, IReadOnlyList<MethodMetadata> methods)
     {
         TypeSymbol = typeSymbol;
         Methods = methods;

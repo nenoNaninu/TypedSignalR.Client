@@ -12,18 +12,18 @@ namespace TypedSignalR.Client
 {
     public static partial class HubConnectionExtensions
     {
-<# foreach(var hubProxyType in HubProxyTypeList) {#>
-        private sealed class HubInvokerFor_<#= hubProxyType.CollisionFreeName #> : <#= hubProxyType.InterfaceFullName #>, IHubInvoker
+<# foreach(var hubType in HubTypes) {#>
+        private sealed class HubInvokerFor_<#= hubType.CollisionFreeName #> : <#= hubType.InterfaceFullName #>, IHubInvoker
         {
             private readonly global::Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
             private readonly global::System.Threading.CancellationToken _cancellationToken;
 
-            public HubInvokerFor_<#= hubProxyType.CollisionFreeName #>(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
+            public HubInvokerFor_<#= hubType.CollisionFreeName #>(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
             {
                 _connection = connection;
                 _cancellationToken = cancellationToken;
             }
-<# foreach(var method in hubProxyType.Methods) { #>
+<# foreach(var method in hubType.Methods) { #>
 
             public <#= method.ReturnType #> <#= method.MethodName #>(<#= method.CreateParametersString() #>)
             {
@@ -32,16 +32,16 @@ namespace TypedSignalR.Client
 <# } #>
         }
 
-        private sealed class HubInvokerFactoryFor_<#= hubProxyType.CollisionFreeName #> : IHubInvokerFactory<<#= hubProxyType.InterfaceFullName #>>
+        private sealed class HubInvokerFactoryFor_<#= hubType.CollisionFreeName #> : IHubInvokerFactory<<#= hubType.InterfaceFullName #>>
         {
-            public <#= hubProxyType.InterfaceFullName #> CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
+            public <#= hubType.InterfaceFullName #> CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
             {
-                return new HubInvokerFor_<#= hubProxyType.CollisionFreeName #>(connection, cancellationToken);
+                return new HubInvokerFor_<#= hubType.CollisionFreeName #>(connection, cancellationToken);
             }
         }
 
 <# } #>
-<# foreach(var receiverType in ReceiverTypeList){ #>
+<# foreach(var receiverType in ReceiverTypes){ #>
         private sealed class BinderFor_<#= receiverType.CollisionFreeName #> : IReceiverBinder<<#= receiverType.InterfaceFullName #>>
         {
             public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
@@ -66,8 +66,8 @@ namespace TypedSignalR.Client
             {
                 var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
 
-<# foreach(var hubProxyType in HubProxyTypeList) {#>
-                factories.Add(typeof(<#= hubProxyType.InterfaceFullName #>), new HubInvokerFactoryFor_<#= hubProxyType.CollisionFreeName #>());
+<# foreach(var hubType in HubTypes) {#>
+                factories.Add(typeof(<#= hubType.InterfaceFullName #>), new HubInvokerFactoryFor_<#= hubType.CollisionFreeName #>());
 <# } #>
 
                 global::System.Threading.Interlocked.CompareExchange(ref Factories, factories, null);
@@ -83,7 +83,7 @@ namespace TypedSignalR.Client
             {
                 var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
 
-<# foreach(var receiverType in ReceiverTypeList){ #>
+<# foreach(var receiverType in ReceiverTypes){ #>
                 binders.Add(typeof(<#= receiverType.InterfaceFullName #>), new BinderFor_<#= receiverType.CollisionFreeName #>());
 <# } #>
 

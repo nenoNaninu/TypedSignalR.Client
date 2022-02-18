@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace TypedSignalR.Client.CodeAnalysis;
 
 public readonly struct MethodParameter
@@ -5,9 +7,9 @@ public readonly struct MethodParameter
     public readonly string Name;
     public readonly string TypeName;
 
-    public MethodParameter(string name, string typeName)
+    public MethodParameter(IParameterSymbol parameterSymbol)
     {
-        Name = name;
-        TypeName = typeName;
+        Name = parameterSymbol.Name;
+        TypeName = parameterSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     }
 }

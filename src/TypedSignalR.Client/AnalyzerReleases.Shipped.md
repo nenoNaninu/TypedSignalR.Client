@@ -7,6 +7,7 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
+TSRC000 |  Usage   |  Error   | Unexpected exception.
 TSRC001 |  Usage   |  Error   | The type argument must be an interface.
 TSRC002 |  Usage   |  Error   | Only define methods in the interface.
 TSRC003 |  Usage   |  Error   | The return type of methods in the interface must be Task or Task<T>.
