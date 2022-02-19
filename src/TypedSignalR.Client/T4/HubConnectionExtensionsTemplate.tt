@@ -103,6 +103,12 @@ namespace TypedSignalR.Client
         private static partial void InitializeFactories();
         private static partial void InitializeBinders();
 
+        static HubConnectionExtensions()
+        {
+            InitializeFactories();
+            InitializeBinders();
+        }
+
         private static class HubInvokerFactoryProvider
         {
             public static IHubInvokerFactory<T>? GetHubInvokerFactory<T>()
@@ -166,6 +172,7 @@ namespace TypedSignalR.Client
             {
                 _connection = connection;
                 _hubConnectionObserver = hubConnectionObserver;
+
                 _connection.Closed += hubConnectionObserver.OnClosed;
                 _connection.Reconnected += hubConnectionObserver.OnReconnected;
                 _connection.Reconnecting += hubConnectionObserver.OnReconnecting;

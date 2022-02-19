@@ -42,17 +42,22 @@
 
     <ItemGroup>
         <Compile Update="T4\ComponentsTemplate.cs">
-          <DependentUpon>ComponentsTemplate.tt</DependentUpon>
-          <DesignTime>True</DesignTime>
-          <AutoGen>True</AutoGen>
+            <DependentUpon>ComponentsTemplate.tt</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
         </Compile>
         <Compile Update="T4\HubConnectionExtensionsTemplate.cs">
             <DependentUpon>HubConnectionExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
-        <Compile Update="T4\HubConnectionExtensionsCoreTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsCoreTemplate.tt</DependentUpon>
+        <Compile Update="T4\HubConnectionExtensionsHubInvokerTemplate.cs">
+            <DependentUpon>HubConnectionExtensionsHubInvokerTemplate.tt</DependentUpon>
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+        </Compile>
+        <Compile Update="T4\HubConnectionExtensionsBinderTemplate.cs">
+            <DependentUpon>HubConnectionExtensionsBinderTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
         </Compile>
@@ -60,15 +65,19 @@
 
     <ItemGroup>
         <None Update="T4\ComponentsTemplate.tt">
-          <LastGenOutput>ComponentsTemplate.cs</LastGenOutput>
-          <Generator>TextTemplatingFilePreprocessor</Generator>
+            <LastGenOutput>ComponentsTemplate.cs</LastGenOutput>
+            <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
         <None Update="T4\HubConnectionExtensionsTemplate.tt">
             <LastGenOutput>HubConnectionExtensionsTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
-        <None Update="T4\HubConnectionExtensionsCoreTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsCoreTemplate.cs</LastGenOutput>
+        <None Update="T4\HubConnectionExtensionsHubInvokerTemplate.tt">
+            <LastGenOutput>HubConnectionExtensionsHubInvokerTemplate.cs</LastGenOutput>
+            <Generator>TextTemplatingFilePreprocessor</Generator>
+        </None>
+        <None Update="T4\HubConnectionExtensionsBinderTemplate.tt">
+            <LastGenOutput>HubConnectionExtensionsBinderTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
         </None>
     </ItemGroup>
