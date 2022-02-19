@@ -96,8 +96,8 @@ This Source Generator provides two extension methods and one interface.
 ```cs
 static class HubConnectionExtensions
 {
-    THub CreateHubProxy<THub>(this HubConnection source, CancellationToken cancellationToken = default){...}
-    IDisposable Register<TReceiver>(this HubConnection source, TReceiver receiver){...}
+    THub CreateHubProxy<THub>(this HubConnection connection, CancellationToken cancellationToken = default){...}
+    IDisposable Register<TReceiver>(this HubConnection connection, TReceiver receiver){...}
 }
 
 // An interface for observing SignalR events.
