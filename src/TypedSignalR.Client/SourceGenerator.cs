@@ -31,22 +31,22 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 return GetSpecialSymbols(compilation);
             });
 
-        var createHubProxyMethods = context.SyntaxProvider
+        var createHubProxyMethodSymbols = context.SyntaxProvider
             .CreateSyntaxProvider(WhereCreateHubProxyMethod, TransformToSourceSymbol)
             .Combine(specialSymbols)
             .Select(ValidateCreateHubProxyMethod)
             .Where(static x => x.IsValid())
             .Collect();
 
-        var registerMethods = context.SyntaxProvider
+        var registerMethodSymbols = context.SyntaxProvider
             .CreateSyntaxProvider(WhereRegisterMethod, TransformToSourceSymbol)
             .Combine(specialSymbols)
             .Select(ValidateRegisterMethod)
             .Where(static x => x.IsValid())
             .Collect();
 
-        context.RegisterSourceOutput(createHubProxyMethods.Combine(specialSymbols), GenerateHubInvokerSource);
-        context.RegisterSourceOutput(registerMethods.Combine(specialSymbols), GenerateBinderSource);
+        context.RegisterSourceOutput(createHubProxyMethodSymbols.Combine(specialSymbols), GenerateHubInvokerSource);
+        context.RegisterSourceOutput(registerMethodSymbols.Combine(specialSymbols), GenerateBinderSource);
     }
 
     private static bool WhereCreateHubProxyMethod(SyntaxNode syntaxNode, CancellationToken cancellationToken)
