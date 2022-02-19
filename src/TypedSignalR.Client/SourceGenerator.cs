@@ -34,14 +34,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var createHubProxyMethodSymbols = context.SyntaxProvider
             .CreateSyntaxProvider(WhereCreateHubProxyMethod, TransformToSourceSymbol)
             .Combine(specialSymbols)
-            .Select(ValidateCreateHubProxyMethod)
+            .Select(ValidateCreateHubProxyMethodSymbol)
             .Where(static x => x.IsValid())
             .Collect();
 
         var registerMethodSymbols = context.SyntaxProvider
             .CreateSyntaxProvider(WhereRegisterMethod, TransformToSourceSymbol)
             .Combine(specialSymbols)
-            .Select(ValidateRegisterMethod)
+            .Select(ValidateRegisterMethodSymbol)
             .Where(static x => x.IsValid())
             .Collect();
 
@@ -107,7 +107,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return new SourceSymbol(methodSymbol, target.GetLocation());
     }
 
-    private static ValidatedSourceSymbol ValidateCreateHubProxyMethod((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static ValidatedSourceSymbol ValidateCreateHubProxyMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -137,7 +137,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return default;
     }
 
-    private static ValidatedSourceSymbol ValidateRegisterMethod((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static ValidatedSourceSymbol ValidateRegisterMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
