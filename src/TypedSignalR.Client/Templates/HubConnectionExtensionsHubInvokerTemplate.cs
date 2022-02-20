@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace TypedSignalR.Client.T4
+namespace TypedSignalR.Client.Templates
 {
     using System.Linq;
     using System.Text;
