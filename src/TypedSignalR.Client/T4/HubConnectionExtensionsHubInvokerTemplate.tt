@@ -41,22 +41,6 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-<# foreach(var receiverType in ReceiverTypes){ #>
-        private sealed class BinderFor_<#= receiverType.CollisionFreeName #> : IReceiverBinder<<#= receiverType.InterfaceFullName #>>
-        {
-            public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, <#= receiverType.InterfaceFullName #> receiver)
-            {
-                var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count #>);
-
-<# foreach(var method in receiverType.Methods) { #>
-                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.<#= method.MethodName #>), <#= method.CreateParameterTypeArrayString() #>, HandlerConverter.Convert<#= method.CreateTypeArgumentsStringFromParameterTypes() #>(receiver.<#= method.MethodName #>)));
-<# } #>
-
-                return compositeDisposable;
-            }
-        }
-
-<# } #>
 #if NET5_0_OR_GREATER
         [global::System.Diagnostics.CodeAnalysis.MemberNotNull("Factories")]
 #endif
@@ -72,29 +56,6 @@ namespace TypedSignalR.Client
 
                 global::System.Threading.Interlocked.CompareExchange(ref Factories, factories, null);
             }
-        }
-
-#if NET5_0_OR_GREATER
-        [global::System.Diagnostics.CodeAnalysis.MemberNotNull("Binders")]
-#endif
-        private static partial void InitializeBinders()
-        {
-            if (Binders is null)
-            {
-                var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
-
-<# foreach(var receiverType in ReceiverTypes){ #>
-                binders.Add(typeof(<#= receiverType.InterfaceFullName #>), new BinderFor_<#= receiverType.CollisionFreeName #>());
-<# } #>
-
-                global::System.Threading.Interlocked.CompareExchange(ref Binders, binders, null);
-            }
-        }
-
-        static HubConnectionExtensions()
-        {
-            InitializeFactories();
-            InitializeBinders();
         }
     }
 }

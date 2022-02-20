@@ -9,15 +9,15 @@ public static class MetadataUtilities
         SourceProductionContext context,
         ITypeSymbol hubTypeSymbol,
         INamedTypeSymbol taskSymbol,
-        INamedTypeSymbol genericsTaskSymbol,
+        INamedTypeSymbol genericTaskSymbol,
         Location memberAccessLocation)
     {
         var hubMethods = new List<MethodMetadata>();
         bool isValid = true;
 
-        foreach (ISymbol symbol in hubTypeSymbol.GetMembers())
+        foreach (ISymbol memberSymbol in hubTypeSymbol.GetMembers())
         {
-            if (symbol is IMethodSymbol methodSymbol)
+            if (memberSymbol is IMethodSymbol methodSymbol)
             {
                 if (methodSymbol.MethodKind is MethodKind.PropertyGet or MethodKind.PropertySet)
                 {
@@ -37,7 +37,7 @@ public static class MetadataUtilities
                     continue;
                 }
 
-                if (!ValidateHubMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, genericsTaskSymbol, memberAccessLocation))
+                if (!ValidateHubMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, genericTaskSymbol, memberAccessLocation))
                 {
                     isValid = false;
                     continue;
@@ -53,7 +53,7 @@ public static class MetadataUtilities
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     memberAccessLocation,
                     "hub proxy",
-                    symbol.ToDisplayString()));
+                    memberSymbol.ToDisplayString()));
 
                 isValid = false;
                 continue;
@@ -65,16 +65,16 @@ public static class MetadataUtilities
 
     public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractReceiverMethods(
         SourceProductionContext context,
-        ITypeSymbol clientTypeSymbol,
+        ITypeSymbol receiverTypeSymbol,
         INamedTypeSymbol taskSymbol,
         Location memberAccessLocation)
     {
-        var clientMethods = new List<MethodMetadata>();
+        var receiverMethods = new List<MethodMetadata>();
         bool isValid = true;
 
-        foreach (ISymbol symbol in clientTypeSymbol.GetMembers())
+        foreach (ISymbol memberSymbol in receiverTypeSymbol.GetMembers())
         {
-            if (symbol is IMethodSymbol methodSymbol)
+            if (memberSymbol is IMethodSymbol methodSymbol)
             {
                 if (methodSymbol.MethodKind is MethodKind.PropertyGet or MethodKind.PropertySet)
                 {
@@ -94,7 +94,7 @@ public static class MetadataUtilities
                     continue;
                 }
 
-                if (!ValidateClientMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, memberAccessLocation))
+                if (!ValidateReceiverMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, memberAccessLocation))
                 {
                     isValid = false;
                     continue;
@@ -102,7 +102,7 @@ public static class MetadataUtilities
 
                 var methodMetadata = new MethodMetadata(methodSymbol);
 
-                clientMethods.Add(methodMetadata);
+                receiverMethods.Add(methodMetadata);
             }
             else
             {
@@ -110,14 +110,14 @@ public static class MetadataUtilities
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     memberAccessLocation,
                     "receiver",
-                    symbol.ToDisplayString()));
+                    memberSymbol.ToDisplayString()));
 
                 isValid = false;
                 continue;
             }
         }
 
-        return (clientMethods, isValid);
+        return (receiverMethods, isValid);
     }
 
     private static bool ValidateHubMethodReturnTypeRule(
@@ -125,12 +125,12 @@ public static class MetadataUtilities
         INamedTypeSymbol returnTypeSymbol,
         IMethodSymbol methodSymbol,
         INamedTypeSymbol taskSymbol,
-        INamedTypeSymbol genericsTaskSymbol,
+        INamedTypeSymbol genericTaskSymbol,
         Location memberAccessLocation)
     {
         if (returnTypeSymbol.IsGenericType)
         {
-            if (returnTypeSymbol.IsUnboundGenericType || !SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, genericsTaskSymbol))
+            if (returnTypeSymbol.IsUnboundGenericType || !SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, genericTaskSymbol))
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.HubMethodReturnTypeRule,
@@ -156,7 +156,7 @@ public static class MetadataUtilities
         return true;
     }
 
-    private static bool ValidateClientMethodReturnTypeRule(
+    private static bool ValidateReceiverMethodReturnTypeRule(
         SourceProductionContext context,
         INamedTypeSymbol returnTypeSymbol,
         IMethodSymbol methodSymbol,

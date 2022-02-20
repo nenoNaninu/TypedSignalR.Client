@@ -31,17 +31,25 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 return GetSpecialSymbols(compilation);
             });
 
-        var methods = context.SyntaxProvider
-            .CreateSyntaxProvider(Predicate, Transform)
+        var createHubProxyMethodSymbols = context.SyntaxProvider
+            .CreateSyntaxProvider(WhereCreateHubProxyMethod, TransformToSourceSymbol)
             .Combine(specialSymbols)
-            .Select(PostTransform)
-            .Where(static x => x is not null)
+            .Select(ValidateCreateHubProxyMethodSymbol)
+            .Where(static x => x.IsValid())
             .Collect();
 
-        context.RegisterSourceOutput(methods.Combine(specialSymbols), GenerateSource);
+        var registerMethodSymbols = context.SyntaxProvider
+            .CreateSyntaxProvider(WhereRegisterMethod, TransformToSourceSymbol)
+            .Combine(specialSymbols)
+            .Select(ValidateRegisterMethodSymbol)
+            .Where(static x => x.IsValid())
+            .Collect();
+
+        context.RegisterSourceOutput(createHubProxyMethodSymbols.Combine(specialSymbols), GenerateHubInvokerSource);
+        context.RegisterSourceOutput(registerMethodSymbols.Combine(specialSymbols), GenerateBinderSource);
     }
 
-    private static bool Predicate(SyntaxNode syntaxNode, CancellationToken cancellationToken)
+    private static bool WhereCreateHubProxyMethod(SyntaxNode syntaxNode, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -49,7 +57,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         {
             if (invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
             {
-                if (memberAccessExpressionSyntax.Name.Identifier.ValueText is "CreateHubProxy" or "Register")
+                if (memberAccessExpressionSyntax.Name.Identifier.ValueText is "CreateHubProxy")
                 {
                     return true;
                 }
@@ -59,91 +67,146 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static SourceSymbols Transform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static bool WhereRegisterMethod(SyntaxNode syntaxNode, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (syntaxNode is InvocationExpressionSyntax invocationExpressionSyntax)
+        {
+            if (invocationExpressionSyntax.Expression is MemberAccessExpressionSyntax memberAccessExpressionSyntax)
+            {
+                if (memberAccessExpressionSyntax.Name.Identifier.ValueText is "Register")
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static SourceSymbol TransformToSourceSymbol(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         var invocationExpressionSyntax = context.Node as InvocationExpressionSyntax;
-        var target = (invocationExpressionSyntax!.Expression as MemberAccessExpressionSyntax)!;
+        var target = invocationExpressionSyntax?.Expression as MemberAccessExpressionSyntax;
 
-        var callerSymbol = context.SemanticModel.GetTypeInfo(target.Expression).Type;
-        var extensionMethodSymbol = context.SemanticModel.GetSymbolInfo(target).Symbol as IMethodSymbol;
+        if (target is null)
+        {
+            return default;
+        }
 
-        return new SourceSymbols(callerSymbol, extensionMethodSymbol, target.GetLocation());
+        var methodSymbol = context.SemanticModel.GetSymbolInfo(target).Symbol as IMethodSymbol;
+
+        if (methodSymbol is null)
+        {
+            return default;
+        }
+
+        return new SourceSymbol(methodSymbol, target.GetLocation());
     }
 
-    private static MethodSymbolWithLocation? PostTransform((SourceSymbols, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static ValidatedSourceSymbol ValidateCreateHubProxyMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var callerSymbol = pair.Item1.CallerSymbol;
-        var extensionMethodSymbol = pair.Item1.ExtensionMethodSymbol;
-        var location = pair.Item1.Location;
+        var sourceSymbol = pair.Item1;
+
+        if (sourceSymbol.IsNone())
+        {
+            return default;
+        }
+
+        var methodSymbol = sourceSymbol.MethodSymbol;
+        var location = sourceSymbol.Location;
         var specialSymbols = pair.Item2;
 
-        if (callerSymbol is null)
+        var extensionMethod = methodSymbol.ReducedFrom;
+
+        if (extensionMethod is null)
         {
-            return null;
+            return default;
         }
 
-        if (extensionMethodSymbol is null)
+        if (SymbolEqualityComparer.Default.Equals(extensionMethod, specialSymbols.CreateHubProxySymbol))
         {
-            return null;
+            return new ValidatedSourceSymbol(methodSymbol, location);
         }
 
-        var sourceMethod = extensionMethodSymbol.ReducedFrom;
-
-        if (sourceMethod is null)
-        {
-            return null;
-        }
-
-        if (SymbolEqualityComparer.Default.Equals(sourceMethod, specialSymbols.CreateHubProxySymbol))
-        {
-            return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.CreateHubProxy);
-        }
-
-        if (SymbolEqualityComparer.Default.Equals(sourceMethod, specialSymbols.RegisterSymbol))
-        {
-            return new MethodSymbolWithLocation(extensionMethodSymbol, location, ExtensionMethod.Register);
-        }
-
-        return null;
+        return default;
     }
 
-    private static void GenerateSource(SourceProductionContext context, (ImmutableArray<MethodSymbolWithLocation?>, SpecialSymbols) data)
+    private static ValidatedSourceSymbol ValidateRegisterMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
-        var methodSymbolWithLocations = data.Item1;
-        var specialSymbols = data.Item2;
+        cancellationToken.ThrowIfCancellationRequested();
 
-        var hubProxyMethodList = new List<MethodSymbolWithLocation>();
-        var receiverMethodList = new List<MethodSymbolWithLocation>();
+        var sourceSymbol = pair.Item1;
 
-        foreach (var methodWithLocation in methodSymbolWithLocations)
+        if (sourceSymbol.IsNone())
         {
-            if (methodWithLocation is null)
-            {
-                continue;
-            }
-
-            if (methodWithLocation.ExtensionMethod is ExtensionMethod.CreateHubProxy)
-            {
-                hubProxyMethodList.Add(methodWithLocation);
-            }
-            else if (methodWithLocation.ExtensionMethod is ExtensionMethod.Register)
-            {
-                receiverMethodList.Add(methodWithLocation);
-            }
+            return default;
         }
+
+        var methodSymbol = sourceSymbol.MethodSymbol;
+        var location = sourceSymbol.Location;
+        var specialSymbols = pair.Item2;
+
+        var extensionMethod = methodSymbol.ReducedFrom;
+
+        if (extensionMethod is null)
+        {
+            return default;
+        }
+
+        if (SymbolEqualityComparer.Default.Equals(extensionMethod, specialSymbols.RegisterSymbol))
+        {
+            return new ValidatedSourceSymbol(methodSymbol, location);
+        }
+
+        return default;
+    }
+
+    private static void GenerateHubInvokerSource(SourceProductionContext context, (ImmutableArray<ValidatedSourceSymbol>, SpecialSymbols) data)
+    {
+        var sourceSymbols = data.Item1;
+        var specialSymbols = data.Item2;
 
         try
         {
-            var hubTypes = ExtractHubTypesFromCreateHubProxyMethods(context, hubProxyMethodList, specialSymbols);
-            var receiverTypes = ExtractReceiverTypesFromRegisterMethods(context, receiverMethodList, specialSymbols);
+            var hubTypes = ExtractHubTypesFromCreateHubProxyMethods(context, sourceSymbols, specialSymbols);
 
-            var template = new HubConnectionExtensionsCoreTemplate()
+            var template = new HubConnectionExtensionsHubInvokerTemplate()
             {
                 HubTypes = hubTypes,
+            };
+
+            var source = template.TransformText();
+
+            Debug.WriteLine(source);
+
+            context.AddSource("TypedSignalR.Client.HubConnectionExtensions.HubInvoker.Generated.cs", source);
+        }
+        catch (Exception exception)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptorItems.UnexpectedException,
+                Location.None,
+                exception));
+        }
+    }
+
+    private static void GenerateBinderSource(SourceProductionContext context, (ImmutableArray<ValidatedSourceSymbol>, SpecialSymbols) data)
+    {
+        var sourceSymbols = data.Item1;
+        var specialSymbols = data.Item2;
+
+        try
+        {
+            var receiverTypes = ExtractReceiverTypesFromRegisterMethods(context, sourceSymbols, specialSymbols);
+
+            var template = new HubConnectionExtensionsBinderTemplate()
+            {
                 ReceiverTypes = receiverTypes
             };
 
@@ -151,7 +214,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             Debug.WriteLine(source);
 
-            context.AddSource("TypedSignalR.Client.HubConnectionExtensions.Core.Generated.cs", source);
+            context.AddSource("TypedSignalR.Client.HubConnectionExtensions.Binder.Generated.cs", source);
         }
         catch (Exception exception)
         {
@@ -205,12 +268,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
     private static IReadOnlyList<HubTypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
         SourceProductionContext context,
-        IReadOnlyList<MethodSymbolWithLocation> createHubProxyMethods,
+        IReadOnlyList<ValidatedSourceSymbol> createHubProxyMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var hubTypeList = new List<HubTypeMetadata>(createHubProxyMethods.Count);
+        var hubTypeList = new List<HubTypeMetadata>(createHubProxyMethodSymbols.Count);
 
-        foreach (var createHubProxyMethod in createHubProxyMethods)
+        foreach (var createHubProxyMethod in createHubProxyMethodSymbols)
         {
             var methodSymbol = createHubProxyMethod.MethodSymbol;
             var location = createHubProxyMethod.Location;
@@ -230,7 +293,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             if (!hubTypeList.Any(hubType))
             {
-                var (hubMethods, isValid) = MetadataUtilities.ExtractHubMethods(context, hubType, specialSymbols.Task, specialSymbols.GenericTask, location);
+                var (hubMethods, isValid) = MetadataUtilities.ExtractHubMethods(context, hubType, specialSymbols.TaskSymbol, specialSymbols.GenericTaskSymbol, location);
 
                 if (isValid)
                 {
@@ -245,12 +308,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
     private static IReadOnlyList<ReceiverTypeMetadata> ExtractReceiverTypesFromRegisterMethods(
         SourceProductionContext context,
-        IReadOnlyList<MethodSymbolWithLocation> registerMethods,
+        IReadOnlyList<ValidatedSourceSymbol> registerMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var receiverTypeList = new List<ReceiverTypeMetadata>(registerMethods.Count);
+        var receiverTypeList = new List<ReceiverTypeMetadata>(registerMethodSymbols.Count);
 
-        foreach (var registerMethod in registerMethods)
+        foreach (var registerMethod in registerMethodSymbols)
         {
             var methodSymbol = registerMethod.MethodSymbol;
             var location = registerMethod.Location;
@@ -259,7 +322,6 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             if (receiverType.TypeKind != TypeKind.Interface)
             {
-
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.TypeArgumentRule,
                     location,
@@ -269,14 +331,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 continue;
             }
 
-            if (SymbolEqualityComparer.Default.Equals(receiverType, specialSymbols.HubConnectionObserver))
+            if (SymbolEqualityComparer.Default.Equals(receiverType, specialSymbols.HubConnectionObserverSymbol))
             {
                 continue;
             }
 
             if (!receiverTypeList.Any(receiverType))
             {
-                var (receiverMethods, isValid) = MetadataUtilities.ExtractReceiverMethods(context, receiverType, specialSymbols.Task, location);
+                var (receiverMethods, isValid) = MetadataUtilities.ExtractReceiverMethods(context, receiverType, specialSymbols.TaskSymbol, location);
 
                 if (isValid)
                 {
@@ -289,60 +351,63 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return receiverTypeList;
     }
 
-    private enum ExtensionMethod
+    private readonly record struct SourceSymbol
     {
-        None,
-        CreateHubProxy,
-        Register
-    }
+        public static SourceSymbol None => default;
 
-    private class MethodSymbolWithLocation
-    {
         public readonly IMethodSymbol MethodSymbol;
         public readonly Location Location;
-        public readonly ExtensionMethod ExtensionMethod;
 
-        public MethodSymbolWithLocation(IMethodSymbol methodSymbol, Location location, ExtensionMethod extensionMethod)
+        public SourceSymbol(IMethodSymbol methodSymbol, Location location)
         {
             MethodSymbol = methodSymbol;
             Location = location;
-            ExtensionMethod = extensionMethod;
+        }
+
+        public bool IsNone()
+        {
+            return this == default;
         }
     }
 
-    private readonly struct SourceSymbols
+    private readonly record struct ValidatedSourceSymbol
     {
-        public readonly ITypeSymbol? CallerSymbol;
-        public readonly IMethodSymbol? ExtensionMethodSymbol;
+        public static ValidatedSourceSymbol None => default;
+
+        public readonly IMethodSymbol MethodSymbol;
         public readonly Location Location;
 
-        public SourceSymbols(ITypeSymbol? callerSymbol, IMethodSymbol? extensionMethodSymbol, Location location)
+        public ValidatedSourceSymbol(IMethodSymbol methodSymbol, Location location)
         {
-            CallerSymbol = callerSymbol;
-            ExtensionMethodSymbol = extensionMethodSymbol;
+            MethodSymbol = methodSymbol;
             Location = location;
+        }
+
+        public bool IsValid()
+        {
+            return this != default;
         }
     }
 
     private class SpecialSymbols
     {
-        public readonly INamedTypeSymbol Task;
-        public readonly INamedTypeSymbol GenericTask;
-        public readonly INamedTypeSymbol HubConnectionObserver;
+        public readonly INamedTypeSymbol TaskSymbol;
+        public readonly INamedTypeSymbol GenericTaskSymbol;
+        public readonly INamedTypeSymbol HubConnectionObserverSymbol;
         public readonly IMethodSymbol CreateHubProxySymbol;
         public readonly IMethodSymbol RegisterSymbol;
 
         public SpecialSymbols(
-            INamedTypeSymbol task,
-            INamedTypeSymbol genericTask,
-            INamedTypeSymbol hubConnectionObserver,
+            INamedTypeSymbol taskSymbol,
+            INamedTypeSymbol genericTaskSymbol,
+            INamedTypeSymbol hubConnectionObserverSymbol,
             IMethodSymbol createHubProxySymbol,
             IMethodSymbol registerSymbol
            )
         {
-            Task = task;
-            GenericTask = genericTask;
-            HubConnectionObserver = hubConnectionObserver;
+            TaskSymbol = taskSymbol;
+            GenericTaskSymbol = genericTaskSymbol;
+            HubConnectionObserverSymbol = hubConnectionObserverSymbol;
             CreateHubProxySymbol = createHubProxySymbol;
             RegisterSymbol = registerSymbol;
         }

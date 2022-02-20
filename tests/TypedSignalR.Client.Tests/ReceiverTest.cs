@@ -127,3 +127,35 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
         return Task.CompletedTask;
     }
 }
+
+public interface IReceiver2
+{
+    Task ReceiveMessage(string message, int value);
+    Task Nofity();
+    Task ReceiveCustomMessage(UserDefinedType userDefined);
+}
+
+class SecondReceiver : IReceiver2
+{
+    public SecondReceiver()
+    {
+        // Test if the source generator can generate multiple receiver codes when build time.
+        HubConnection connection = default!;
+        connection.Register<IReceiver2>(this);
+    }
+
+    public Task Nofity()
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ReceiveCustomMessage(UserDefinedType userDefined)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task ReceiveMessage(string message, int value)
+    {
+        throw new NotImplementedException();
+    }
+}
