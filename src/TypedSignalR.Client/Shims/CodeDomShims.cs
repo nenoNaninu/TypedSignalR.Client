@@ -8,7 +8,7 @@ public class CompilerError
 
 public class CompilerErrorCollection
 {
-    public void Add(CompilerError error)
+    public void Add(CompilerError _)
     {
     }
 }
