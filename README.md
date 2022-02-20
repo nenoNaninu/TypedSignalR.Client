@@ -230,7 +230,7 @@ public class SomeHub : Hub<IClientContract>, IHubContract
 I recommend that these interfaces be shared between the client-side and server-side project, for example, by project references.
 
 ```
-server.csproj => shared.csproj <= client.csproj
+server.csproj --> shared.csproj <-- client.csproj
 ```
 
 ## Client code format
@@ -272,4 +272,4 @@ Therefore, no run-time error occurs.
 TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
 Generated source code can be seen in Visual Studio. 
 
-![generated-source-code-in-dependencies](https://user-images.githubusercontent.com/27144255/153228062-08d56132-01d0-4015-9c2d-bb9cd34ea76f.png)
+![generated-code-visible-from-solution-explorer](https://user-images.githubusercontent.com/27144255/154827948-dca0b9b1-0a1b-4833-8b32-3d5ceaa41414.png)
