@@ -6,7 +6,7 @@ using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TypedSignalR.Client.CodeAnalysis;
-using TypedSignalR.Client.T4;
+using TypedSignalR.Client.Templates;
 
 namespace TypedSignalR.Client;
 

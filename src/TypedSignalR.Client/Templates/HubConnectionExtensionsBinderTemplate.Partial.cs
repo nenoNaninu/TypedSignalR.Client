@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using TypedSignalR.Client.CodeAnalysis;
 
-namespace TypedSignalR.Client.T4;
+namespace TypedSignalR.Client.Templates;
 
 public partial class HubConnectionExtensionsBinderTemplate
 {

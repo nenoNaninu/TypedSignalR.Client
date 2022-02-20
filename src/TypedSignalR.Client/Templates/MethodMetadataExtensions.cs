@@ -1,7 +1,7 @@
 using System.Text;
 using TypedSignalR.Client.CodeAnalysis;
 
-namespace TypedSignalR.Client.T4;
+namespace TypedSignalR.Client.Templates;
 
 public static class MethodMetadataExtensions
 {
