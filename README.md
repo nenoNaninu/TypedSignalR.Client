@@ -27,8 +27,8 @@ dotnet add package TypedSignalR.Client
 ```
 
 # Why TypedSignalR.Client?
-The C# SignalR Client is untyped.
-To call a Hub (server-side) function, you must specify the function defined in Hub using a string.
+The pure C# SignalR Client is untyped.
+To call a Hub (server-side) function, we must specify the function defined in Hub using a string.
 We also have to determine the return type manually.
 Moreover, registering a client function called from the server also requires a string, and we must set the parameter types manually.
 
@@ -47,7 +47,7 @@ var guid = await connection.InvokeAsync<Guid>("HubMethod2", "message", 99);
 var subscription = connection.On<string, DateTime>("ClientMethod", (message, dateTime) => {});
 ```
 
-Therefore, if you change the code on the server-side, the modification on the client-side becomes very troublesome. 
+Therefore, if we change the code on the server-side, the modification on the client-side becomes very troublesome. 
 The leading cause is that it is not strongly typed.
 
 TypedSignalR.Client aims to generate a strongly typed SignalR Client by sharing interfaces in which the server and client functions are defined. 
@@ -61,7 +61,7 @@ See [Usage](#usage) section for details.
 IHub hubProxy = connection.CreateHubProxy<IHub>();
 
 // Invoke a hub method through hub proxy.
-// You no longer need to specify the function using a string.
+// We no longer need to specify the function using a string.
 await hubProxy.HubMethod1();
 
 // Both parameters and return types are strongly typed.
@@ -119,7 +119,7 @@ IDisposable subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
 # Usage
-For example, you have the following interface defined.
+For example, we have the following interface defined.
 
 ```cs
 public class UserDefinedType
@@ -197,7 +197,7 @@ await hubProxy.HubMethod2();
 ```
 
 ## Server
-Using the interface definitions, you can write as follows on the server-side (ASP.NET Core). 
+Using the interface definitions, we can write as follows on the server-side (ASP.NET Core). 
 TypedSignalR.Client is not nessesary.
 
 ```cs
@@ -234,7 +234,7 @@ server.csproj --> shared.csproj <-- client.csproj
 ```
 
 ## Client code format
-It is easier to handle if you write the client code in the following format.
+It is easier to handle if we write the client code in the following format.
 
 ```cs
 class Client : IReceiver, IHubConnectionObserver, IDisposable
