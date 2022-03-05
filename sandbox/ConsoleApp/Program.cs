@@ -70,14 +70,14 @@ class Program
         //    var hub2 = connection.CreateHubProxy<ConsoleApp.IHubContract>();
 
         //    ConsoleApp.IClientContract receiver = new Receiver2();
-        //    var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
+        //var subscription2 = connection.Register<ConsoleApp.IClientContract>(new Receiver2());
         //    var subscription3 = connection.Register(receiver);
         //}
 
         //{
         //    var empty = connection.CreateHubProxy<IEmptyProxy>();
         //}
-
+        Console.WriteLine(args);
         {
             // error pattern!
 

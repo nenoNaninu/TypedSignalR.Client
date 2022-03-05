@@ -1,8 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.SignalR.Client;
-using TypedSignalR.Client;
-
 
 namespace ConsoleApp;
 
