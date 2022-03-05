@@ -2,7 +2,7 @@
   "profiles": {
     "TypedSignalR.Client": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\sandbox\\ConsoleApp\\ConsoleApp.csproj"
+      "targetProject": "..\\..\\tests\\TypedSignalR.Client.Tests\\TypedSignalR.Client.Tests.csproj"
     }
   }
 }
