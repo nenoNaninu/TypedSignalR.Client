@@ -33,7 +33,7 @@ We also have to determine the return type manually.
 Moreover, registering a client function called from the server also requires a string, and we must set the parameter types manually.
 
 ```cs
-// pure SignalR Client
+// Pure SignalR Client
 
 // Specify the hub method to invoke using string.
 await connection.InvokeAsync("HubMethod1");
@@ -257,8 +257,8 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
 This library has some restrictions, including those that come from server-side implementations.
 
 - Type argument of the `CreateHubProxy/Register` method must be an interface.
-- Only methods must be defined in the interface used for `CreateHubProxy/Register`.
-  - It is forbidden to define properties.
+- Only method definitions are allowed in the interface used for `CreateHubProxy/Register`.
+  - It is forbidden to define properties and events.
 - The return type of the method in the interface used for `CreateHubProxy` must be `Task` or `Task<T>`.
 - The return type of the method in the interface used for `Register` must be `Task`.
 
@@ -266,7 +266,7 @@ It is complicated for humans to comply with these restrictions properly.
 So, this library looks for parts that do not follow the restriction and report detailed errors at compile-time. 
 Therefore, no run-time error occurs. 
 
-![compile-time-error](https://user-images.githubusercontent.com/27144255/153356331-3b4d9af6-b289-457c-8f45-2a4fcb8bb049.png)
+![compile-time-error](https://user-images.githubusercontent.com/27144255/155505022-0a13bf1b-643c-472c-882e-8508e52c2b63.png)
 
 # Generated source code
 TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
