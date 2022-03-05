@@ -1,18 +1,27 @@
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public static class MetadataUtilities
+public static class TypeValidator
 {
-    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractHubMethods(
+    public static bool ValidateHubTypeRule(
         SourceProductionContext context,
         ITypeSymbol hubTypeSymbol,
         INamedTypeSymbol taskSymbol,
         INamedTypeSymbol genericTaskSymbol,
-        Location memberAccessLocation)
+        Location accessLocation)
     {
-        var hubMethods = new List<MethodMetadata>();
+        if (hubTypeSymbol.TypeKind is not TypeKind.Interface)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptorItems.TypeArgumentRule,
+                accessLocation,
+                "CreateHubProxy",
+                hubTypeSymbol.ToDisplayString())); ;
+
+            return false;
+        }
+
         bool isValid = true;
 
         foreach (ISymbol memberSymbol in hubTypeSymbol.GetMembers())
@@ -21,6 +30,25 @@ public static class MetadataUtilities
             {
                 if (methodSymbol.MethodKind is MethodKind.PropertyGet or MethodKind.PropertySet)
                 {
+                    isValid = false;
+                    continue;
+                }
+
+                if (methodSymbol.MethodKind is MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise)
+                {
+                    isValid = false;
+                    continue;
+                }
+
+                if (methodSymbol.MethodKind is not MethodKind.Ordinary)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorItems.InterfaceDefineRule,
+                        accessLocation,
+                        "hub proxy",
+                        memberSymbol.ToDisplayString()));
+
+                    isValid = false;
                     continue;
                 }
 
@@ -30,28 +58,24 @@ public static class MetadataUtilities
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.HubMethodReturnTypeRule,
-                        memberAccessLocation,
+                        accessLocation,
                         methodSymbol.ToDisplayString()));
 
                     isValid = false;
                     continue;
                 }
 
-                if (!ValidateHubMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, genericTaskSymbol, memberAccessLocation))
+                if (!ValidateHubMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, genericTaskSymbol, accessLocation))
                 {
                     isValid = false;
                     continue;
                 }
-
-                var methodMetadata = new MethodMetadata(methodSymbol);
-
-                hubMethods.Add(methodMetadata);
             }
             else
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
-                    memberAccessLocation,
+                    accessLocation,
                     "hub proxy",
                     memberSymbol.ToDisplayString()));
 
@@ -60,16 +84,26 @@ public static class MetadataUtilities
             }
         }
 
-        return (hubMethods, isValid);
+        return isValid;
     }
 
-    public static (IReadOnlyList<MethodMetadata> Methods, bool IsValid) ExtractReceiverMethods(
+    public static bool ValidateReceiverTypeRule(
         SourceProductionContext context,
         ITypeSymbol receiverTypeSymbol,
         INamedTypeSymbol taskSymbol,
-        Location memberAccessLocation)
+        Location accessLocation)
     {
-        var receiverMethods = new List<MethodMetadata>();
+        if (receiverTypeSymbol.TypeKind is not TypeKind.Interface)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptorItems.TypeArgumentRule,
+                accessLocation,
+                "Register",
+                receiverTypeSymbol.ToDisplayString()));
+
+            return false;
+        }
+
         bool isValid = true;
 
         foreach (ISymbol memberSymbol in receiverTypeSymbol.GetMembers())
@@ -78,6 +112,25 @@ public static class MetadataUtilities
             {
                 if (methodSymbol.MethodKind is MethodKind.PropertyGet or MethodKind.PropertySet)
                 {
+                    isValid = false;
+                    continue;
+                }
+
+                if (methodSymbol.MethodKind is MethodKind.EventAdd or MethodKind.EventRemove or MethodKind.EventRaise)
+                {
+                    isValid = false;
+                    continue;
+                }
+
+                if (methodSymbol.MethodKind is not MethodKind.Ordinary)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptorItems.InterfaceDefineRule,
+                        accessLocation,
+                        "receiver",
+                        memberSymbol.ToDisplayString()));
+
+                    isValid = false;
                     continue;
                 }
 
@@ -87,28 +140,24 @@ public static class MetadataUtilities
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
-                        memberAccessLocation,
+                        accessLocation,
                         methodSymbol.ToDisplayString()));
 
                     isValid = false;
                     continue;
                 }
 
-                if (!ValidateReceiverMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, memberAccessLocation))
+                if (!ValidateReceiverMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, taskSymbol, accessLocation))
                 {
                     isValid = false;
                     continue;
                 }
-
-                var methodMetadata = new MethodMetadata(methodSymbol);
-
-                receiverMethods.Add(methodMetadata);
             }
             else
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
-                    memberAccessLocation,
+                    accessLocation,
                     "receiver",
                     memberSymbol.ToDisplayString()));
 
@@ -117,7 +166,7 @@ public static class MetadataUtilities
             }
         }
 
-        return (receiverMethods, isValid);
+        return isValid;
     }
 
     private static bool ValidateHubMethodReturnTypeRule(
@@ -126,7 +175,7 @@ public static class MetadataUtilities
         IMethodSymbol methodSymbol,
         INamedTypeSymbol taskSymbol,
         INamedTypeSymbol genericTaskSymbol,
-        Location memberAccessLocation)
+        Location accessLocation)
     {
         if (returnTypeSymbol.IsGenericType)
         {
@@ -134,7 +183,7 @@ public static class MetadataUtilities
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.HubMethodReturnTypeRule,
-                    memberAccessLocation,
+                    accessLocation,
                     methodSymbol.ToDisplayString()));
 
                 return false;
@@ -146,7 +195,7 @@ public static class MetadataUtilities
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.HubMethodReturnTypeRule,
-                    memberAccessLocation,
+                    accessLocation,
                     methodSymbol.ToDisplayString()));
 
                 return false;
@@ -161,13 +210,13 @@ public static class MetadataUtilities
         INamedTypeSymbol returnTypeSymbol,
         IMethodSymbol methodSymbol,
         INamedTypeSymbol taskSymbol,
-        Location memberAccessLocation)
+        Location accessLocation)
     {
         if (returnTypeSymbol.IsGenericType)
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
-                memberAccessLocation,
+                accessLocation,
                 methodSymbol.ToDisplayString()));
 
             return false;
@@ -178,7 +227,7 @@ public static class MetadataUtilities
             {
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
-                    memberAccessLocation,
+                    accessLocation,
                     methodSymbol.ToDisplayString()));
 
                 return false;

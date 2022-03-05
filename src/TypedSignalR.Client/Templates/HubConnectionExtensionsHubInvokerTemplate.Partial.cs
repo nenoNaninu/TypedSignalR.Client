@@ -6,5 +6,5 @@ namespace TypedSignalR.Client.Templates;
 
 public partial class HubConnectionExtensionsHubInvokerTemplate
 {
-    public IReadOnlyList<HubTypeMetadata> HubTypes { get; set; } = Array.Empty<HubTypeMetadata>();
+    public IReadOnlyList<TypeMetadata> HubTypes { get; set; } = Array.Empty<TypeMetadata>();
 }

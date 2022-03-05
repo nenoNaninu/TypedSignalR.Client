@@ -6,5 +6,5 @@ namespace TypedSignalR.Client.Templates;
 
 public partial class HubConnectionExtensionsBinderTemplate
 {
-    public IReadOnlyList<ReceiverTypeMetadata> ReceiverTypes { get; set; } = Array.Empty<ReceiverTypeMetadata>();
+    public IReadOnlyList<TypeMetadata> ReceiverTypes { get; set; } = Array.Empty<TypeMetadata>();
 }

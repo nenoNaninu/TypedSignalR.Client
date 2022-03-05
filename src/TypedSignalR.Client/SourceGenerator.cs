@@ -89,8 +89,8 @@ public sealed class SourceGenerator : IIncrementalGenerator
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var invocationExpressionSyntax = context.Node as InvocationExpressionSyntax;
-        var target = invocationExpressionSyntax?.Expression as MemberAccessExpressionSyntax;
+        var node = context.Node as InvocationExpressionSyntax;
+        var target = node?.Expression as MemberAccessExpressionSyntax;
 
         if (target is null)
         {
@@ -122,14 +122,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var location = sourceSymbol.Location;
         var specialSymbols = pair.Item2;
 
-        var extensionMethod = methodSymbol.ReducedFrom;
+        var extensionMethodSymbol = methodSymbol.ReducedFrom;
 
-        if (extensionMethod is null)
+        if (extensionMethodSymbol is null)
         {
             return default;
         }
 
-        if (SymbolEqualityComparer.Default.Equals(extensionMethod, specialSymbols.CreateHubProxySymbol))
+        if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.CreateHubProxyMethodSymbol))
         {
             return new ValidatedSourceSymbol(methodSymbol, location);
         }
@@ -152,14 +152,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var location = sourceSymbol.Location;
         var specialSymbols = pair.Item2;
 
-        var extensionMethod = methodSymbol.ReducedFrom;
+        var extensionMethodSymbol = methodSymbol.ReducedFrom;
 
-        if (extensionMethod is null)
+        if (extensionMethodSymbol is null)
         {
             return default;
         }
 
-        if (SymbolEqualityComparer.Default.Equals(extensionMethod, specialSymbols.RegisterSymbol))
+        if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.RegisterMethodSymbol))
         {
             return new ValidatedSourceSymbol(methodSymbol, location);
         }
@@ -230,32 +230,32 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
         var genericTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
-        var membersSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers()!;
+        var memberSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers();
 
-        IMethodSymbol? createHubProxySymbol = null;
-        IMethodSymbol? registerSymbol = null;
+        IMethodSymbol? createHubProxyMethodSymbol = null;
+        IMethodSymbol? registerMethodSymbol = null;
 
-        foreach (var symbol in membersSymbols)
+        foreach (var methodSymbol in memberSymbols.OfType<IMethodSymbol>())
         {
-            if (symbol.Name is "CreateHubProxy")
+            if (methodSymbol.Name is "CreateHubProxy")
             {
-                if (symbol is IMethodSymbol method)
+                if (methodSymbol.MethodKind is MethodKind.Ordinary)
                 {
-                    createHubProxySymbol = method;
+                    createHubProxyMethodSymbol = methodSymbol;
 
-                    if (registerSymbol is not null)
+                    if (registerMethodSymbol is not null)
                     {
                         break;
                     }
                 }
             }
-            else if (symbol.Name is "Register")
+            else if (methodSymbol.Name is "Register")
             {
-                if (symbol is IMethodSymbol method)
+                if (methodSymbol.MethodKind is MethodKind.Ordinary)
                 {
-                    registerSymbol = method;
+                    registerMethodSymbol = methodSymbol;
 
-                    if (createHubProxySymbol is not null)
+                    if (createHubProxyMethodSymbol is not null)
                     {
                         break;
                     }
@@ -263,88 +263,58 @@ public sealed class SourceGenerator : IIncrementalGenerator
             }
         }
 
-        return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxySymbol!, registerSymbol!);
+        return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxyMethodSymbol!, registerMethodSymbol!);
     }
 
-    private static IReadOnlyList<HubTypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
+    private static IReadOnlyList<TypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
         SourceProductionContext context,
         IReadOnlyList<ValidatedSourceSymbol> createHubProxyMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var hubTypeList = new List<HubTypeMetadata>(createHubProxyMethodSymbols.Count);
+        var hubTypeList = new List<TypeMetadata>(createHubProxyMethodSymbols.Count);
 
-        foreach (var createHubProxyMethod in createHubProxyMethodSymbols)
+        foreach (var createHubProxyMethodSymbol in createHubProxyMethodSymbols)
         {
-            var methodSymbol = createHubProxyMethod.MethodSymbol;
-            var location = createHubProxyMethod.Location;
+            var methodSymbol = createHubProxyMethodSymbol.MethodSymbol;
+            var location = createHubProxyMethodSymbol.Location;
 
-            ITypeSymbol hubType = methodSymbol.TypeArguments[0];
+            ITypeSymbol hubTypeSymbol = methodSymbol.TypeArguments[0];
 
-            if (hubType.TypeKind != TypeKind.Interface)
+            var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols.TaskSymbol, specialSymbols.GenericTaskSymbol, location);
+
+            if (isValid && !hubTypeList.Any(hubTypeSymbol))
             {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorItems.TypeArgumentRule,
-                    location,
-                    "CreateHubProxy",
-                    hubType.ToDisplayString())); ;
-
-                continue;
-            }
-
-            if (!hubTypeList.Any(hubType))
-            {
-                var (hubMethods, isValid) = MetadataUtilities.ExtractHubMethods(context, hubType, specialSymbols.TaskSymbol, specialSymbols.GenericTaskSymbol, location);
-
-                if (isValid)
-                {
-                    var invoker = new HubTypeMetadata(hubType, hubMethods);
-                    hubTypeList.Add(invoker);
-                }
+                hubTypeList.Add(new TypeMetadata(hubTypeSymbol));
             }
         }
 
         return hubTypeList;
     }
 
-    private static IReadOnlyList<ReceiverTypeMetadata> ExtractReceiverTypesFromRegisterMethods(
+    private static IReadOnlyList<TypeMetadata> ExtractReceiverTypesFromRegisterMethods(
         SourceProductionContext context,
         IReadOnlyList<ValidatedSourceSymbol> registerMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var receiverTypeList = new List<ReceiverTypeMetadata>(registerMethodSymbols.Count);
+        var receiverTypeList = new List<TypeMetadata>(registerMethodSymbols.Count);
 
-        foreach (var registerMethod in registerMethodSymbols)
+        foreach (var registerMethodSymbol in registerMethodSymbols)
         {
-            var methodSymbol = registerMethod.MethodSymbol;
-            var location = registerMethod.Location;
+            var methodSymbol = registerMethodSymbol.MethodSymbol;
+            var location = registerMethodSymbol.Location;
 
-            ITypeSymbol receiverType = methodSymbol.TypeArguments[0];
+            ITypeSymbol receiverTypeSymbol = methodSymbol.TypeArguments[0];
 
-            if (receiverType.TypeKind != TypeKind.Interface)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorItems.TypeArgumentRule,
-                    location,
-                    "Register",
-                    receiverType.ToDisplayString()));
-
-                continue;
-            }
-
-            if (SymbolEqualityComparer.Default.Equals(receiverType, specialSymbols.HubConnectionObserverSymbol))
+            if (SymbolEqualityComparer.Default.Equals(receiverTypeSymbol, specialSymbols.HubConnectionObserverSymbol))
             {
                 continue;
             }
 
-            if (!receiverTypeList.Any(receiverType))
-            {
-                var (receiverMethods, isValid) = MetadataUtilities.ExtractReceiverMethods(context, receiverType, specialSymbols.TaskSymbol, location);
+            var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols.TaskSymbol, location);
 
-                if (isValid)
-                {
-                    var receiverInfo = new ReceiverTypeMetadata(receiverType, receiverMethods);
-                    receiverTypeList.Add(receiverInfo);
-                }
+            if (isValid && !receiverTypeList.Any(receiverTypeSymbol))
+            {
+                receiverTypeList.Add(new TypeMetadata(receiverTypeSymbol));
             }
         }
 
@@ -394,22 +364,22 @@ public sealed class SourceGenerator : IIncrementalGenerator
         public readonly INamedTypeSymbol TaskSymbol;
         public readonly INamedTypeSymbol GenericTaskSymbol;
         public readonly INamedTypeSymbol HubConnectionObserverSymbol;
-        public readonly IMethodSymbol CreateHubProxySymbol;
-        public readonly IMethodSymbol RegisterSymbol;
+        public readonly IMethodSymbol CreateHubProxyMethodSymbol;
+        public readonly IMethodSymbol RegisterMethodSymbol;
 
         public SpecialSymbols(
             INamedTypeSymbol taskSymbol,
             INamedTypeSymbol genericTaskSymbol,
             INamedTypeSymbol hubConnectionObserverSymbol,
-            IMethodSymbol createHubProxySymbol,
-            IMethodSymbol registerSymbol
+            IMethodSymbol createHubProxyMethodSymbol,
+            IMethodSymbol registerMethodSymbol
            )
         {
             TaskSymbol = taskSymbol;
             GenericTaskSymbol = genericTaskSymbol;
             HubConnectionObserverSymbol = hubConnectionObserverSymbol;
-            CreateHubProxySymbol = createHubProxySymbol;
-            RegisterSymbol = registerSymbol;
+            CreateHubProxyMethodSymbol = createHubProxyMethodSymbol;
+            RegisterMethodSymbol = registerMethodSymbol;
         }
     }
 }
