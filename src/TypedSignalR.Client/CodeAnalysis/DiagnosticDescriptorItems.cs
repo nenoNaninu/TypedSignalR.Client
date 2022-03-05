@@ -24,12 +24,12 @@ public static class DiagnosticDescriptorItems
 
     public static readonly DiagnosticDescriptor InterfaceDefineRule = new(
         id: "TSRC002",
-        title: "Only define methods in the interface",
-        messageFormat: "[Only define methods in the interface used for {0}] {1} is not a method",
+        title: "Only method definitions are allowed in the interface",
+        messageFormat: "[Only method definitions are allowed in the interface used for {0}] {1} is not a method",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Only define methods in the interface.");
+        description: "Only method definitions are allowed in the interface.");
 
     public static readonly DiagnosticDescriptor HubMethodReturnTypeRule = new(
         id: "TSRC003",

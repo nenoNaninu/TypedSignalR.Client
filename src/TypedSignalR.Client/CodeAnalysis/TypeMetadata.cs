@@ -1,9 +1,10 @@
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
-public sealed class HubTypeMetadata : ITypeSymbolHolder
+public sealed class TypeMetadata : ITypeSymbolHolder
 {
     public ITypeSymbol TypeSymbol { get; }
 
@@ -13,10 +14,15 @@ public sealed class HubTypeMetadata : ITypeSymbolHolder
     public string InterfaceFullName { get; }
     public string CollisionFreeName { get; }
 
-    public HubTypeMetadata(ITypeSymbol typeSymbol, IReadOnlyList<MethodMetadata> methods)
+    public TypeMetadata(ITypeSymbol typeSymbol)
     {
         TypeSymbol = typeSymbol;
-        Methods = methods;
+
+        Methods = typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(static x => x.MethodKind is MethodKind.Ordinary)
+            .Select(static x => new MethodMetadata(x))
+            .ToArray();
 
         InterfaceName = typeSymbol.Name;
         InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
