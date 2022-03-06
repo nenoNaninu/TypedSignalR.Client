@@ -30,5 +30,8 @@ jobs:
       - name: Launch test server
         run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
 
-      - name: Test
+      - name: Test (project reference)
         run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore
+
+      - name: Test (NuGet)
+        run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --no-restore
