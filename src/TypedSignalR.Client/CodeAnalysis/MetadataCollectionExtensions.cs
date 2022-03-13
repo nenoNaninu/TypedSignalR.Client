@@ -5,7 +5,7 @@ namespace TypedSignalR.Client.CodeAnalysis;
 
 public static class MetadataCollectionExtensions
 {
-    public static bool Any(this IEnumerable<ITypeSymbolHolder> source, ITypeSymbol typeSymbol)
+    public static bool Contains(this IEnumerable<ITypeSymbolHolder> source, ITypeSymbol typeSymbol)
     {
         foreach (var item in source)
         {

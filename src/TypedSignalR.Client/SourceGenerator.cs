@@ -282,7 +282,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols.TaskSymbol, specialSymbols.GenericTaskSymbol, location);
 
-            if (isValid && !hubTypeList.Any(hubTypeSymbol))
+            if (isValid && !hubTypeList.Contains(hubTypeSymbol))
             {
                 hubTypeList.Add(new TypeMetadata(hubTypeSymbol));
             }
@@ -312,7 +312,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols.TaskSymbol, location);
 
-            if (isValid && !receiverTypeList.Any(receiverTypeSymbol))
+            if (isValid && !receiverTypeList.Contains(receiverTypeSymbol))
             {
                 receiverTypeList.Add(new TypeMetadata(receiverTypeSymbol));
             }
