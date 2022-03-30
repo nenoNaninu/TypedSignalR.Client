@@ -13,12 +13,12 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
     - [Cancellation](#cancellation)
   - [Server](#server)
 - [Recommendation](#recommendation)
-  - [Sharing a project](#sharing-a-project)
-  - [Client code format](#client-code-format)
-- [Compile-time error support](#compile-time-error-support)
-- [Generated source code](#generated-source-code)
+  - [Sharing a Project](#sharing-a-project)
+  - [Client Code Format](#client-code-format)
+- [Compile-Time Error Support](#compile-time-error-support)
+- [Generated Source Code](#generated-source-code)
 
-# Install
+## Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
 
 ```
@@ -26,7 +26,7 @@ dotnet add package Microsoft.AspNetCore.SignalR.Client
 dotnet add package TypedSignalR.Client
 ```
 
-# Why TypedSignalR.Client?
+## Why TypedSignalR.Client?
 The pure C# SignalR Client is untyped.
 To call a Hub (server-side) function, we must specify the function defined in Hub using a string.
 We also have to determine the return type manually.
@@ -90,7 +90,7 @@ class Receiver : IReceiver
 
 ```
 
-# API
+## API
 This Source Generator provides two extension methods and one interface. 
 
 ```cs
@@ -118,7 +118,7 @@ IHub hub = connection.CreateHubProxy<IHub>();
 IDisposable subscription = connection.Register<IReceiver>(new Receiver());
 ```
 
-# Usage
+## Usage
 For example, we have the following interface defined.
 
 ```cs
@@ -154,7 +154,7 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 }
 ```
 
-## Client
+### Client
 It's very easy to use. 
 
 ```cs
@@ -175,7 +175,7 @@ hub.HubMethod1("user", "message");
 subscription.Dispose();
 ```
 
-### Cancellation
+#### Cancellation
 In pure SignalR, `CancellationToken` is passed for each invoke.
 
 On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating hub proxy.
@@ -196,7 +196,7 @@ var ret = await hubProxy.HubMethod1("user", "message");
 await hubProxy.HubMethod2();
 ```
 
-## Server
+### Server
 Using the interface definitions, we can write as follows on the server-side (ASP.NET Core). 
 TypedSignalR.Client is not nessesary.
 
@@ -225,15 +225,15 @@ public class SomeHub : Hub<IClientContract>, IHubContract
 }
 ```
 
-# Recommendation
-## Sharing a project
+## Recommendation
+### Sharing a Project
 I recommend that these interfaces be shared between the client-side and server-side project, for example, by project references.
 
 ```
 server.csproj --> shared.csproj <-- client.csproj
 ```
 
-## Client code format
+### Client Code Format
 It is easier to handle if we write the client code in the following format.
 
 ```cs
@@ -253,7 +253,7 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
 }
 ```
 
-# Compile-time error support
+## Compile-Time Error Support
 This library has some restrictions, including those that come from server-side implementations.
 
 - Type argument of the `CreateHubProxy/Register` method must be an interface.
@@ -268,7 +268,7 @@ Therefore, no run-time error occurs.
 
 ![compile-time-error](https://user-images.githubusercontent.com/27144255/155505022-0a13bf1b-643c-472c-882e-8508e52c2b63.png)
 
-# Generated source code
+## Generated Source Code
 TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `Register` and generates source code.
 Generated source code can be seen in Visual Studio. 
 

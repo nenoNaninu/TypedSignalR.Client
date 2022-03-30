@@ -1,7 +1,7 @@
 {
     "markdown.extension.toc.omittedFromToc": {
         "README.md": [
-            "# TypedSignalR.Client"
+            "## Table of Contents"
         ]
     }
 }
