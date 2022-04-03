@@ -235,8 +235,13 @@ public sealed class SourceGenerator : IIncrementalGenerator
         IMethodSymbol? createHubProxyMethodSymbol = null;
         IMethodSymbol? registerMethodSymbol = null;
 
-        foreach (var methodSymbol in memberSymbols.OfType<IMethodSymbol>())
+        foreach (var memberSymbol in memberSymbols)
         {
+            if (memberSymbol is not IMethodSymbol methodSymbol)
+            {
+                continue;
+            }
+
             if (methodSymbol.Name is "CreateHubProxy")
             {
                 if (methodSymbol.MethodKind is MethodKind.Ordinary)
