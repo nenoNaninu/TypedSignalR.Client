@@ -7,7 +7,6 @@ root = true
 [*]
 indent_style = space
 charset = utf-8
-end_of_line = lf
 insert_final_newline = true
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
@@ -36,15 +35,8 @@ indent_size = 4
 end_of_line = lf
 indent_size = 4
 
-[*.tt]
-end_of_line = crlf
-
-[*.md]
-end_of_line = lf
-
 # Dotnet code style settings:
 [*.{cs,vb}]
-
 # IDE0055: Fix formatting
 dotnet_diagnostic.IDE0055.severity = warning
 
