@@ -2,7 +2,7 @@
 
 [![build-and-test](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml)
 
-C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to create strongly typed SignalR Client.
+C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to create strongly typed SignalR client.
 
 ## Table of Contents
 - [Install](#install)
@@ -27,7 +27,7 @@ dotnet add package TypedSignalR.Client
 ```
 
 ## Why TypedSignalR.Client?
-The pure C# SignalR Client is untyped.
+The pure C# SignalR client is untyped.
 To call a Hub (server-side) function, we must specify the function defined in Hub using a string.
 We also have to determine the return type manually.
 Moreover, registering a client function called from the server also requires a string, and we must set the parameter types manually.
@@ -50,7 +50,7 @@ var subscription = connection.On<string, DateTime>("ClientMethod", (message, dat
 Therefore, if we change the code on the server-side, the modification on the client-side becomes very troublesome. 
 The leading cause is that it is not strongly typed.
 
-TypedSignalR.Client aims to generate a strongly typed SignalR Client by sharing interfaces in which the server and client functions are defined. 
+TypedSignalR.Client aims to generate a strongly typed SignalR client by sharing interfaces in which the server and client functions are defined. 
 Defining interfaces are helpful not only for the client-side but also for the server-side.
 See [Usage](#usage) section for details.
 
