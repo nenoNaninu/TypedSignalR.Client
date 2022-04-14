@@ -41,21 +41,15 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-#if NET5_0_OR_GREATER
-        [global::System.Diagnostics.CodeAnalysis.MemberNotNull("Factories")]
-#endif
-        private static partial void InitializeFactories()
+        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories()
         {
-            if (Factories is null)
-            {
-                var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
+            var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
 
 <# foreach(var hubType in HubTypes) {#>
-                factories.Add(typeof(<#= hubType.InterfaceFullName #>), new HubInvokerFactoryFor_<#= hubType.CollisionFreeName #>());
+            factories.Add(typeof(<#= hubType.InterfaceFullName #>), new HubInvokerFactoryFor_<#= hubType.CollisionFreeName #>());
 <# } #>
 
-                global::System.Threading.Interlocked.CompareExchange(ref Factories, factories, null);
-            }
+            return factories;
         }
     }
 }

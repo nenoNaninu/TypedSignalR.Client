@@ -28,21 +28,15 @@ namespace TypedSignalR.Client
         }
 
 <# } #>
-#if NET5_0_OR_GREATER
-        [global::System.Diagnostics.CodeAnalysis.MemberNotNull("Binders")]
-#endif
-        private static partial void InitializeBinders()
+        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> CreateBinders()
         {
-            if (Binders is null)
-            {
-                var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
+            var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
 
 <# foreach(var receiverType in ReceiverTypes){ #>
-                binders.Add(typeof(<#= receiverType.InterfaceFullName #>), new BinderFor_<#= receiverType.CollisionFreeName #>());
+            binders.Add(typeof(<#= receiverType.InterfaceFullName #>), new BinderFor_<#= receiverType.CollisionFreeName #>());
 <# } #>
 
-                global::System.Threading.Interlocked.CompareExchange(ref Binders, binders, null);
-            }
+            return binders;
         }
     }
 }
