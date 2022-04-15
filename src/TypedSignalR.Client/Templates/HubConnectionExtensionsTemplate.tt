@@ -97,20 +97,18 @@ namespace TypedSignalR.Client
 
     public static partial class HubConnectionExtensions
     {
-        private static global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>? Factories = default;
-        private static global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>? Binders = default;
-
-        private static partial void InitializeFactories();
-        private static partial void InitializeBinders();
-
-        static HubConnectionExtensions()
-        {
-            InitializeFactories();
-            InitializeBinders();
-        }
+        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories();
+        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> CreateBinders();
 
         private static class HubInvokerFactoryProvider
         {
+            private static global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> Factories;
+
+            static HubInvokerFactoryProvider()
+            {
+                Factories = CreateFactories();
+            }
+
             public static IHubInvokerFactory<T>? GetHubInvokerFactory<T>()
             {
                 return Cache<T>.HubInvokerFactory;
@@ -122,11 +120,6 @@ namespace TypedSignalR.Client
 
                 static Cache()
                 {
-                    if (Factories is null)
-                    {
-                        InitializeFactories();
-                    }
-
                     if (Factories.TryGetValue(typeof(T), out var hubInvokerFactory))
                     {
                         HubInvokerFactory = hubInvokerFactory as IHubInvokerFactory<T>;
@@ -137,6 +130,13 @@ namespace TypedSignalR.Client
 
         private static class ReceiverBinderProvider
         {
+            private static global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> Binders;
+
+            static ReceiverBinderProvider()
+            {
+                Binders = CreateBinders();
+            }
+
             public static IReceiverBinder<T>? GetReceiverBinder<T>()
             {
                 return Cache<T>.ReceiverBinder;
@@ -148,11 +148,6 @@ namespace TypedSignalR.Client
 
                 static Cache()
                 {
-                    if (Binders is null)
-                    {
-                        InitializeBinders();
-                    }
-
                     if (Binders.TryGetValue(typeof(T), out var receiverBinder))
                     {
                         ReceiverBinder = receiverBinder as IReceiverBinder<T>;

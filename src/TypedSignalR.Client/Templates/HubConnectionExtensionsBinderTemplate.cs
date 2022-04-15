@@ -54,25 +54,19 @@ namespace TypedSignalR.Client.Templates
  } 
             this.Write("\r\n                return compositeDisposable;\r\n            }\r\n        }\r\n\r\n");
  } 
-            this.Write(@"#if NET5_0_OR_GREATER
-        [global::System.Diagnostics.CodeAnalysis.MemberNotNull(""Binders"")]
-#endif
-        private static partial void InitializeBinders()
+            this.Write(@"        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> CreateBinders()
         {
-            if (Binders is null)
-            {
-                var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
+            var binders = new global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>();
 
 ");
  foreach(var receiverType in ReceiverTypes){ 
-            this.Write("                binders.Add(typeof(");
+            this.Write("            binders.Add(typeof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.InterfaceFullName));
             this.Write("), new BinderFor_");
             this.Write(this.ToStringHelper.ToStringWithCulture(receiverType.CollisionFreeName));
             this.Write("());\r\n");
  } 
-            this.Write("\r\n                global::System.Threading.Interlocked.CompareExchange(ref Binder" +
-                    "s, binders, null);\r\n            }\r\n        }\r\n    }\r\n}\r\n");
+            this.Write("\r\n            return binders;\r\n        }\r\n    }\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

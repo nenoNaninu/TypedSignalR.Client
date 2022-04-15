@@ -72,25 +72,19 @@ namespace TypedSignalR.Client.Templates
             this.Write(this.ToStringHelper.ToStringWithCulture(hubType.CollisionFreeName));
             this.Write("(connection, cancellationToken);\r\n            }\r\n        }\r\n\r\n");
  } 
-            this.Write(@"#if NET5_0_OR_GREATER
-        [global::System.Diagnostics.CodeAnalysis.MemberNotNull(""Factories"")]
-#endif
-        private static partial void InitializeFactories()
+            this.Write(@"        private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories()
         {
-            if (Factories is null)
-            {
-                var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
+            var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
 
 ");
  foreach(var hubType in HubTypes) {
-            this.Write("                factories.Add(typeof(");
+            this.Write("            factories.Add(typeof(");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubType.InterfaceFullName));
             this.Write("), new HubInvokerFactoryFor_");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubType.CollisionFreeName));
             this.Write("());\r\n");
  } 
-            this.Write("\r\n                global::System.Threading.Interlocked.CompareExchange(ref Factor" +
-                    "ies, factories, null);\r\n            }\r\n        }\r\n    }\r\n}\r\n");
+            this.Write("\r\n            return factories;\r\n        }\r\n    }\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }
