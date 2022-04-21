@@ -122,7 +122,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var location = sourceSymbol.Location;
         var specialSymbols = pair.Item2;
 
-        var extensionMethodSymbol = methodSymbol.ReducedFrom;
+        var extensionMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol.ConstructedFrom;
 
         if (extensionMethodSymbol is null)
         {
@@ -152,7 +152,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var location = sourceSymbol.Location;
         var specialSymbols = pair.Item2;
 
-        var extensionMethodSymbol = methodSymbol.ReducedFrom;
+        var extensionMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol.ConstructedFrom;
 
         if (extensionMethodSymbol is null)
         {
