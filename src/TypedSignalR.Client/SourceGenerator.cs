@@ -19,8 +19,8 @@ public sealed class SourceGenerator : IIncrementalGenerator
         {
             ctx.CancellationToken.ThrowIfCancellationRequested();
 
-            ctx.AddSource("TypedSignalR.Client.Components.Generated.cs", new ComponentsTemplate().TransformText());
-            ctx.AddSource("TypedSignalR.Client.HubConnectionExtensions.Generated.cs", new HubConnectionExtensionsTemplate().TransformText());
+            ctx.AddSource("TypedSignalR.Client.Components.Generated.cs", NormalizeNewLines(new ComponentsTemplate().TransformText()));
+            ctx.AddSource("TypedSignalR.Client.HubConnectionExtensions.Generated.cs", NormalizeNewLines(new HubConnectionExtensionsTemplate().TransformText()));
         });
 
         var specialSymbols = context.CompilationProvider
@@ -181,7 +181,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 HubTypes = hubTypes,
             };
 
-            var source = template.TransformText();
+            var source = NormalizeNewLines(template.TransformText());
 
             Debug.WriteLine(source);
 
@@ -210,7 +210,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 ReceiverTypes = receiverTypes
             };
 
-            var source = template.TransformText();
+            var source = NormalizeNewLines(template.TransformText());
 
             Debug.WriteLine(source);
 
@@ -324,6 +324,11 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
 
         return receiverTypeList;
+    }
+
+    private static string NormalizeNewLines(string source)
+    {
+        return source.Replace("\r\n", "\n");
     }
 
     private readonly record struct SourceSymbol
