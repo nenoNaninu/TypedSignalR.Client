@@ -8,7 +8,7 @@ public sealed class MethodMetadata
 {
     public string MethodName { get; }
 
-    public IReadOnlyList<MethodParameter> Parameters { get; }
+    public IReadOnlyList<ParameterMetadata> Parameters { get; }
 
     public string ReturnType { get; }
     public bool IsGenericReturnType { get; }
@@ -19,7 +19,7 @@ public sealed class MethodMetadata
         MethodName = methodSymbol.Name;
 
         Parameters = methodSymbol.Parameters
-            .Select(x => new MethodParameter(x))
+            .Select(x => new ParameterMetadata(x))
             .ToArray();
 
         ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
