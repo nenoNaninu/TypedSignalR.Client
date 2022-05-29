@@ -58,7 +58,7 @@ namespace TypedSignalR.Client
 
             if (hubInvokerFactory is null)
             {
-                throw new global::System.InvalidOperationException($"Failed to create hub proxy. TypedSignalR.Client did not generate source code to create hub proxy, which type is {typeof(THub)}.");
+                throw new global::System.InvalidOperationException($"Failed to create a hub proxy. TypedSignalR.Client did not generate source code to create a hub proxy, which type is {typeof(THub)}.");
             }
 
             return hubInvokerFactory.CreateHubInvoker(connection, cancellationToken);
@@ -82,7 +82,7 @@ namespace TypedSignalR.Client
 
             if (binder is null)
             {
-                throw new global::System.InvalidOperationException($"Failed to register receiver. TypedSignalR.Client did not generate source code to register receiver, which type is {typeof(TReceiver)}.");
+                throw new global::System.InvalidOperationException($"Failed to register a receiver. TypedSignalR.Client did not generate source code to register a receiver, which type is {typeof(TReceiver)}.");
             }
 
             var subscription = binder.Bind(connection, receiver);
