@@ -2,7 +2,7 @@
 
 [![build-and-test](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml)
 
-C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to create strongly typed SignalR client.
+C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to create strongly typed SignalR clients.
 
 ## Table of Contents
 - [Install](#install)
@@ -27,31 +27,31 @@ dotnet add package TypedSignalR.Client
 ```
 
 ## Why TypedSignalR.Client?
-The pure C# SignalR client is untyped.
-To call a Hub (server-side) function, we must specify the function defined in Hub using a string.
+The ASP.NET Core SignalR C# client is not strongly typed.
+To call a Hub (server-side) method, we must specify the method defined in Hub using a string.
 We also have to determine the return type manually.
-Moreover, registering a client function called from the server also requires a string, and we must set the parameter types manually.
+Moreover, registering client methods called from a server also requires specifying the method name as a string, and we must set parameter types manually.
 
 ```cs
-// Pure SignalR Client
+// ASP.NET Core SignalR Client
 
-// Specify the hub method to invoke using string.
+// Specify a hub method to invoke using string.
 await connection.InvokeAsync("HubMethod1");
 
-// Manually determine the return type.
-// The parameter is cast to object type.
+// Manually determine a return type.
+// Parameters are cast to object type.
 var guid = await connection.InvokeAsync<Guid>("HubMethod2", "message", 99);
 
-// Registering a client function requires a string, 
-// and the parameter types must be set manually.
+// Registering a client method requires a string, and parameter types must be set manually.
 var subscription = connection.On<string, DateTime>("ClientMethod", (message, dateTime) => {});
 ```
 
-Therefore, if we change the code on the server-side, the modification on the client-side becomes very troublesome. 
-The leading cause is that it is not strongly typed.
+These are very painful and cause bugs easily.
+Moreover, if we change the code on the server-side, the modification on the client-side becomes very troublesome. 
+The leading cause of the problems is that they are not strongly typed.
 
-TypedSignalR.Client aims to generate a strongly typed SignalR client by sharing interfaces in which the server and client functions are defined. 
-Defining interfaces are helpful not only for the client-side but also for the server-side.
+TypedSignalR.Client aims to generate strongly typed SignalR clients using interfaces in which the server and client methods are defined. 
+Defining interfaces is helpful not only for the client-side but also for the server-side.
 See [Usage](#usage) section for details.
 
 ```cs
@@ -61,13 +61,13 @@ See [Usage](#usage) section for details.
 IHub hubProxy = connection.CreateHubProxy<IHub>();
 
 // Invoke a hub method through hub proxy.
-// We no longer need to specify the function using a string.
+// We no longer need to specify the method using a string.
 await hubProxy.HubMethod1();
 
 // Both parameters and return types are strongly typed.
 var guid = await hubProxy.HubMethod2("message", 99);
 
-// The client's function registration is also strongly typed, so it's safe and easy.
+// Client method registration is also strongly typed, so it's safe and easy.
 var subscription = connection.Register<IReceiver>(new Receiver());
 
 // Defining interfaces are useful not only for the client-side but also for the server-side.
@@ -85,7 +85,7 @@ interface IReceiver
 
 class Receiver : IReceiver
 {
-    ...
+    // implementation
 }
 
 ```
@@ -176,9 +176,9 @@ subscription.Dispose();
 ```
 
 #### Cancellation
-In pure SignalR, `CancellationToken` is passed for each invoke.
+In ASP.NET Core SignalR SignalR, `CancellationToken` is passed for each invoke.
 
-On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating hub proxy.
+On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating a hub proxy.
 The passed `CancelationToken` will be used for each invoke internally.
 
 ```cs
@@ -186,7 +186,7 @@ var cts = new CancellationTokenSource();
 
 // The following two are equivalent.
 
-// 1: Pure SignalR
+// 1: ASP.NET Core SignalR Client
 var ret =  await connection.InvokeAsync<string>("HubMethod1", "user", "message", cts.Token);
 await connection.InvokeAsync("HubMethod2", cts.Token);
 
@@ -198,7 +198,7 @@ await hubProxy.HubMethod2();
 
 ### Server
 Using the interface definitions, we can write as follows on the server-side (ASP.NET Core). 
-TypedSignalR.Client is not nessesary.
+TypedSignalR.Client is not necessary.
 
 ```cs
 using Microsoft.AspNetCore.SignalR;
@@ -234,7 +234,7 @@ server.csproj --> shared.csproj <-- client.csproj
 ```
 
 ### Client Code Format
-It is easier to handle if we write the client code in the following format.
+It is easier to handle if we write client code in the following format.
 
 ```cs
 class Client : IReceiver, IHubConnectionObserver, IDisposable
@@ -263,8 +263,8 @@ This library has some restrictions, including those that come from server-side i
 - The return type of the method in the interface used for `Register` must be `Task`.
 
 It is complicated for humans to comply with these restrictions properly.
-So, this library looks for parts that do not follow the restriction and report detailed errors at compile-time. 
-Therefore, no run-time error occurs. 
+So, this library looks for parts that do not follow the restriction and report detailed errors at compile time. 
+Therefore, no runtime error occurs. 
 
 ![compile-time-error](https://user-images.githubusercontent.com/27144255/155505022-0a13bf1b-643c-472c-882e-8508e52c2b63.png)
 
