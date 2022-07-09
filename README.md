@@ -17,6 +17,7 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
   - [Client Code Format](#client-code-format)
 - [Compile-Time Error Support](#compile-time-error-support)
 - [Generated Source Code](#generated-source-code)
+- [Related Work](#related-work)
 
 ## Install
 NuGet: [TypedSignalR.Client](https://www.nuget.org/packages/TypedSignalR.Client/)
@@ -273,3 +274,7 @@ TypedSignalR.Client checks the type argument of a methods `CreateHubProxy` and `
 Generated source code can be seen in Visual Studio. 
 
 ![generated-code-visible-from-solution-explorer](https://user-images.githubusercontent.com/27144255/154827948-dca0b9b1-0a1b-4833-8b32-3d5ceaa41414.png)
+
+## Related Work
+- [nenoNaninu/TypedSignalR.Client.TypeScript](https://github.com/nenoNaninu/TypedSignalR.Client.TypeScript)
+  - TypeScript source generator to provide strongly typed SignalR clients by analyzing C# type definitions.
