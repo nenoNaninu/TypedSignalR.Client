@@ -65,19 +65,19 @@ public static class TypeValidator
                     continue;
                 }
 
-                if (!ValidateHubMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, specialSymbols, accessLocation))
+                if (!ValidateHubMethodReturnTypeRule(context, methodSymbol, returnTypeSymbol, specialSymbols, accessLocation))
                 {
                     isValid = false;
                     continue;
                 }
 
-                if (!ValidateHubMethodCancellationTokenParameterRule(context, methodSymbol, specialSymbols, accessLocation))
+                if (!ValidateHubMethodCancellationTokenParameterRule(context, methodSymbol, returnTypeSymbol, specialSymbols, accessLocation))
                 {
                     isValid = false;
                     continue;
                 }
 
-                if (!ValidateStreamingMethodRule(context, methodSymbol, specialSymbols, accessLocation))
+                if (!ValidateStreamingMethodRule(context, methodSymbol, returnTypeSymbol, specialSymbols, accessLocation))
                 {
                     isValid = false;
                     continue;
@@ -159,7 +159,7 @@ public static class TypeValidator
                     continue;
                 }
 
-                if (!ValidateReceiverMethodReturnTypeRule(context, returnTypeSymbol, methodSymbol, specialSymbols, accessLocation))
+                if (!ValidateReceiverMethodReturnTypeRule(context, methodSymbol, returnTypeSymbol, specialSymbols, accessLocation))
                 {
                     isValid = false;
                     continue;
@@ -183,8 +183,8 @@ public static class TypeValidator
 
     private static bool ValidateHubMethodReturnTypeRule(
         SourceProductionContext context,
-        INamedTypeSymbol returnTypeSymbol,
         IMethodSymbol methodSymbol,
+        INamedTypeSymbol returnTypeSymbol,
         SpecialSymbols specialSymbols,
         Location accessLocation)
     {
@@ -236,8 +236,8 @@ public static class TypeValidator
 
     private static bool ValidateReceiverMethodReturnTypeRule(
         SourceProductionContext context,
-        INamedTypeSymbol returnTypeSymbol,
         IMethodSymbol methodSymbol,
+        INamedTypeSymbol returnTypeSymbol,
         SpecialSymbols specialSymbols,
         Location accessLocation)
     {
@@ -269,6 +269,7 @@ public static class TypeValidator
     private static bool ValidateHubMethodCancellationTokenParameterRule(
         SourceProductionContext context,
         IMethodSymbol methodSymbol,
+        INamedTypeSymbol returnTypeSymbol,
         SpecialSymbols specialSymbols,
         Location accessLocation)
     {
@@ -288,18 +289,6 @@ public static class TypeValidator
 
         if (count == 1)
         {
-            var returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
-
-            if (returnTypeSymbol is null)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorItems.HubMethodReturnTypeRule,
-                    accessLocation,
-                    methodSymbol.ToDisplayString()));
-
-                return false;
-            }
-
             // return type: Task<T>
             if (SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, specialSymbols.GenericTaskSymbol))
             {
@@ -346,16 +335,10 @@ public static class TypeValidator
     private static bool ValidateStreamingMethodRule(
         SourceProductionContext context,
         IMethodSymbol methodSymbol,
+        INamedTypeSymbol returnTypeSymbol,
         SpecialSymbols specialSymbols,
         Location accessLocation)
     {
-        var returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
-
-        if (returnTypeSymbol is null)
-        {
-            return false;
-        }
-
         var isValid = true;
 
         // server streaming
