@@ -17,7 +17,7 @@ public static class TypeValidator
                 DiagnosticDescriptorItems.TypeArgumentRule,
                 accessLocation,
                 "CreateHubProxy",
-                hubTypeSymbol.ToDisplayString())); ;
+                hubTypeSymbol.ToDisplayString()));
 
             return false;
         }
