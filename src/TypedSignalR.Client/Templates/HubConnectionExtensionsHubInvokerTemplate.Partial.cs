@@ -7,4 +7,5 @@ namespace TypedSignalR.Client.Templates;
 public partial class HubConnectionExtensionsHubInvokerTemplate
 {
     public IReadOnlyList<TypeMetadata> HubTypes { get; set; } = Array.Empty<TypeMetadata>();
+    public SpecialSymbols SpecialSymbols { get; set; } = default!;
 }

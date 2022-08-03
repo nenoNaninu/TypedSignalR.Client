@@ -48,4 +48,40 @@ public static class DiagnosticDescriptorItems
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
         description: "The return type of methods in the interface must be Task.");
+
+    public static readonly DiagnosticDescriptor HubMethodCancellationTokenParameterRule = new(
+        id: "TSRC005",
+        title: "CancellationToken can be used as a parameter only in the server-to-client streaming method",
+        messageFormat: "[CancellationToken can be used as a parameter only in the server-to-client streaming method] CancellationToken is used in the {0} parameters",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Using multiple CancellationToken in method parameters is prohibited.");
+
+    public static readonly DiagnosticDescriptor HubMethodMultipleCancellationTokenParameterRule = new(
+        id: "TSRC006",
+        title: "Using multiple CancellationToken in method parameters is prohibited",
+        messageFormat: "[Using multiple CancellationToken in method parameters is prohibited] Multiple CancellationToken are used in the {0} parameters",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Using multiple CancellationToken in method parameters is prohibited.");
+
+    public static readonly DiagnosticDescriptor ServerStreamingMethodParameterRule = new(
+        id: "TSRC007",
+        title: "Using IAsyncEnumerable<T> or ChannelReader<T> as a parameter in a server-to-client streaming method is prohibited",
+        messageFormat: "[Using IAsyncEnumerable<T> or ChannelReader<T> as a parameter in a server-to-client streaming method is prohibited] {0} use IAsyncEnumerable<T> or ChannelReader<T> as a parameter",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "Must be following the server streaming method rules.");
+
+    public static readonly DiagnosticDescriptor ClientStreamingMethodReturnTypeRule = new(
+        id: "TSRC008",
+        title: "The return type of client-to-server streaming method must be Task",
+        messageFormat: "[The return type of client-to-server streaming method must be Task] The return type of {0} is not Task",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "The return type of client-to-server streaming method must be Task.");
 }

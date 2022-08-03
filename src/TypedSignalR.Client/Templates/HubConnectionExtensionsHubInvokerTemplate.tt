@@ -25,11 +25,7 @@ namespace TypedSignalR.Client
                 _cancellationToken = cancellationToken;
             }
 <# foreach(var method in hubType.Methods) { #>
-
-            public <#= method.ReturnType #> <#= method.MethodName #>(<#= method.CreateParametersString() #>)
-            {
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync<#= method.CreateGenericReturnTypeArgumentString() #>(_connection, nameof(<#= method.MethodName #>), <#= method.CreateArgumentsStringForInvokeCoreAsync() #>, _cancellationToken);
-            }
+<#= method.CreateMethodString(this.SpecialSymbols) #>
 <# } #>
         }
 

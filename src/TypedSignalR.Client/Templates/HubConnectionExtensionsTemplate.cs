@@ -97,81 +97,81 @@ namespace TypedSignalR.Client.Templates
                     "eneric.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories();\r\n " +
                     "       private static partial global::System.Collections.Generic.Dictionary<glob" +
                     "al::System.Type, IReceiverBinder> CreateBinders();\r\n\r\n        private static cla" +
-                    "ss HubInvokerFactoryProvider\r\n        {\r\n            private static global::Syst" +
-                    "em.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> Facto" +
-                    "ries;\r\n\r\n            static HubInvokerFactoryProvider()\r\n            {\r\n        " +
-                    "        Factories = CreateFactories();\r\n            }\r\n\r\n            public stat" +
-                    "ic IHubInvokerFactory<T>? GetHubInvokerFactory<T>()\r\n            {\r\n            " +
-                    "    return Cache<T>.HubInvokerFactory;\r\n            }\r\n\r\n            private sta" +
-                    "tic class Cache<T>\r\n            {\r\n                public static readonly IHubIn" +
-                    "vokerFactory<T>? HubInvokerFactory = default;\r\n\r\n                static Cache()\r" +
-                    "\n                {\r\n                    if (Factories.TryGetValue(typeof(T), out" +
-                    " var hubInvokerFactory))\r\n                    {\r\n                        HubInvo" +
-                    "kerFactory = hubInvokerFactory as IHubInvokerFactory<T>;\r\n                    }\r" +
-                    "\n                }\r\n            }\r\n        }\r\n\r\n        private static class Rec" +
-                    "eiverBinderProvider\r\n        {\r\n            private static global::System.Collec" +
-                    "tions.Generic.Dictionary<global::System.Type, IReceiverBinder> Binders;\r\n\r\n     " +
-                    "       static ReceiverBinderProvider()\r\n            {\r\n                Binders =" +
-                    " CreateBinders();\r\n            }\r\n\r\n            public static IReceiverBinder<T>" +
-                    "? GetReceiverBinder<T>()\r\n            {\r\n                return Cache<T>.Receive" +
-                    "rBinder;\r\n            }\r\n\r\n            private static class Cache<T>\r\n          " +
-                    "  {\r\n                public static readonly IReceiverBinder<T>? ReceiverBinder =" +
-                    " default;\r\n\r\n                static Cache()\r\n                {\r\n                " +
-                    "    if (Binders.TryGetValue(typeof(T), out var receiverBinder))\r\n               " +
-                    "     {\r\n                        ReceiverBinder = receiverBinder as IReceiverBind" +
-                    "er<T>;\r\n                    }\r\n                }\r\n            }\r\n        }\r\n\r\n  " +
-                    "      private sealed class HubConnectionObserverSubscription : global::System.ID" +
-                    "isposable\r\n        {\r\n            private readonly global::Microsoft.AspNetCore." +
-                    "SignalR.Client.HubConnection _connection;\r\n            private readonly IHubConn" +
-                    "ectionObserver _hubConnectionObserver;\r\n\r\n            private int _disposed = 0;" +
-                    "\r\n\r\n            public HubConnectionObserverSubscription(global::Microsoft.AspNe" +
-                    "tCore.SignalR.Client.HubConnection connection, IHubConnectionObserver hubConnect" +
-                    "ionObserver)\r\n            {\r\n                _connection = connection;\r\n        " +
-                    "        _hubConnectionObserver = hubConnectionObserver;\r\n\r\n                _conn" +
-                    "ection.Closed += hubConnectionObserver.OnClosed;\r\n                _connection.Re" +
-                    "connected += hubConnectionObserver.OnReconnected;\r\n                _connection.R" +
-                    "econnecting += hubConnectionObserver.OnReconnecting;\r\n            }\r\n\r\n         " +
-                    "   public void Dispose()\r\n            {\r\n                if (global::System.Thre" +
-                    "ading.Interlocked.Exchange(ref _disposed, 1) == 0)\r\n                {\r\n         " +
-                    "           _connection.Closed -= _hubConnectionObserver.OnClosed;\r\n             " +
-                    "       _connection.Reconnected -= _hubConnectionObserver.OnReconnected;\r\n       " +
-                    "             _connection.Reconnecting -= _hubConnectionObserver.OnReconnecting;\r" +
-                    "\n                }\r\n            }\r\n        }\r\n\r\n        private sealed class Com" +
-                    "positeDisposable : global::System.IDisposable\r\n        {\r\n            private re" +
-                    "adonly object _gate = new object();\r\n            private readonly global::System" +
-                    ".Collections.Generic.List<global::System.IDisposable> _disposables;\r\n\r\n         " +
-                    "   private bool _disposed;\r\n\r\n            public CompositeDisposable()\r\n        " +
-                    "    {\r\n                _disposables = new global::System.Collections.Generic.Lis" +
-                    "t<global::System.IDisposable>();\r\n            }\r\n\r\n            public CompositeD" +
-                    "isposable(global::System.IDisposable[] disposables)\r\n            {\r\n            " +
-                    "    _disposables = new global::System.Collections.Generic.List<global::System.ID" +
-                    "isposable>(disposables);\r\n            }\r\n\r\n            public CompositeDisposabl" +
-                    "e(int capacity)\r\n            {\r\n                if (capacity < 0)\r\n             " +
-                    "   {\r\n                    throw new global::System.ArgumentOutOfRangeException(n" +
-                    "ameof(capacity));\r\n                }\r\n\r\n                _disposables = new globa" +
-                    "l::System.Collections.Generic.List<global::System.IDisposable>(capacity);\r\n     " +
-                    "       }\r\n\r\n            public void Add(global::System.IDisposable item)\r\n      " +
-                    "      {\r\n                bool shouldDispose = false;\r\n\r\n                lock (_g" +
-                    "ate)\r\n                {\r\n                    shouldDispose = _disposed;\r\n\r\n     " +
-                    "               if (!_disposed)\r\n                    {\r\n                        _" +
-                    "disposables.Add(item);\r\n                    }\r\n                }\r\n\r\n            " +
-                    "    if (shouldDispose)\r\n                {\r\n                    item.Dispose();\r\n" +
-                    "                }\r\n            }\r\n\r\n            public void Dispose()\r\n         " +
-                    "   {\r\n                var currentDisposables = default(global::System.Collection" +
-                    "s.Generic.List<global::System.IDisposable>);\r\n\r\n                lock (_gate)\r\n  " +
-                    "              {\r\n                    if (_disposed)\r\n                    {\r\n    " +
-                    "                    return;\r\n                    }\r\n\r\n                    _dispo" +
-                    "sed = true;\r\n                    currentDisposables = _disposables;\r\n           " +
-                    "     }\r\n\r\n                foreach (var item in currentDisposables)\r\n            " +
-                    "    {\r\n                    if (item is not null)\r\n                    {\r\n       " +
-                    "                 item.Dispose();\r\n                    }\r\n                }\r\n\r\n  " +
-                    "              currentDisposables.Clear();\r\n            }\r\n        }\r\n\r\n        /" +
-                    "/ It is not possible to avoid boxing.\r\n        // This is a limitation caused by" +
-                    " the SignalR implementation.\r\n        private static class HandlerConverter\r\n   " +
-                    "     {\r\n            public static global::System.Func<object?[], global::System." +
-                    "Threading.Tasks.Task> Convert(global::System.Func<global::System.Threading.Tasks" +
-                    ".Task> handler)\r\n            {\r\n                return args => handler();\r\n     " +
-                    "       }\r\n");
+                    "ss HubInvokerFactoryProvider\r\n        {\r\n            private static readonly glo" +
+                    "bal::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFacto" +
+                    "ry> Factories;\r\n\r\n            static HubInvokerFactoryProvider()\r\n            {\r" +
+                    "\n                Factories = CreateFactories();\r\n            }\r\n\r\n            pu" +
+                    "blic static IHubInvokerFactory<T>? GetHubInvokerFactory<T>()\r\n            {\r\n   " +
+                    "             return Cache<T>.HubInvokerFactory;\r\n            }\r\n\r\n            pr" +
+                    "ivate static class Cache<T>\r\n            {\r\n                public static readon" +
+                    "ly IHubInvokerFactory<T>? HubInvokerFactory = default;\r\n\r\n                static" +
+                    " Cache()\r\n                {\r\n                    if (Factories.TryGetValue(typeo" +
+                    "f(T), out var hubInvokerFactory))\r\n                    {\r\n                      " +
+                    "  HubInvokerFactory = hubInvokerFactory as IHubInvokerFactory<T>;\r\n             " +
+                    "       }\r\n                }\r\n            }\r\n        }\r\n\r\n        private static " +
+                    "class ReceiverBinderProvider\r\n        {\r\n            private static readonly glo" +
+                    "bal::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder>" +
+                    " Binders;\r\n\r\n            static ReceiverBinderProvider()\r\n            {\r\n       " +
+                    "         Binders = CreateBinders();\r\n            }\r\n\r\n            public static " +
+                    "IReceiverBinder<T>? GetReceiverBinder<T>()\r\n            {\r\n                retur" +
+                    "n Cache<T>.ReceiverBinder;\r\n            }\r\n\r\n            private static class Ca" +
+                    "che<T>\r\n            {\r\n                public static readonly IReceiverBinder<T>" +
+                    "? ReceiverBinder = default;\r\n\r\n                static Cache()\r\n                {" +
+                    "\r\n                    if (Binders.TryGetValue(typeof(T), out var receiverBinder)" +
+                    ")\r\n                    {\r\n                        ReceiverBinder = receiverBinde" +
+                    "r as IReceiverBinder<T>;\r\n                    }\r\n                }\r\n            " +
+                    "}\r\n        }\r\n\r\n        private sealed class HubConnectionObserverSubscription :" +
+                    " global::System.IDisposable\r\n        {\r\n            private readonly global::Mic" +
+                    "rosoft.AspNetCore.SignalR.Client.HubConnection _connection;\r\n            private" +
+                    " readonly IHubConnectionObserver _hubConnectionObserver;\r\n\r\n            private " +
+                    "int _disposed = 0;\r\n\r\n            public HubConnectionObserverSubscription(globa" +
+                    "l::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, IHubConnectionO" +
+                    "bserver hubConnectionObserver)\r\n            {\r\n                _connection = con" +
+                    "nection;\r\n                _hubConnectionObserver = hubConnectionObserver;\r\n\r\n   " +
+                    "             _connection.Closed += hubConnectionObserver.OnClosed;\r\n            " +
+                    "    _connection.Reconnected += hubConnectionObserver.OnReconnected;\r\n           " +
+                    "     _connection.Reconnecting += hubConnectionObserver.OnReconnecting;\r\n        " +
+                    "    }\r\n\r\n            public void Dispose()\r\n            {\r\n                if (g" +
+                    "lobal::System.Threading.Interlocked.Exchange(ref _disposed, 1) == 0)\r\n          " +
+                    "      {\r\n                    _connection.Closed -= _hubConnectionObserver.OnClos" +
+                    "ed;\r\n                    _connection.Reconnected -= _hubConnectionObserver.OnRec" +
+                    "onnected;\r\n                    _connection.Reconnecting -= _hubConnectionObserve" +
+                    "r.OnReconnecting;\r\n                }\r\n            }\r\n        }\r\n\r\n        privat" +
+                    "e sealed class CompositeDisposable : global::System.IDisposable\r\n        {\r\n    " +
+                    "        private readonly object _gate = new object();\r\n            private reado" +
+                    "nly global::System.Collections.Generic.List<global::System.IDisposable> _disposa" +
+                    "bles;\r\n\r\n            private bool _disposed;\r\n\r\n            public CompositeDisp" +
+                    "osable()\r\n            {\r\n                _disposables = new global::System.Colle" +
+                    "ctions.Generic.List<global::System.IDisposable>();\r\n            }\r\n\r\n           " +
+                    " public CompositeDisposable(global::System.IDisposable[] disposables)\r\n         " +
+                    "   {\r\n                _disposables = new global::System.Collections.Generic.List" +
+                    "<global::System.IDisposable>(disposables);\r\n            }\r\n\r\n            public " +
+                    "CompositeDisposable(int capacity)\r\n            {\r\n                if (capacity <" +
+                    " 0)\r\n                {\r\n                    throw new global::System.ArgumentOut" +
+                    "OfRangeException(nameof(capacity));\r\n                }\r\n\r\n                _dispo" +
+                    "sables = new global::System.Collections.Generic.List<global::System.IDisposable>" +
+                    "(capacity);\r\n            }\r\n\r\n            public void Add(global::System.IDispos" +
+                    "able item)\r\n            {\r\n                bool shouldDispose = false;\r\n\r\n      " +
+                    "          lock (_gate)\r\n                {\r\n                    shouldDispose = _" +
+                    "disposed;\r\n\r\n                    if (!_disposed)\r\n                    {\r\n       " +
+                    "                 _disposables.Add(item);\r\n                    }\r\n               " +
+                    " }\r\n\r\n                if (shouldDispose)\r\n                {\r\n                   " +
+                    " item.Dispose();\r\n                }\r\n            }\r\n\r\n            public void Di" +
+                    "spose()\r\n            {\r\n                var currentDisposables = default(global:" +
+                    ":System.Collections.Generic.List<global::System.IDisposable>);\r\n\r\n              " +
+                    "  lock (_gate)\r\n                {\r\n                    if (_disposed)\r\n         " +
+                    "           {\r\n                        return;\r\n                    }\r\n\r\n        " +
+                    "            _disposed = true;\r\n                    currentDisposables = _disposa" +
+                    "bles;\r\n                }\r\n\r\n                foreach (var item in currentDisposab" +
+                    "les)\r\n                {\r\n                    if (item is not null)\r\n            " +
+                    "        {\r\n                        item.Dispose();\r\n                    }\r\n     " +
+                    "           }\r\n\r\n                currentDisposables.Clear();\r\n            }\r\n    " +
+                    "    }\r\n\r\n        // It is not possible to avoid boxing.\r\n        // This is a li" +
+                    "mitation caused by the SignalR implementation.\r\n        private static class Han" +
+                    "dlerConverter\r\n        {\r\n            public static global::System.Func<object?[" +
+                    "], global::System.Threading.Tasks.Task> Convert(global::System.Func<global::Syst" +
+                    "em.Threading.Tasks.Task> handler)\r\n            {\r\n                return args =>" +
+                    " handler();\r\n            }\r\n");
  for(int i = 1; i <= 16; i++) { 
             this.Write("            \r\n            public static global::System.Func<object?[], global::Sy" +
                     "stem.Threading.Tasks.Task> Convert<");

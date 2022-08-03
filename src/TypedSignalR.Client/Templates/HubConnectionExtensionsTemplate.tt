@@ -103,7 +103,7 @@ namespace TypedSignalR.Client
 
         private static class HubInvokerFactoryProvider
         {
-            private static global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> Factories;
+            private static readonly global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> Factories;
 
             static HubInvokerFactoryProvider()
             {
@@ -131,7 +131,7 @@ namespace TypedSignalR.Client
 
         private static class ReceiverBinderProvider
         {
-            private static global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> Binders;
+            private static readonly global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> Binders;
 
             static ReceiverBinderProvider()
             {
