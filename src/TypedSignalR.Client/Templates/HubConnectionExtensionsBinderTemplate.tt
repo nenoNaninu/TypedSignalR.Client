@@ -11,7 +11,7 @@
 #pragma warning disable CS1591
 namespace TypedSignalR.Client
 {
-    public static partial class HubConnectionExtensions
+    internal static partial class HubConnectionExtensions
     {
 <# foreach(var receiverType in ReceiverTypes){ #>
         private sealed class BinderFor_<#= receiverType.CollisionFreeName #> : IReceiverBinder<<#= receiverType.InterfaceFullName #>>
