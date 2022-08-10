@@ -7,9 +7,9 @@ namespace TypedSignalR.Client.CodeAnalysis;
 public sealed class MethodMetadata
 {
     public IMethodSymbol MethodSymbol { get; }
-    public IReadOnlyList<ParameterMetadata> Parameters { get; }
-
     public ITypeSymbol ReturnTypeSymbol => MethodSymbol.ReturnType;
+
+    public IReadOnlyList<ParameterMetadata> Parameters { get; }
 
     public string MethodName { get; }
     public string ReturnType { get; }
