@@ -125,17 +125,24 @@ public sealed class StreamingHub : Hub, IStreamingHub
         return Task.FromResult(channel.Reader);
     }
 
-    // Client-to-Server streaming
-    // TODO: HOW TO TEST?
     public async Task UploadStream(Person publisher, IAsyncEnumerable<Person> stream)
     {
         try
         {
             _logger.Log(LogLevel.Information, "UploadStream: publisher {publisher}", publisher);
 
+            int idx = 0;
+
             await foreach (var it in stream)
             {
                 _logger.Log(LogLevel.Information, "UploadStream: it {it}", it);
+
+                if (_persons[idx] != it)
+                {
+                    throw new HubException();
+                }
+
+                idx++;
             }
         }
         catch (Exception exception)
@@ -150,11 +157,20 @@ public sealed class StreamingHub : Hub, IStreamingHub
         {
             _logger.Log(LogLevel.Information, "UploadStreamAsChannel: publisher {publisher}", publisher);
 
+            int idx = 0;
+
             while (await stream.WaitToReadAsync())
             {
                 while (stream.TryRead(out var it))
                 {
                     _logger.Log(LogLevel.Information, "UploadStreamAsChannel: it {it}", it);
+
+                    if (_persons[idx] != it)
+                    {
+                        throw new HubException();
+                    }
+
+                    idx++;
                 }
             }
         }

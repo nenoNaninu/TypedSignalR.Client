@@ -244,8 +244,8 @@ public class StreamingTest : IAsyncLifetime
         Assert.Equal(20, value);
     }
 
-    // ↓ :thinking_face:
-
+    // ALWAYS PASS
+    // TODO: HOW TO TEST?
     [Fact]
     public async Task UploadStream()
     {
@@ -260,7 +260,7 @@ public class StreamingTest : IAsyncLifetime
     {
         foreach (var person in _persons)
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(20));
+            await Task.Delay(TimeSpan.FromMilliseconds(50));
             yield return person;
         }
     }
@@ -283,7 +283,7 @@ public class StreamingTest : IAsyncLifetime
     {
         foreach (var person in _persons)
         {
-            await Task.Delay(TimeSpan.FromMilliseconds(20));
+            await Task.Delay(TimeSpan.FromMilliseconds(50));
             channelWriter.TryWrite(person);
         }
 
