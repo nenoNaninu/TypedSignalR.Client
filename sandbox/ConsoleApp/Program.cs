@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using SignalR.Shared;
@@ -19,12 +22,6 @@ class Receiver : SignalR.Shared.IClientContract
     }
 }
 
-public interface IErrorProxy3
-{
-    Task<string> Hoge();
-    int Id { get; } // forbidden property
-}
-
 public interface IEmptyProxy
 {
 }
@@ -41,6 +38,35 @@ interface IErrorProxy2
     int Id(); // must Task or Task<T>
 }
 
+interface IErrorProxy3
+{
+    IAsyncEnumerable<int> Hoge(IAsyncEnumerable<int> param);
+    Task<IAsyncEnumerable<int>> Hoge2(IAsyncEnumerable<int> param);
+    IAsyncEnumerable<int> Hoge3(CancellationToken cancellationToken, CancellationToken cancellationToken2);
+}
+
+interface IErrorProxy4
+{
+    Task<ChannelReader<int>> Hoge2(ChannelReader<int> param);
+}
+
+interface IErrorProxy5
+{
+    Task Hoge(IAsyncEnumerable<int> param, CancellationToken cancellationToken);
+    Task<int> Hoge2(IAsyncEnumerable<int> param);
+}
+
+interface IErrorProxy6
+{
+    Task Hoge(ChannelReader<int> param, CancellationToken cancellationToken);
+    Task<int> Hoge2(ChannelReader<int> param);
+}
+
+interface IErrorProxy7
+{
+    Task<int> Hoge(CancellationToken cancellationToken);
+}
+
 class Program
 {
     static void Main(string[] args)
@@ -51,6 +77,12 @@ class Program
 
         connection.CreateHubProxy<IErrorProxy>(); // error
         connection.CreateHubProxy<IErrorProxy2>(); // error
+        connection.CreateHubProxy<IErrorProxy3>(); // error
+        connection.CreateHubProxy<IErrorProxy4>(); // error
+        connection.CreateHubProxy<IErrorProxy5>(); // error
+        connection.CreateHubProxy<IErrorProxy6>(); // error
+        connection.CreateHubProxy<IErrorProxy7>(); // error
+
 
         //var id = connection.ConnectionId;
         //{
