@@ -28,7 +28,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\TypedSignalR.Client.Tests\**\*.cs" Exclude="..\TypedSignalR.Client.Tests\obj\**\*.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\DisposeTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\PostTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\ReceiverTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\UnaryTest.cs" LinkBase="" />
     </ItemGroup>
 
 </Project>

@@ -46,20 +46,8 @@ namespace TypedSignalR.Client.Templates
             }
 ");
  foreach(var method in hubType.Methods) { 
-            this.Write("\r\n            public ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType));
-            this.Write(" ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write("(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateParametersString()));
-            this.Write(")\r\n            {\r\n                return global::Microsoft.AspNetCore.SignalR.Cli" +
-                    "ent.HubConnectionExtensions.InvokeCoreAsync");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateGenericReturnTypeArgumentString()));
-            this.Write("(_connection, nameof(");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
-            this.Write("), ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateArgumentsStringForInvokeCoreAsync()));
-            this.Write(", _cancellationToken);\r\n            }\r\n");
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateMethodString(this.SpecialSymbols)));
+            this.Write("\r\n");
  } 
             this.Write("        }\r\n\r\n        private sealed class HubInvokerFactoryFor_");
             this.Write(this.ToStringHelper.ToStringWithCulture(hubType.CollisionFreeName));

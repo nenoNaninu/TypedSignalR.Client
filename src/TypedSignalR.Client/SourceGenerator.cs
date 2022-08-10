@@ -179,6 +179,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
             var template = new HubConnectionExtensionsHubInvokerTemplate()
             {
                 HubTypes = hubTypes,
+                SpecialSymbols = specialSymbols
             };
 
             var source = NormalizeNewLines(template.TransformText());
@@ -229,6 +230,9 @@ public sealed class SourceGenerator : IIncrementalGenerator
     {
         var taskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
         var genericTaskSymbol = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
+        var cancellationTokenSymbol = compilation.GetTypeByMetadataName("System.Threading.CancellationToken");
+        var asyncEnumerableSymbol = compilation.GetTypeByMetadataName("System.Collections.Generic.IAsyncEnumerable`1");
+        var channelReaderSymbol = compilation.GetTypeByMetadataName("System.Threading.Channels.ChannelReader`1");
         var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
         var memberSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers();
 
@@ -268,7 +272,16 @@ public sealed class SourceGenerator : IIncrementalGenerator
             }
         }
 
-        return new SpecialSymbols(taskSymbol!, genericTaskSymbol!, hubConnectionObserverSymbol!, createHubProxyMethodSymbol!, registerMethodSymbol!);
+        return new SpecialSymbols(
+            taskSymbol!,
+            genericTaskSymbol!,
+            cancellationTokenSymbol!,
+            asyncEnumerableSymbol!,
+            channelReaderSymbol!,
+            hubConnectionObserverSymbol!,
+            createHubProxyMethodSymbol!,
+            registerMethodSymbol!
+        );
     }
 
     private static IReadOnlyList<TypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
@@ -285,7 +298,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             ITypeSymbol hubTypeSymbol = methodSymbol.TypeArguments[0];
 
-            var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols.TaskSymbol, specialSymbols.GenericTaskSymbol, location);
+            var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols, location);
 
             if (isValid && !hubTypeList.Contains(hubTypeSymbol))
             {
@@ -315,7 +328,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
                 continue;
             }
 
-            var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols.TaskSymbol, location);
+            var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols, location);
 
             if (isValid && !receiverTypeList.Contains(receiverTypeSymbol))
             {
@@ -366,30 +379,6 @@ public sealed class SourceGenerator : IIncrementalGenerator
         public bool IsValid()
         {
             return this != default;
-        }
-    }
-
-    private class SpecialSymbols
-    {
-        public readonly INamedTypeSymbol TaskSymbol;
-        public readonly INamedTypeSymbol GenericTaskSymbol;
-        public readonly INamedTypeSymbol HubConnectionObserverSymbol;
-        public readonly IMethodSymbol CreateHubProxyMethodSymbol;
-        public readonly IMethodSymbol RegisterMethodSymbol;
-
-        public SpecialSymbols(
-            INamedTypeSymbol taskSymbol,
-            INamedTypeSymbol genericTaskSymbol,
-            INamedTypeSymbol hubConnectionObserverSymbol,
-            IMethodSymbol createHubProxyMethodSymbol,
-            IMethodSymbol registerMethodSymbol
-           )
-        {
-            TaskSymbol = taskSymbol;
-            GenericTaskSymbol = genericTaskSymbol;
-            HubConnectionObserverSymbol = hubConnectionObserverSymbol;
-            CreateHubProxyMethodSymbol = createHubProxyMethodSymbol;
-            RegisterMethodSymbol = registerMethodSymbol;
         }
     }
 }
