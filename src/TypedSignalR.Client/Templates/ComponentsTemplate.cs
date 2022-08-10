@@ -32,31 +32,31 @@ namespace TypedSignalR.Client.Templates
 #pragma warning disable CS1591
 namespace TypedSignalR.Client
 {
-    public interface IHubConnectionObserver
+    internal interface IHubConnectionObserver
     {
         global::System.Threading.Tasks.Task OnClosed(global::System.Exception? exception);
         global::System.Threading.Tasks.Task OnReconnected(string? connectionId);
         global::System.Threading.Tasks.Task OnReconnecting(global::System.Exception? exception);
     }
 
-    public interface IHubInvoker
+    internal interface IHubInvoker
     {
     }
 
-    public interface IHubInvokerFactory
+    internal interface IHubInvokerFactory
     {
     }
 
-    public interface IHubInvokerFactory<out T> : IHubInvokerFactory
+    internal interface IHubInvokerFactory<out T> : IHubInvokerFactory
     {
         T CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken);
     }
 
-    public interface IReceiverBinder
+    internal interface IReceiverBinder
     {
     }
 
-    public interface IReceiverBinder<in T> : IReceiverBinder
+    internal interface IReceiverBinder<in T> : IReceiverBinder
     {
         global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, T receiver);
     }

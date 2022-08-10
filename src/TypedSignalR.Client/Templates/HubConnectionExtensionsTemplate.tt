@@ -50,7 +50,7 @@
 #pragma warning disable CS1591
 namespace TypedSignalR.Client
 {
-    public static partial class HubConnectionExtensions
+    internal static partial class HubConnectionExtensions
     {
         public static THub CreateHubProxy<THub>(this global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken = default)
         {
@@ -96,7 +96,7 @@ namespace TypedSignalR.Client
         }
     }
 
-    public static partial class HubConnectionExtensions
+    internal static partial class HubConnectionExtensions
     {
         private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories();
         private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IReceiverBinder> CreateBinders();
