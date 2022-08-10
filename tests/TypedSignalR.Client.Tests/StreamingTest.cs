@@ -244,17 +244,49 @@ public class StreamingTest : IAsyncLifetime
         Assert.Equal(20, value);
     }
 
+    // ↓ :thinking_face:
+
     [Fact]
-    public Task UploadStream()
+    public async Task UploadStream()
     {
+        var publisher = new Person(Guid.Parse("8fd696c1-b102-7aa6-259b-4f8772457a7a"), "NANA DAIBA", 15);
+
+        await _streamingHub.UploadStream(publisher, UploadStreamCore());
+
         Assert.True(true);
-        return Task.CompletedTask;
+    }
+
+    private async IAsyncEnumerable<Person> UploadStreamCore()
+    {
+        foreach (var person in _persons)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(20));
+            yield return person;
+        }
     }
 
     [Fact]
-    public Task UploadStreamAsChannel()
+    public async Task UploadStreamAsChannel()
     {
-        Assert.True(true);
-        return Task.CompletedTask;
+        var publisher = new Person(Guid.Parse("8fd696c1-b102-7aa6-259b-4f8772457a7a"), "NANA DAIBA", 15);
+
+        var channel = Channel.CreateUnbounded<Person>();
+
+        _ = UploadStreamAsChannelCore(channel.Writer);
+
+        await _streamingHub.UploadStreamAsChannel(publisher, channel.Reader);
+
+        Assert.True(channel.Reader.Completion.IsCompleted);
+    }
+
+    private async Task UploadStreamAsChannelCore(ChannelWriter<Person> channelWriter)
+    {
+        foreach (var person in _persons)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(20));
+            channelWriter.TryWrite(person);
+        }
+
+        channelWriter.Complete();
     }
 }
