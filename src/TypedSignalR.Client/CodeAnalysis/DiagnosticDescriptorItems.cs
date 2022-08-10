@@ -52,7 +52,7 @@ public static class DiagnosticDescriptorItems
     public static readonly DiagnosticDescriptor HubMethodCancellationTokenParameterRule = new(
         id: "TSRC005",
         title: "CancellationToken can be used as a parameter only in the server-to-client streaming method",
-        messageFormat: "[CancellationToken can be used as a parameter only in the server-to-client streaming method] CancellationToken is used in the {0} parameters",
+        messageFormat: "[CancellationToken can be used as a parameter only in the server-to-client streaming method] CancellationToken is used as a parameter in the {0}",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -61,7 +61,7 @@ public static class DiagnosticDescriptorItems
     public static readonly DiagnosticDescriptor HubMethodMultipleCancellationTokenParameterRule = new(
         id: "TSRC006",
         title: "Using multiple CancellationToken in method parameters is prohibited",
-        messageFormat: "[Using multiple CancellationToken in method parameters is prohibited] Multiple CancellationToken are used in the {0} parameters",
+        messageFormat: "[Using multiple CancellationToken in method parameters is prohibited] Multiple CancellationToken are used as a parameter in the {0}",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,

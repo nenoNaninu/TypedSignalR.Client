@@ -355,8 +355,8 @@ public static class TypeValidator
                 || SymbolEqualityComparer.Default.Equals(typeArgument.OriginalDefinition, specialSymbols.ChannelReaderSymbol))
             {
                 var contain = methodSymbol.Parameters.Any(x =>
-                    SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.AsyncEnumerableSymbol)
-                    || SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.ChannelReaderSymbol));
+                    SymbolEqualityComparer.Default.Equals(x.Type.OriginalDefinition, specialSymbols.AsyncEnumerableSymbol)
+                    || SymbolEqualityComparer.Default.Equals(x.Type.OriginalDefinition, specialSymbols.ChannelReaderSymbol));
 
                 if (contain)
                 {
@@ -373,8 +373,8 @@ public static class TypeValidator
         else if (SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, specialSymbols.AsyncEnumerableSymbol))
         {
             var contain = methodSymbol.Parameters.Any(x =>
-                SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.AsyncEnumerableSymbol)
-                || SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.ChannelReaderSymbol));
+                SymbolEqualityComparer.Default.Equals(x.Type.OriginalDefinition, specialSymbols.AsyncEnumerableSymbol)
+                || SymbolEqualityComparer.Default.Equals(x.Type.OriginalDefinition, specialSymbols.ChannelReaderSymbol));
 
             if (contain)
             {
