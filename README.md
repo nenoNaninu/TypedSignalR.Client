@@ -15,6 +15,7 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
 - [Recommendation](#recommendation)
   - [Sharing a Project](#sharing-a-project)
   - [Client Code Format](#client-code-format)
+- [Streaming Support](#streaming-support)
 - [Compile-Time Error Support](#compile-time-error-support)
 - [Generated Source Code](#generated-source-code)
 - [Related Work](#related-work)
@@ -253,6 +254,16 @@ class Client : IReceiver, IHubConnectionObserver, IDisposable
     // implementation
 }
 ```
+
+## Streaming Support
+
+SignalR supports both [server-to-client streaming and client-to-server streaming](https://docs.microsoft.com/en-us/aspnet/core/signalr/streaming?view=aspnetcore-6.0).
+
+TypedSignalR.Client supports both server-to-client streaming and client-to-server streaming.
+If you use `IAsyncEnumerable<T>`, `Task<IAsyncEnumerable<T>`, or `Task<ChannelReader<T>>` for the method return type, it is analyzed as server-to-client streaming.
+And if `IAsyncEnumerable<T>` or `ChannelReader<T>` is used in the method parameter, it is analyzed as client-to-server streaming.
+
+When using server-to-client streaming, a single `CancellationToken` can be used as a method parameter (Note: `CancellationToken` cannot be used as a parameter except for server-to-client streaming).
 
 ## Compile-Time Error Support
 This library has some restrictions, including those that come from server-side implementations.
