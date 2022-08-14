@@ -106,21 +106,21 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
         }
     }
 
-    public Task ReceiveMessage(string message, int value)
+    Task IReceiver.ReceiveMessage(string message, int value)
     {
         _receiveMessage.Add((message, value));
 
         return Task.CompletedTask;
     }
 
-    public Task Nofity()
+    Task IReceiver.Nofity()
     {
         _notifyCallCount++;
 
         return Task.CompletedTask;
     }
 
-    public Task ReceiveCustomMessage(UserDefinedType userDefined)
+    Task IReceiver.ReceiveCustomMessage(UserDefinedType userDefined)
     {
         _userDefinedList.Add(userDefined);
 
