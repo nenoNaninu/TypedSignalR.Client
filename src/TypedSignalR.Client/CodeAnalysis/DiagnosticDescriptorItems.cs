@@ -56,7 +56,7 @@ public static class DiagnosticDescriptorItems
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Using multiple CancellationToken in method parameters is prohibited.");
+        description: "CancellationToken can be used as a parameter only in the server-to-client streaming method.");
 
     public static readonly DiagnosticDescriptor HubMethodMultipleCancellationTokenParameterRule = new(
         id: "TSRC006",
@@ -74,7 +74,7 @@ public static class DiagnosticDescriptorItems
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Must be following the server streaming method rules.");
+        description: "Using IAsyncEnumerable<T> or ChannelReader<T> as a parameter in a server-to-client streaming method is prohibited.");
 
     public static readonly DiagnosticDescriptor ClientStreamingMethodReturnTypeRule = new(
         id: "TSRC008",
