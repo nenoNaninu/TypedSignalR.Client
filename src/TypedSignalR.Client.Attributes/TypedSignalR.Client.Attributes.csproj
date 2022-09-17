@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <Nullable>enable</Nullable>
+        <RootNamespace>TypedSignalR.Client</RootNamespace>
+
+        <!-- NuGet -->
+        <PackageId>TypedSignalR.Client.Attributes</PackageId>
+        <AssemblyName>TypedSignalR.Client.Attributes</AssemblyName>
+        <Title>TypedSignalR.Client.Attributes</Title>
+        <Description>TypedSignalR.Client.Attributes</Description>
+        <Authors>nenoNaninu</Authors>
+        <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
+        <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>signalr</PackageTags>
+        <Copyright>(c) nenoNaninu</Copyright>
+    </PropertyGroup>
+
+</Project>
