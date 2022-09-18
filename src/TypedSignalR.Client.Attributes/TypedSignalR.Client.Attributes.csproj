@@ -10,7 +10,7 @@
         <PackageId>TypedSignalR.Client.Attributes</PackageId>
         <AssemblyName>TypedSignalR.Client.Attributes</AssemblyName>
         <Title>TypedSignalR.Client.Attributes</Title>
-        <Description>TypedSignalR.Client.Attributes</Description>
+        <Description>Attributes to apply to SignalR interfaces.</Description>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
