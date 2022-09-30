@@ -14,25 +14,25 @@ jobs:
     name: release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: "Get version from git tag"
-        run: echo "Version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Get version from git tag
+        run: echo "RELEASE_VER=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: "dotnet build"
-        run: dotnet build -c Release -p:Version=$Version ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
+      - name: dotnet build
+        run: dotnet build -c Release -p:Version=${{ env.RELEASE_VER }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
 
-      - name: "dotnet pack"
-        run: dotnet pack -c Release --no-build --output $GITHUB_WORKSPACE/artifacts -p:Version=$Version ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
+      - name: dotnet pack
+        run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VER }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: Packages
-          path: artifacts
+          path: ${{ github.workspace }}/artifacts
 
-      - name: "dotnet nuget push"
-        run: dotnet nuget push "$GITHUB_WORKSPACE/artifacts/*.nupkg" --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      - name: dotnet nuget push
+        run: dotnet nuget push ${{ github.workspace }}/artifacts/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
