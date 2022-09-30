@@ -21,13 +21,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Get version from git tag
-        run: echo "RELEASE_VER=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: dotnet build
-        run: dotnet build -c Release -p:Version=${{ env.RELEASE_VER }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
+        run: dotnet build -c Release -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
 
       - name: dotnet pack
-        run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VER }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
+        run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client/TypedSignalR.Client.csproj
 
       - uses: actions/upload-artifact@v3
         with:
