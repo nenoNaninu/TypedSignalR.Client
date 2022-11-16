@@ -1,0 +1,38 @@
+name: release-attributes
+
+on:
+  push:
+    tags:
+      - "attributes-v[0-9]+.[0-9]+.[0-9]+*"
+
+env:
+  DOTNET_VERSION: "6.0.x"
+  DOTNET_NOLOGO: true
+
+jobs:
+  release:
+    name: release-attributes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Get version from git tag
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/attributes-v}" >> $GITHUB_ENV
+
+      - name: dotnet build
+        run: dotnet build -c Release -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj
+
+      - name: dotnet pack
+        run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Packages
+          path: ${{ github.workspace }}/artifacts
+
+      - name: dotnet nuget push
+        run: dotnet nuget push ${{ github.workspace }}/artifacts/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
