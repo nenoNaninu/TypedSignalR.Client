@@ -293,7 +293,7 @@ public static class MethodMetadataExtensions
     }
 
     /// <summary>
-    /// Task<IAsyncEnumerable<T>> --> T
+    /// Task&lt;IAsyncEnumerable&lt;T&gt;&gt; --&gt; T
     /// </summary>
     private static string CreateGenericReturnTypeArgumentStringForStreaming(this MethodMetadata methodMetadata)
     {
