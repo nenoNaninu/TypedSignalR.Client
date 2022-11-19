@@ -43,7 +43,7 @@ public class ReceiverTestHub : Hub<IReceiver>, IReceiverTestHub
 
         for (int i = 0; i < 17; i++)
         {
-            await this.Clients.Caller.Nofity();
+            await this.Clients.Caller.Notify();
         }
 
         for (int i = 0; i < _message.Length; i++)
