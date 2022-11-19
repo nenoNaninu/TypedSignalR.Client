@@ -13,11 +13,11 @@ public interface IDataStore
 /// </summary>
 public class DataStore : IDataStore
 {
-    private readonly Dictionary<string, IUserData> _dictonary = new();
+    private readonly Dictionary<string, IUserData> _dictionary = new();
 
     public IUserData Get(string connectionId)
     {
-        if (_dictonary.TryGetValue(connectionId, out var data))
+        if (_dictionary.TryGetValue(connectionId, out var data))
         {
             return data;
         }
@@ -25,7 +25,7 @@ public class DataStore : IDataStore
         {
             var newData = new UserData();
 
-            _dictonary.Add(connectionId, newData);
+            _dictionary.Add(connectionId, newData);
 
             return newData;
         }
@@ -33,7 +33,7 @@ public class DataStore : IDataStore
 
     public void Remove(string connectionId)
     {
-        _dictonary.Remove(connectionId);
+        _dictionary.Remove(connectionId);
     }
 }
 
