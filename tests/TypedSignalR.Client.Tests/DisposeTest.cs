@@ -70,7 +70,7 @@ public class DisposeTest : IAsyncLifetime, IReceiver
         return Task.CompletedTask;
     }
 
-    Task IReceiver.Nofity()
+    Task IReceiver.Notify()
     {
         _notifyCallCount++;
 
