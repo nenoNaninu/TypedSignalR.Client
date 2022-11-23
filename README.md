@@ -178,7 +178,7 @@ subscription.Dispose();
 ```
 
 #### Cancellation
-In ASP.NET Core SignalR SignalR, `CancellationToken` is passed for each invoke.
+In ASP.NET Core SignalR, `CancellationToken` is passed for each invoke.
 
 On the other hand, in TypedSignalR.Client, `CancellationToken` is passed only once when creating a hub proxy.
 The passed `CancelationToken` will be used for each invoke internally.
