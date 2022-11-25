@@ -268,10 +268,30 @@ namespace TypedSignalR.Client
                 return args => handler();
             }
 <# for(int i = 1; i <= 16; i++) { #>
-            
+
             public static global::System.Func<object?[], global::System.Threading.Tasks.Task> Convert<<#= CreateTypeParametersString(i) #>>(global::System.Func<<#= CreateTypeParametersString(i) #>, global::System.Threading.Tasks.Task> handler)
             {
                 return args => handler(<#= CreateHandlerArgumentsString(i) #>);
+            }
+<# } #>
+
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<TResult>(global::System.Func<global::System.Threading.Tasks.Task<TResult>> handler)
+            {
+                return async args =>
+                {
+                    var result = await handler();
+                    return result;
+                };
+            }
+<# for(int i = 1; i <= 16; i++) { #>
+
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<<#= CreateTypeParametersString(i) #>, TResult>(global::System.Func<<#= CreateTypeParametersString(i) #>, global::System.Threading.Tasks.Task<TResult>> handler)
+            {
+                return async args =>
+                {
+                    var result = await handler(<#= CreateHandlerArgumentsString(i) #>).ConfigureAwait(false);
+                    return result;
+                };
             }
 <# } #>
         }

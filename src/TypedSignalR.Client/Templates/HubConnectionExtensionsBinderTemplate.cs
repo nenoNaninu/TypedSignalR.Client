@@ -48,7 +48,7 @@ namespace TypedSignalR.Client.Templates
             this.Write("), ");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateParameterTypeArrayString()));
             this.Write(", HandlerConverter.Convert");
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateTypeArgumentsStringFromParameterTypes()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.CreateTypeArgumentsStringForHandlerConverter()));
             this.Write("(receiver.");
             this.Write(this.ToStringHelper.ToStringWithCulture(method.MethodName));
             this.Write(")));\r\n");

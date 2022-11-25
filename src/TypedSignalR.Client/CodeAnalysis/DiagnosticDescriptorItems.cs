@@ -42,12 +42,12 @@ public static class DiagnosticDescriptorItems
 
     public static readonly DiagnosticDescriptor ReceiverMethodReturnTypeRule = new(
         id: "TSRC004",
-        title: "The return type of methods in the interface must be Task",
-        messageFormat: "[The return type of methods in the interface used for the receiver must be Task] The return type of {0} is not Task",
+        title: "The return type of methods in the interface must be Task or Task<T>",
+        messageFormat: "[The return type of methods in the interface used for the receiver must be Task or Task<T>] The return type of {0} is not Task or Task<T>",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The return type of methods in the interface must be Task.");
+        description: "The return type of methods in the interface must be Task or Task<T>.");
 
     public static readonly DiagnosticDescriptor HubMethodCancellationTokenParameterRule = new(
         id: "TSRC005",
