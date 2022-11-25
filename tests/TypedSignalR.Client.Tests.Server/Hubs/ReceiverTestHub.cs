@@ -43,16 +43,19 @@ public class ReceiverTestHub : Hub<IReceiver>, IReceiverTestHub
 
         for (int i = 0; i < 17; i++)
         {
+            await Task.Delay(TimeSpan.FromMilliseconds(15));
             await this.Clients.Caller.Notify();
         }
 
         for (int i = 0; i < _message.Length; i++)
         {
+            await Task.Delay(TimeSpan.FromMilliseconds(15));
             await this.Clients.Caller.ReceiveMessage(_message[i], i);
         }
 
         for (int i = 0; i < _guids.Length; i++)
         {
+            await Task.Delay(TimeSpan.FromMilliseconds(15));
             await this.Clients.Caller.ReceiveCustomMessage(new UserDefinedType() { Guid = Guid.Parse(_guids[i]), DateTime = DateTime.Parse(_dateTimes[i]) });
         }
     }
