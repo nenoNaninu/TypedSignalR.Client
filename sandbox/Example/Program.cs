@@ -26,7 +26,7 @@ public interface IHubContract
 {
     Task<string> SomeHubMethod1(string user, string message);
     Task SomeHubMethod2();
-    Task<string> SomeHubMethod3(string user, string message, CancellationToken cancellationToken);
+    Task<string> SomeHubMethod3(string user, string message, CancellationToken cancellationToken); // cannot use CancellationToken
 }
 
 class Receiver : IClientContract, IHubConnectionObserver
