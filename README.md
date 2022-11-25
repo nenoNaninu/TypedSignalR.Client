@@ -16,6 +16,7 @@ C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/
   - [Sharing a Project](#sharing-a-project)
   - [Client Code Format](#client-code-format)
 - [Streaming Support](#streaming-support)
+- [Client Results Support](#client-results-support)
 - [Compile-Time Error Support](#compile-time-error-support)
 - [Generated Source Code](#generated-source-code)
 - [Related Work](#related-work)
@@ -264,6 +265,13 @@ If you use `IAsyncEnumerable<T>`, `Task<IAsyncEnumerable<T>`, or `Task<ChannelRe
 And if `IAsyncEnumerable<T>` or `ChannelReader<T>` is used in the method parameter, it is analyzed as client-to-server streaming.
 
 When using server-to-client streaming, a single `CancellationToken` can be used as a method parameter (Note: `CancellationToken` cannot be used as a parameter except for server-to-client streaming).
+
+## Client Results Support
+
+.NET 7 and later, [client results](https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-7.0#client-results) can be used.
+
+TypedSignalR.Client supports client results.
+If you use `Task<T>` for the method return type in the receiver interface, you can use client results.
 
 ## Compile-Time Error Support
 This library has some restrictions, including those that come from server-side implementations.
