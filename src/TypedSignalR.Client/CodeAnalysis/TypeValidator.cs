@@ -16,7 +16,6 @@ public static class TypeValidator
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptorItems.TypeArgumentRule,
                 accessLocation,
-                "CreateHubProxy",
                 hubTypeSymbol.ToDisplayString()));
 
             return false;
@@ -45,7 +44,6 @@ public static class TypeValidator
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.InterfaceDefineRule,
                         accessLocation,
-                        "hub proxy",
                         memberSymbol.ToDisplayString()));
 
                     isValid = false;
@@ -88,7 +86,6 @@ public static class TypeValidator
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     accessLocation,
-                    "hub proxy",
                     memberSymbol.ToDisplayString()));
 
                 isValid = false;
@@ -110,7 +107,6 @@ public static class TypeValidator
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptorItems.TypeArgumentRule,
                 accessLocation,
-                "Register",
                 receiverTypeSymbol.ToDisplayString()));
 
             return false;
@@ -139,7 +135,6 @@ public static class TypeValidator
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.InterfaceDefineRule,
                         accessLocation,
-                        "receiver",
                         memberSymbol.ToDisplayString()));
 
                     isValid = false;
@@ -173,7 +168,6 @@ public static class TypeValidator
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     accessLocation,
-                    "receiver",
                     memberSymbol.ToDisplayString()));
 
                 isValid = false;
