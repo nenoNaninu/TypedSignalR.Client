@@ -21,7 +21,7 @@ namespace TypedSignalR.Client
                 var compositeDisposable = new CompositeDisposable(<#= receiverType.Methods.Count #>);
 
 <# foreach(var method in receiverType.Methods) { #>
-                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.<#= method.MethodName #>), <#= method.CreateParameterTypeArrayString() #>, HandlerConverter.Convert<#= method.CreateTypeArgumentsStringFromParameterTypes() #>(receiver.<#= method.MethodName #>)));
+                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.<#= method.MethodName #>), <#= method.CreateParameterTypeArrayString() #>, HandlerConverter.Convert<#= method.CreateTypeArgumentsStringForHandlerConverter() #>(receiver.<#= method.MethodName #>)));
 <# } #>
 
                 return compositeDisposable;

@@ -173,8 +173,8 @@ namespace TypedSignalR.Client.Templates
                     "System.Threading.Tasks.Task> handler)\r\n            {\r\n                return arg" +
                     "s => handler();\r\n            }\r\n");
  for(int i = 1; i <= 16; i++) { 
-            this.Write("            \r\n            public static global::System.Func<object?[], global::Sy" +
-                    "stem.Threading.Tasks.Task> Convert<");
+            this.Write("\r\n            public static global::System.Func<object?[], global::System.Threadi" +
+                    "ng.Tasks.Task> Convert<");
             this.Write(this.ToStringHelper.ToStringWithCulture(CreateTypeParametersString(i)));
             this.Write(">(global::System.Func<");
             this.Write(this.ToStringHelper.ToStringWithCulture(CreateTypeParametersString(i)));
@@ -182,6 +182,29 @@ namespace TypedSignalR.Client.Templates
                     "eturn args => handler(");
             this.Write(this.ToStringHelper.ToStringWithCulture(CreateHandlerArgumentsString(i)));
             this.Write(");\r\n            }\r\n");
+ } 
+            this.Write(@"
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<TResult>(global::System.Func<global::System.Threading.Tasks.Task<TResult>> handler)
+            {
+                return async args =>
+                {
+                    var result = await handler();
+                    return result;
+                };
+            }
+");
+ for(int i = 1; i <= 16; i++) { 
+            this.Write("\r\n            public static global::System.Func<object?[], global::System.Threadi" +
+                    "ng.Tasks.Task<TResult>> Convert<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(CreateTypeParametersString(i)));
+            this.Write(", TResult>(global::System.Func<");
+            this.Write(this.ToStringHelper.ToStringWithCulture(CreateTypeParametersString(i)));
+            this.Write(", global::System.Threading.Tasks.Task<TResult>> handler)\r\n            {\r\n        " +
+                    "        return async args =>\r\n                {\r\n                    var result " +
+                    "= await handler(");
+            this.Write(this.ToStringHelper.ToStringWithCulture(CreateHandlerArgumentsString(i)));
+            this.Write(").ConfigureAwait(false);\r\n                    return result;\r\n                };\r" +
+                    "\n            }\r\n");
  } 
             this.Write("        }\r\n    }\r\n}\r\n#pragma warning restore CS1591\r\n");
             return this.GenerationEnvironment.ToString();

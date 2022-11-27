@@ -131,7 +131,7 @@ public class ReceiverTest : IAsyncLifetime, IReceiver
 public interface IReceiver2
 {
     Task ReceiveMessage(string message, int value);
-    Task Nofity();
+    Task Notify();
     Task ReceiveCustomMessage(UserDefinedType userDefined);
 }
 
@@ -144,7 +144,7 @@ class SecondReceiver : IReceiver2
         connection.Register<IReceiver2>(this);
     }
 
-    public Task Nofity()
+    public Task Notify()
     {
         throw new NotImplementedException();
     }

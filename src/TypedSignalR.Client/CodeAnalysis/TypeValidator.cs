@@ -16,7 +16,6 @@ public static class TypeValidator
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptorItems.TypeArgumentRule,
                 accessLocation,
-                "CreateHubProxy",
                 hubTypeSymbol.ToDisplayString()));
 
             return false;
@@ -45,7 +44,6 @@ public static class TypeValidator
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.InterfaceDefineRule,
                         accessLocation,
-                        "hub proxy",
                         memberSymbol.ToDisplayString()));
 
                     isValid = false;
@@ -88,7 +86,6 @@ public static class TypeValidator
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     accessLocation,
-                    "hub proxy",
                     memberSymbol.ToDisplayString()));
 
                 isValid = false;
@@ -110,7 +107,6 @@ public static class TypeValidator
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptorItems.TypeArgumentRule,
                 accessLocation,
-                "Register",
                 receiverTypeSymbol.ToDisplayString()));
 
             return false;
@@ -139,14 +135,16 @@ public static class TypeValidator
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptorItems.InterfaceDefineRule,
                         accessLocation,
-                        "receiver",
                         memberSymbol.ToDisplayString()));
 
                     isValid = false;
                     continue;
                 }
 
-                INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol; // only Task. not Task<T>.
+                // ReturnType
+                //     Task : ordinary receiver method
+                //     Task<T> : client results
+                INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
 
                 if (returnTypeSymbol is null)
                 {
@@ -170,7 +168,6 @@ public static class TypeValidator
                 context.ReportDiagnostic(Diagnostic.Create(
                     DiagnosticDescriptorItems.InterfaceDefineRule,
                     accessLocation,
-                    "receiver",
                     memberSymbol.ToDisplayString()));
 
                 isValid = false;
@@ -241,29 +238,24 @@ public static class TypeValidator
         SpecialSymbols specialSymbols,
         Location accessLocation)
     {
-        if (returnTypeSymbol.IsGenericType)
+        // Task
+        if (SymbolEqualityComparer.Default.Equals(returnTypeSymbol, specialSymbols.TaskSymbol))
         {
-            context.ReportDiagnostic(Diagnostic.Create(
-                DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
-                accessLocation,
-                methodSymbol.ToDisplayString()));
-
-            return false;
-        }
-        else
-        {
-            if (!SymbolEqualityComparer.Default.Equals(returnTypeSymbol, specialSymbols.TaskSymbol))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
-                    accessLocation,
-                    methodSymbol.ToDisplayString()));
-
-                return false;
-            }
+            return true;
         }
 
-        return true;
+        // Task<T>
+        if (SymbolEqualityComparer.Default.Equals(returnTypeSymbol.OriginalDefinition, specialSymbols.GenericTaskSymbol))
+        {
+            return true;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(
+            DiagnosticDescriptorItems.ReceiverMethodReturnTypeRule,
+            accessLocation,
+            methodSymbol.ToDisplayString()));
+
+        return false;
     }
 
     private static bool ValidateHubMethodCancellationTokenParameterRule(

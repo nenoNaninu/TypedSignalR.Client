@@ -86,15 +86,25 @@ public static class MethodMetadataExtensions
         return sb.ToString();
     }
 
-    public static string CreateTypeArgumentsStringFromParameterTypes(this MethodMetadata methodMetadata)
+    public static string CreateTypeArgumentsStringForHandlerConverter(this MethodMetadata methodMetadata)
     {
         if (methodMetadata.Parameters.Count == 0)
         {
+            if (methodMetadata.IsGenericReturnType)
+            {
+                return $"<{methodMetadata.GenericReturnTypeArgument}>";
+            }
+
             return string.Empty;
         }
 
         if (methodMetadata.Parameters.Count == 1)
         {
+            if (methodMetadata.IsGenericReturnType)
+            {
+                return $"<{methodMetadata.Parameters[0].TypeName}, {methodMetadata.GenericReturnTypeArgument}>";
+            }
+
             return $"<{methodMetadata.Parameters[0].TypeName}>";
         }
 
@@ -107,6 +117,12 @@ public static class MethodMetadataExtensions
         {
             sb.Append(", ");
             sb.Append(methodMetadata.Parameters[i].TypeName);
+        }
+
+        if (methodMetadata.IsGenericReturnType)
+        {
+            sb.Append(", ");
+            sb.Append(methodMetadata.GenericReturnTypeArgument);
         }
 
         sb.Append('>');
