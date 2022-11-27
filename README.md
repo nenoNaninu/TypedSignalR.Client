@@ -268,7 +268,7 @@ When using server-to-client streaming, a single `CancellationToken` can be used 
 
 ## Client Results Support
 
-.NET 7 and later, [client results](https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-7.0#client-results) can be used.
+.NET 7 and later, you can use [client results](https://learn.microsoft.com/en-us/aspnet/core/signalr/hubs?view=aspnetcore-7.0#client-results).
 
 TypedSignalR.Client supports client results.
 If you use `Task<T>` for the method return type in the receiver interface, you can use client results.
