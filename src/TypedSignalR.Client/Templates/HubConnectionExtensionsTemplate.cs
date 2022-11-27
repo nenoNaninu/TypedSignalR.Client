@@ -188,7 +188,7 @@ namespace TypedSignalR.Client.Templates
             {
                 return async args =>
                 {
-                    var result = await handler();
+                    var result = await handler().ConfigureAwait(false);
                     return result;
                 };
             }
