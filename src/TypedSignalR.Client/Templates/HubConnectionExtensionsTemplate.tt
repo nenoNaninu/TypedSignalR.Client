@@ -279,7 +279,7 @@ namespace TypedSignalR.Client
             {
                 return async args =>
                 {
-                    var result = await handler();
+                    var result = await handler().ConfigureAwait(false);
                     return result;
                 };
             }
