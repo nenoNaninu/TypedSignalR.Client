@@ -11,7 +11,7 @@
         <PackageId>TypedSignalR.Client.Attributes</PackageId>
         <AssemblyName>TypedSignalR.Client.Attributes</AssemblyName>
         <Title>TypedSignalR.Client.Attributes</Title>
-        <Description>Provides attributes that are applied to the SignalR hub/receiver interfaces.</Description>
+        <Description>Provides attributes that are applied to SignalR hub and receiver interfaces.</Description>
         <Authors>nenoNaninu</Authors>
         <RepositoryUrl>https://github.com/nenoNaninu/TypedSignalR.Client</RepositoryUrl>
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
