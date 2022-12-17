@@ -10,6 +10,8 @@ public class SpecialSymbols
     public readonly INamedTypeSymbol AsyncEnumerableSymbol;
     public readonly INamedTypeSymbol ChannelReaderSymbol;
     public readonly INamedTypeSymbol HubConnectionObserverSymbol;
+    public readonly INamedTypeSymbol? HubAttributeSymbol;
+    public readonly INamedTypeSymbol? ReceiverAttributeSymbol;
     public readonly IMethodSymbol CreateHubProxyMethodSymbol;
     public readonly IMethodSymbol RegisterMethodSymbol;
 
@@ -20,6 +22,8 @@ public class SpecialSymbols
         INamedTypeSymbol asyncEnumerableSymbol,
         INamedTypeSymbol channelReaderSymbol,
         INamedTypeSymbol hubConnectionObserverSymbol,
+        INamedTypeSymbol? hubAttributeSymbol,
+        INamedTypeSymbol? receiverAttributeSymbol,
         IMethodSymbol createHubProxyMethodSymbol,
         IMethodSymbol registerMethodSymbol)
     {
@@ -29,6 +33,8 @@ public class SpecialSymbols
         AsyncEnumerableSymbol = asyncEnumerableSymbol;
         ChannelReaderSymbol = channelReaderSymbol;
         HubConnectionObserverSymbol = hubConnectionObserverSymbol;
+        HubAttributeSymbol = hubAttributeSymbol;
+        ReceiverAttributeSymbol = receiverAttributeSymbol;
         CreateHubProxyMethodSymbol = createHubProxyMethodSymbol;
         RegisterMethodSymbol = registerMethodSymbol;
     }

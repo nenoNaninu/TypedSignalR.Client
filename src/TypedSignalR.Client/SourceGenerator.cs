@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -32,21 +33,27 @@ public sealed class SourceGenerator : IIncrementalGenerator
             });
 
         var createHubProxyMethodSymbols = context.SyntaxProvider
-            .CreateSyntaxProvider(WhereCreateHubProxyMethod, TransformToSourceSymbol)
+            .CreateSyntaxProvider(WhereCreateHubProxyMethod, TransformToSourceMethodSymbol)
             .Combine(specialSymbols)
             .Select(ValidateCreateHubProxyMethodSymbol)
             .Where(static x => x.IsValid())
             .Collect();
 
         var registerMethodSymbols = context.SyntaxProvider
-            .CreateSyntaxProvider(WhereRegisterMethod, TransformToSourceSymbol)
+            .CreateSyntaxProvider(WhereRegisterMethod, TransformToSourceMethodSymbol)
             .Combine(specialSymbols)
             .Select(ValidateRegisterMethodSymbol)
             .Where(static x => x.IsValid())
             .Collect();
 
-        context.RegisterSourceOutput(createHubProxyMethodSymbols.Combine(specialSymbols), GenerateHubInvokerSource);
-        context.RegisterSourceOutput(registerMethodSymbols.Combine(specialSymbols), GenerateBinderSource);
+        var hubInterfaces = context.CompilationProvider
+            .Select(GetHubSourceTypeSymbol);
+
+        var receiverInterfaces = context.CompilationProvider
+            .Select(GetReceiverSourceTypeSymbol);
+
+        context.RegisterSourceOutput(createHubProxyMethodSymbols.Combine(hubInterfaces).Combine(specialSymbols), GenerateHubInvokerSource);
+        context.RegisterSourceOutput(registerMethodSymbols.Combine(receiverInterfaces).Combine(specialSymbols), GenerateBinderSource);
     }
 
     private static bool WhereCreateHubProxyMethod(SyntaxNode syntaxNode, CancellationToken cancellationToken)
@@ -85,7 +92,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static SourceSymbol TransformToSourceSymbol(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    private static SourceMethodSymbol TransformToSourceMethodSymbol(GeneratorSyntaxContext context, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -104,10 +111,10 @@ public sealed class SourceGenerator : IIncrementalGenerator
             return default;
         }
 
-        return new SourceSymbol(methodSymbol, target.GetLocation());
+        return new SourceMethodSymbol(methodSymbol, target.GetLocation());
     }
 
-    private static ValidatedSourceSymbol ValidateCreateHubProxyMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static ValidatedSourceMethodSymbol ValidateCreateHubProxyMethodSymbol((SourceMethodSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -123,21 +130,16 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var specialSymbols = pair.Item2;
 
         var extensionMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol.ConstructedFrom;
-
-        if (extensionMethodSymbol is null)
-        {
-            return default;
-        }
 
         if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.CreateHubProxyMethodSymbol))
         {
-            return new ValidatedSourceSymbol(methodSymbol, location);
+            return new ValidatedSourceMethodSymbol(methodSymbol, location);
         }
 
         return default;
     }
 
-    private static ValidatedSourceSymbol ValidateRegisterMethodSymbol((SourceSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
+    private static ValidatedSourceMethodSymbol ValidateRegisterMethodSymbol((SourceMethodSymbol, SpecialSymbols) pair, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -154,27 +156,62 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
         var extensionMethodSymbol = methodSymbol.ReducedFrom ?? methodSymbol.ConstructedFrom;
 
-        if (extensionMethodSymbol is null)
-        {
-            return default;
-        }
-
         if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.RegisterMethodSymbol))
         {
-            return new ValidatedSourceSymbol(methodSymbol, location);
+            return new ValidatedSourceMethodSymbol(methodSymbol, location);
         }
 
         return default;
     }
 
-    private static void GenerateHubInvokerSource(SourceProductionContext context, (ImmutableArray<ValidatedSourceSymbol>, SpecialSymbols) data)
+    private static ImmutableArray<SourceTypeSymbol> GetHubSourceTypeSymbol(Compilation compilation, CancellationToken cancellationToken)
     {
-        var sourceSymbols = data.Item1;
+        var attribute = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubAttribute");
+
+        if (attribute is null)
+        {
+            return ImmutableArray.Create<SourceTypeSymbol>();
+        }
+
+        return ImmutableArray.Create(GetSourceTypeSymbol(compilation, attribute, cancellationToken));
+    }
+
+    private static ImmutableArray<SourceTypeSymbol> GetReceiverSourceTypeSymbol(Compilation compilation, CancellationToken cancellationToken)
+    {
+        var attribute = compilation.GetTypeByMetadataName("TypedSignalR.Client.ReceiverAttribute");
+
+        if (attribute is null)
+        {
+            return ImmutableArray.Create<SourceTypeSymbol>();
+        }
+
+        return ImmutableArray.Create(GetSourceTypeSymbol(compilation, attribute, cancellationToken));
+    }
+
+    private static SourceTypeSymbol[] GetSourceTypeSymbol(Compilation compilation, INamedTypeSymbol attributeTypeSymbol, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var typeCollector = new AttributeAnnotatedTypeCollector(attributeTypeSymbol);
+        typeCollector.VisitNamespace(compilation.GlobalNamespace);
+
+        return typeCollector.ToSourceTypeSymbolArray();
+    }
+
+    private static void GenerateHubInvokerSource(
+        SourceProductionContext context,
+        ((ImmutableArray<ValidatedSourceMethodSymbol>, ImmutableArray<SourceTypeSymbol>), SpecialSymbols) data)
+    {
+        var sourceMethodSymbols = data.Item1.Item1;
+        var sourceTypeSymbols = data.Item1.Item2;
         var specialSymbols = data.Item2;
 
         try
         {
-            var hubTypes = ExtractHubTypesFromCreateHubProxyMethods(context, sourceSymbols, specialSymbols);
+            var hubTypes = new List<TypeMetadata>(16);
+
+            AddHubTypesFromAttributeAnnotatedTypes(hubTypes, context, sourceTypeSymbols, specialSymbols);
+            AddHubTypesFromCreateHubProxyMethods(hubTypes, context, sourceMethodSymbols, specialSymbols);
 
             var template = new HubConnectionExtensionsHubInvokerTemplate()
             {
@@ -197,14 +234,20 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
     }
 
-    private static void GenerateBinderSource(SourceProductionContext context, (ImmutableArray<ValidatedSourceSymbol>, SpecialSymbols) data)
+    private static void GenerateBinderSource(
+        SourceProductionContext context,
+        ((ImmutableArray<ValidatedSourceMethodSymbol>, ImmutableArray<SourceTypeSymbol>), SpecialSymbols) data)
     {
-        var sourceSymbols = data.Item1;
+        var sourceMethodSymbols = data.Item1.Item1;
+        var sourceTypeSymbols = data.Item1.Item2;
         var specialSymbols = data.Item2;
 
         try
         {
-            var receiverTypes = ExtractReceiverTypesFromRegisterMethods(context, sourceSymbols, specialSymbols);
+            var receiverTypes = new List<TypeMetadata>(16);
+
+            AddReceiverTypesFromAttributeAnnotatedTypes(receiverTypes, context, sourceTypeSymbols, specialSymbols);
+            AddReceiverTypesFromRegisterMethods(receiverTypes, context, sourceMethodSymbols, specialSymbols);
 
             var template = new HubConnectionExtensionsBinderTemplate()
             {
@@ -235,6 +278,9 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var channelReaderSymbol = compilation.GetTypeByMetadataName("System.Threading.Channels.ChannelReader`1");
         var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
         var memberSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers();
+
+        var hubAttributeSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubAttribute");
+        var receiverAttributeSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.ReceiverAttribute");
 
         IMethodSymbol? createHubProxyMethodSymbol = null;
         IMethodSymbol? registerMethodSymbol = null;
@@ -279,18 +325,19 @@ public sealed class SourceGenerator : IIncrementalGenerator
             asyncEnumerableSymbol!,
             channelReaderSymbol!,
             hubConnectionObserverSymbol!,
+            hubAttributeSymbols,
+            receiverAttributeSymbols,
             createHubProxyMethodSymbol!,
             registerMethodSymbol!
         );
     }
 
-    private static IReadOnlyList<TypeMetadata> ExtractHubTypesFromCreateHubProxyMethods(
+    private static void AddHubTypesFromCreateHubProxyMethods(
+        ICollection<TypeMetadata> hubTypeBuffer,
         SourceProductionContext context,
-        IReadOnlyList<ValidatedSourceSymbol> createHubProxyMethodSymbols,
+        IReadOnlyList<ValidatedSourceMethodSymbol> createHubProxyMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var hubTypeList = new List<TypeMetadata>(createHubProxyMethodSymbols.Count);
-
         foreach (var createHubProxyMethodSymbol in createHubProxyMethodSymbols)
         {
             var methodSymbol = createHubProxyMethodSymbol.MethodSymbol;
@@ -300,22 +347,19 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols, location);
 
-            if (isValid && !hubTypeList.Contains(hubTypeSymbol))
+            if (isValid && !hubTypeBuffer.Contains(hubTypeSymbol))
             {
-                hubTypeList.Add(new TypeMetadata(hubTypeSymbol));
+                hubTypeBuffer.Add(new TypeMetadata(hubTypeSymbol));
             }
         }
-
-        return hubTypeList;
     }
 
-    private static IReadOnlyList<TypeMetadata> ExtractReceiverTypesFromRegisterMethods(
+    private static void AddReceiverTypesFromRegisterMethods(
+        ICollection<TypeMetadata> receiverTypes,
         SourceProductionContext context,
-        IReadOnlyList<ValidatedSourceSymbol> registerMethodSymbols,
+        IReadOnlyList<ValidatedSourceMethodSymbol> registerMethodSymbols,
         SpecialSymbols specialSymbols)
     {
-        var receiverTypeList = new List<TypeMetadata>(registerMethodSymbols.Count);
-
         foreach (var registerMethodSymbol in registerMethodSymbols)
         {
             var methodSymbol = registerMethodSymbol.MethodSymbol;
@@ -330,13 +374,51 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols, location);
 
-            if (isValid && !receiverTypeList.Contains(receiverTypeSymbol))
+            if (isValid && !receiverTypes.Contains(receiverTypeSymbol))
             {
-                receiverTypeList.Add(new TypeMetadata(receiverTypeSymbol));
+                receiverTypes.Add(new TypeMetadata(receiverTypeSymbol));
             }
         }
+    }
 
-        return receiverTypeList;
+    private static void AddHubTypesFromAttributeAnnotatedTypes(
+        ICollection<TypeMetadata> hubTypes,
+        SourceProductionContext context,
+        IReadOnlyList<SourceTypeSymbol> sourceTypeSymbols,
+        SpecialSymbols specialSymbols)
+    {
+        foreach (var sourceTypeSymbol in sourceTypeSymbols)
+        {
+            var hubTypeSymbol = sourceTypeSymbol.TypeSymbol;
+            var location = sourceTypeSymbol.Location;
+
+            var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols, location);
+
+            if (isValid && !hubTypes.Contains(hubTypeSymbol))
+            {
+                hubTypes.Add(new TypeMetadata(hubTypeSymbol));
+            }
+        }
+    }
+
+    private static void AddReceiverTypesFromAttributeAnnotatedTypes(
+        ICollection<TypeMetadata> receiverTypes,
+        SourceProductionContext context,
+        IReadOnlyList<SourceTypeSymbol> sourceTypeSymbols,
+        SpecialSymbols specialSymbols)
+    {
+        foreach (var sourceTypeSymbol in sourceTypeSymbols)
+        {
+            var receiverTypeSymbol = sourceTypeSymbol.TypeSymbol;
+            var location = sourceTypeSymbol.Location;
+
+            var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols, location);
+
+            if (isValid && !receiverTypes.Contains(receiverTypeSymbol))
+            {
+                receiverTypes.Add(new TypeMetadata(receiverTypeSymbol));
+            }
+        }
     }
 
     private static string NormalizeNewLines(string source)
@@ -344,14 +426,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         return source.Replace("\r\n", "\n");
     }
 
-    private readonly record struct SourceSymbol
+    private readonly record struct SourceMethodSymbol
     {
-        public static SourceSymbol None => default;
+        public static SourceMethodSymbol None => default;
 
         public readonly IMethodSymbol MethodSymbol;
         public readonly Location Location;
 
-        public SourceSymbol(IMethodSymbol methodSymbol, Location location)
+        public SourceMethodSymbol(IMethodSymbol methodSymbol, Location location)
         {
             MethodSymbol = methodSymbol;
             Location = location;
@@ -363,14 +445,14 @@ public sealed class SourceGenerator : IIncrementalGenerator
         }
     }
 
-    private readonly record struct ValidatedSourceSymbol
+    private readonly record struct ValidatedSourceMethodSymbol
     {
-        public static ValidatedSourceSymbol None => default;
+        public static ValidatedSourceMethodSymbol None => default;
 
         public readonly IMethodSymbol MethodSymbol;
         public readonly Location Location;
 
-        public ValidatedSourceSymbol(IMethodSymbol methodSymbol, Location location)
+        public ValidatedSourceMethodSymbol(IMethodSymbol methodSymbol, Location location)
         {
             MethodSymbol = methodSymbol;
             Location = location;
@@ -380,5 +462,94 @@ public sealed class SourceGenerator : IIncrementalGenerator
         {
             return this != default;
         }
+    }
+
+    private readonly record struct SourceTypeSymbol
+    {
+        public static SourceTypeSymbol None => default;
+
+        public readonly INamedTypeSymbol TypeSymbol;
+        public readonly Location Location;
+
+        public SourceTypeSymbol(INamedTypeSymbol typeSymbol)
+        {
+            TypeSymbol = typeSymbol;
+            Location = typeSymbol.Locations[0];
+        }
+    }
+
+    private sealed class AttributeAnnotatedTypeCollector : SymbolVisitor
+    {
+        // Ignore the widely used lib namespace
+        private static readonly string[] IgnoreNamespaces = new[]
+        {
+            "System",
+            "Microsoft",
+            "Dapper",
+            "MySqlConnector",
+            "Npgsql",
+            "MimeKit",
+            "StackExchange",
+            "Azure",
+            "Google",
+            "Amazon",
+            "UnityEngine"
+        };
+
+        private readonly INamedTypeSymbol _targetAttributeTypeSymbol;
+
+        private readonly HashSet<INamedTypeSymbol> _namedTypeSymbols = new(SymbolEqualityComparer.Default);
+
+        public AttributeAnnotatedTypeCollector(INamedTypeSymbol targetAttributeTypeSymbol)
+        {
+            _targetAttributeTypeSymbol = targetAttributeTypeSymbol;
+        }
+
+        public override void VisitNamespace(INamespaceSymbol symbol)
+        {
+            foreach (var ignoreNamespace in IgnoreNamespaces)
+            {
+                if (symbol.Name.StartsWith(ignoreNamespace))
+                {
+                    return;
+                }
+            }
+
+            foreach (var member in symbol.GetMembers())
+            {
+                member.Accept(this);
+            }
+        }
+
+        public override void VisitNamedType(INamedTypeSymbol symbol)
+        {
+            if (symbol.DeclaredAccessibility != Accessibility.Public)
+            {
+                return;
+            }
+
+            var attributes = symbol.GetAttributes();
+
+            foreach (var attribute in attributes)
+            {
+                var attributeSymbol = attribute.AttributeClass;
+
+                if (attributeSymbol is null)
+                {
+                    continue;
+                }
+
+                if (SymbolEqualityComparer.Default.Equals(_targetAttributeTypeSymbol, attributeSymbol))
+                {
+                    _namedTypeSymbols.Add(symbol);
+                }
+            }
+        }
+
+        public INamedTypeSymbol[] ToArray() => _namedTypeSymbols.ToArray();
+
+        public SourceTypeSymbol[] ToSourceTypeSymbolArray() => _namedTypeSymbols
+            .Select(x => new SourceTypeSymbol(x))
+            .ToArray();
     }
 }
