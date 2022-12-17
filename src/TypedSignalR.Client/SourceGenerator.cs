@@ -333,7 +333,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
     }
 
     private static void AddHubTypesFromCreateHubProxyMethods(
-        ICollection<TypeMetadata> hubTypeBuffer,
+        ICollection<TypeMetadata> hubTypes,
         SourceProductionContext context,
         IReadOnlyList<ValidatedSourceMethodSymbol> createHubProxyMethodSymbols,
         SpecialSymbols specialSymbols)
@@ -347,9 +347,9 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             var isValid = TypeValidator.ValidateHubTypeRule(context, hubTypeSymbol, specialSymbols, location);
 
-            if (isValid && !hubTypeBuffer.Contains(hubTypeSymbol))
+            if (isValid && !hubTypes.Contains(hubTypeSymbol))
             {
-                hubTypeBuffer.Add(new TypeMetadata(hubTypeSymbol));
+                hubTypes.Add(new TypeMetadata(hubTypeSymbol));
             }
         }
     }
