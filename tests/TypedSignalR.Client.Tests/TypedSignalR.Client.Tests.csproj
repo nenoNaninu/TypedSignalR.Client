@@ -4,7 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
     </PropertyGroup>
 
     <ItemGroup>
