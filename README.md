@@ -297,3 +297,5 @@ Generated source code can be seen in Visual Studio.
 ## Related Work
 - [nenoNaninu/TypedSignalR.Client.TypeScript](https://github.com/nenoNaninu/TypedSignalR.Client.TypeScript)
   - TypeScript source generator to provide strongly typed SignalR clients by analyzing C# type definitions.
+- [nenoNaninu/TypedSignalR.Client.DevTools](https://github.com/nenoNaninu/TypedSignalR.Client.DevTools)
+  - SignalR development tools inspired by SwaggerUI.
