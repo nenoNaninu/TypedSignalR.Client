@@ -32,6 +32,7 @@
         <Compile Include="..\TypedSignalR.Client.Tests\PostTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\ReceiverTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\UnaryTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\StreamingTest.cs" LinkBase="" />
     </ItemGroup>
 
 </Project>
