@@ -197,30 +197,6 @@ public class StreamingTest : IAsyncLifetime
     }
 
     [Fact]
-    public async Task TaskCancelableCounterChannel()
-    {
-        var publisher = new Person(Guid.Parse("8fd696c1-b102-7aa6-259b-4f8772457a7a"), "NANA DAIBA", 15);
-
-        int value = 0;
-        int step = 2;
-
-        var stream = await _streamingHub.TaskCancelableCounterChannel(publisher, value, step, 10, _cancellationTokenSource.Token);
-
-        while (await stream.WaitToReadAsync(_cancellationTokenSource.Token))
-        {
-            while (stream.TryRead(out var it))
-            {
-                Assert.Equal(publisher, it.Publisher);
-                Assert.Equal(value, it.Value);
-
-                value += step;
-            }
-        }
-
-        Assert.Equal(20, value);
-    }
-
-    [Fact]
     public async Task CancelableCounterChannel()
     {
         var publisher = new Person(Guid.Parse("8fd696c1-b102-7aa6-259b-4f8772457a7a"), "NANA DAIBA", 15);

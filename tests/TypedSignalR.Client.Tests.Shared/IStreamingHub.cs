@@ -16,7 +16,6 @@ public interface IStreamingHub
     Task<ChannelReader<Person>> CancellationTokenOnlyChannel(CancellationToken cancellationToken);
     Task<ChannelReader<Message>> CounterChannel(Person publisher, int init, int step, int count);
     Task<ChannelReader<Message>> CancelableCounterChannel(Person publisher, int init, int step, int count, CancellationToken cancellationToken);
-    Task<ChannelReader<Message>> TaskCancelableCounterChannel(Person publisher, int init, int step, int count, CancellationToken cancellationToken);
 
     // Client-to-Server streaming
     // TODO: HOW TO TEST?

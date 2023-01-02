@@ -116,15 +116,6 @@ public sealed class StreamingHub : Hub, IStreamingHub
         return Task.FromResult(channel.Reader);
     }
 
-    public Task<ChannelReader<Message>> TaskCancelableCounterChannel(Person publisher, int init, int step, int count, CancellationToken cancellationToken)
-    {
-        var channel = Channel.CreateUnbounded<Message>(new UnboundedChannelOptions { SingleReader = false, SingleWriter = true });
-
-        _ = WriteMessageToChannelAsync(channel.Writer, publisher, init, step, count, cancellationToken);
-
-        return Task.FromResult(channel.Reader);
-    }
-
     public async Task UploadStream(Person publisher, IAsyncEnumerable<Person> stream)
     {
         try
