@@ -129,9 +129,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
             return default;
         }
 
-        if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.CreateHubProxyMethodSymbol))
+        foreach (var createHubProxyMethodSymbol in specialSymbols.CreateHubProxyMethodSymbols)
         {
-            return new ValidatedSourceSymbol(methodSymbol, location);
+            if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, createHubProxyMethodSymbol))
+            {
+                return new ValidatedSourceSymbol(methodSymbol, location);
+            }
         }
 
         return default;
@@ -159,9 +162,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
             return default;
         }
 
-        if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, specialSymbols.RegisterMethodSymbol))
+        foreach (var registerMethodSymbol in specialSymbols.RegisterMethodSymbols)
         {
-            return new ValidatedSourceSymbol(methodSymbol, location);
+            if (SymbolEqualityComparer.Default.Equals(extensionMethodSymbol, registerMethodSymbol))
+            {
+                return new ValidatedSourceSymbol(methodSymbol, location);
+            }
         }
 
         return default;
@@ -233,41 +239,33 @@ public sealed class SourceGenerator : IIncrementalGenerator
         var cancellationTokenSymbol = compilation.GetTypeByMetadataName("System.Threading.CancellationToken");
         var asyncEnumerableSymbol = compilation.GetTypeByMetadataName("System.Collections.Generic.IAsyncEnumerable`1");
         var channelReaderSymbol = compilation.GetTypeByMetadataName("System.Threading.Channels.ChannelReader`1");
-        var hubConnectionObserverSymbol = compilation.GetTypeByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
-        var memberSymbols = compilation.GetTypeByMetadataName("TypedSignalR.Client.HubConnectionExtensions")!.GetMembers();
+        var hubConnectionObserverSymbol = compilation.GetTypesByMetadataName("TypedSignalR.Client.IHubConnectionObserver");
+        var hubConnectionExtensions = compilation.GetTypesByMetadataName("TypedSignalR.Client.HubConnectionExtensions");
 
-        IMethodSymbol? createHubProxyMethodSymbol = null;
-        IMethodSymbol? registerMethodSymbol = null;
+        ImmutableArray<IMethodSymbol> createHubProxyMethodSymbol = ImmutableArray<IMethodSymbol>.Empty;
+        ImmutableArray<IMethodSymbol> registerMethodSymbol = ImmutableArray<IMethodSymbol>.Empty;
 
-        foreach (var memberSymbol in memberSymbols)
+        foreach (var hubConnectionExtension in hubConnectionExtensions)
         {
-            if (memberSymbol is not IMethodSymbol methodSymbol)
+            foreach (var memberSymbol in hubConnectionExtension.GetMembers())
             {
-                continue;
-            }
-
-            if (methodSymbol.Name is "CreateHubProxy")
-            {
-                if (methodSymbol.MethodKind is MethodKind.Ordinary)
+                if (memberSymbol is not IMethodSymbol methodSymbol)
                 {
-                    createHubProxyMethodSymbol = methodSymbol;
-
-                    if (registerMethodSymbol is not null)
-                    {
-                        break;
-                    }
+                    continue;
                 }
-            }
-            else if (methodSymbol.Name is "Register")
-            {
-                if (methodSymbol.MethodKind is MethodKind.Ordinary)
-                {
-                    registerMethodSymbol = methodSymbol;
 
-                    if (createHubProxyMethodSymbol is not null)
-                    {
-                        break;
-                    }
+                if (methodSymbol.MethodKind is not MethodKind.Ordinary)
+                {
+                    continue;
+                }
+
+                if (methodSymbol.Name is "CreateHubProxy")
+                {
+                    createHubProxyMethodSymbol = createHubProxyMethodSymbol.Add(methodSymbol);
+                }
+                else if (methodSymbol.Name is "Register")
+                {
+                    registerMethodSymbol = registerMethodSymbol.Add(methodSymbol);
                 }
             }
         }
@@ -323,9 +321,12 @@ public sealed class SourceGenerator : IIncrementalGenerator
 
             ITypeSymbol receiverTypeSymbol = methodSymbol.TypeArguments[0];
 
-            if (SymbolEqualityComparer.Default.Equals(receiverTypeSymbol, specialSymbols.HubConnectionObserverSymbol))
+            foreach (var hubConnectionObserverSymbol in specialSymbols.HubConnectionObserverSymbols)
             {
-                continue;
+                if (SymbolEqualityComparer.Default.Equals(receiverTypeSymbol, hubConnectionObserverSymbol))
+                {
+                    continue;
+                }
             }
 
             var isValid = TypeValidator.ValidateReceiverTypeRule(context, receiverTypeSymbol, specialSymbols, location);
