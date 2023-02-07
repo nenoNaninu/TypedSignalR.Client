@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace TypedSignalR.Client.CodeAnalysis;
@@ -9,9 +10,9 @@ public class SpecialSymbols
     public readonly INamedTypeSymbol CancellationTokenSymbol;
     public readonly INamedTypeSymbol AsyncEnumerableSymbol;
     public readonly INamedTypeSymbol ChannelReaderSymbol;
-    public readonly INamedTypeSymbol HubConnectionObserverSymbol;
-    public readonly IMethodSymbol CreateHubProxyMethodSymbol;
-    public readonly IMethodSymbol RegisterMethodSymbol;
+    public readonly ImmutableArray<INamedTypeSymbol> HubConnectionObserverSymbols;
+    public readonly ImmutableArray<IMethodSymbol> CreateHubProxyMethodSymbols;
+    public readonly ImmutableArray<IMethodSymbol> RegisterMethodSymbols;
 
     public SpecialSymbols(
         INamedTypeSymbol taskSymbol,
@@ -19,17 +20,17 @@ public class SpecialSymbols
         INamedTypeSymbol cancellationTokenSymbol,
         INamedTypeSymbol asyncEnumerableSymbol,
         INamedTypeSymbol channelReaderSymbol,
-        INamedTypeSymbol hubConnectionObserverSymbol,
-        IMethodSymbol createHubProxyMethodSymbol,
-        IMethodSymbol registerMethodSymbol)
+        ImmutableArray<INamedTypeSymbol> hubConnectionObserverSymbols,
+        ImmutableArray<IMethodSymbol> createHubProxyMethodSymbols,
+        ImmutableArray<IMethodSymbol> registerMethodSymbols)
     {
         TaskSymbol = taskSymbol;
         GenericTaskSymbol = genericTaskSymbol;
         CancellationTokenSymbol = cancellationTokenSymbol;
         AsyncEnumerableSymbol = asyncEnumerableSymbol;
         ChannelReaderSymbol = channelReaderSymbol;
-        HubConnectionObserverSymbol = hubConnectionObserverSymbol;
-        CreateHubProxyMethodSymbol = createHubProxyMethodSymbol;
-        RegisterMethodSymbol = registerMethodSymbol;
+        HubConnectionObserverSymbols = hubConnectionObserverSymbols;
+        CreateHubProxyMethodSymbols = createHubProxyMethodSymbols;
+        RegisterMethodSymbols = registerMethodSymbols;
     }
 }
