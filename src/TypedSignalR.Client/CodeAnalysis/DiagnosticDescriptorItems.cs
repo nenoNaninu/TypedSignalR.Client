@@ -33,12 +33,12 @@ public static class DiagnosticDescriptorItems
 
     public static readonly DiagnosticDescriptor HubMethodReturnTypeRule = new(
         id: "TSRC003",
-        title: "The return type of methods in the interface must be Task or Task<T> or IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>",
-        messageFormat: "The return type of {0} is not suitable. Instead, use Task or Task<T> or IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>.",
+        title: "The return type of methods in the interface must be Task, Task<T>, IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>",
+        messageFormat: "The return type of {0} is not suitable. Instead, use Task, Task<T>, IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>.",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The return type of methods in the interface used for hub proxy must be Task or Task<T> or IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>.");
+        description: "The return type of methods in the interface used for hub proxy must be Task, Task<T>, IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or Task<ChannelReader<T>>.");
 
     public static readonly DiagnosticDescriptor ReceiverMethodReturnTypeRule = new(
         id: "TSRC004",
