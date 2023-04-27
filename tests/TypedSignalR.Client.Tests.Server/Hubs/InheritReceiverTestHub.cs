@@ -3,11 +3,11 @@ using TypedSignalR.Client.Tests.Shared;
 
 namespace TypedSignalR.Client.Tests.Server.Hubs;
 
-public class InheritIReceiverTestHub : Hub<IInheritIReceiver>, IInheritIReceiverTestHub
+public class InheritReceiverTestHub : Hub<IInheritReceiver>, IInheritReceiverTestHub
 {
-    private readonly ILogger<InheritIReceiverTestHub> _logger;
+    private readonly ILogger<InheritReceiverTestHub> _logger;
 
-    public InheritIReceiverTestHub(ILogger<InheritIReceiverTestHub> logger)
+    public InheritReceiverTestHub(ILogger<InheritReceiverTestHub> logger)
     {
         _logger = logger;
     }

@@ -14,12 +14,12 @@ public interface IReceiverBase2 : IReceiverBaseBase
     Task Notify();
 }
 
-public interface IInheritIReceiver : IReceiverBase1, IReceiverBase2
+public interface IInheritReceiver : IReceiverBase1, IReceiverBase2
 {
     Task ReceiveMessage2(string message, int value);
 }
 
-public interface IInheritIReceiverTestHub
+public interface IInheritReceiverTestHub
 {
     Task Start();
 }

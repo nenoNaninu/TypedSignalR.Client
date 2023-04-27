@@ -10,25 +10,25 @@ using Xunit.Abstractions;
 namespace TypedSignalR.Client.Tests;
 
 // Lunch TypedSignalR.Client.Tests.Server.csproj before test!
-public class InheritIReceiverTest : IAsyncLifetime
+public class InheritReceiverTest : IAsyncLifetime
 {
     private readonly HubConnection _connection;
-    private readonly IInheritIReceiverTestHub _receiverTestHub;
+    private readonly IInheritReceiverTestHub _receiverTestHub;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly ITestOutputHelper _output;
     private readonly Receiver _receiver = new Receiver();
 
 
-    public InheritIReceiverTest(ITestOutputHelper output)
+    public InheritReceiverTest(ITestOutputHelper output)
     {
         _output = output;
 
         _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/InheritIReceiverTestHub")
+            .WithUrl("http://localhost:5105/Hubs/InheritReceiverTestHub")
             .Build();
 
-        _receiverTestHub = _connection.CreateHubProxy<IInheritIReceiverTestHub>(_cancellationTokenSource.Token);
-        _connection.Register<IInheritIReceiver>(_receiver);
+        _receiverTestHub = _connection.CreateHubProxy<IInheritReceiverTestHub>(_cancellationTokenSource.Token);
+        _connection.Register<IInheritReceiver>(_receiver);
     }
 
     public async Task InitializeAsync()
@@ -105,7 +105,7 @@ public class InheritIReceiverTest : IAsyncLifetime
     }
 }
 
-class Receiver : IInheritIReceiver
+class Receiver : IInheritReceiver
 {
     public int NotifyCallCount { get; private set; }
     public readonly List<(string, int)> ReceiveMessages = new();
