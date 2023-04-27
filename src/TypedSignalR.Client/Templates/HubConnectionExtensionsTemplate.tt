@@ -54,14 +54,14 @@ namespace TypedSignalR.Client
     {
         public static THub CreateHubProxy<THub>(this global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken = default)
         {
-            var hubInvokerFactory = HubInvokerFactoryProvider.GetHubInvokerFactory<THub>();
+            var factory = HubInvokerFactoryProvider.GetHubInvokerFactory<THub>();
 
-            if (hubInvokerFactory is null)
+            if (factory is null)
             {
                 throw new global::System.InvalidOperationException($"Failed to create a hub proxy. TypedSignalR.Client did not generate source code to create a hub proxy, which type is {typeof(THub)}.");
             }
 
-            return hubInvokerFactory.CreateHubInvoker(connection, cancellationToken);
+            return factory.CreateHubInvoker(connection, cancellationToken);
         }
 
         public static global::System.IDisposable Register<TReceiver>(this global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, TReceiver receiver)
@@ -73,9 +73,7 @@ namespace TypedSignalR.Client
 
             if (typeof(TReceiver) == typeof(IHubConnectionObserver))
             {
-#pragma warning disable CS8604
-                return new HubConnectionObserverSubscription(connection, receiver as IHubConnectionObserver);
-#pragma warning restore CS8604
+                return new HubConnectionObserverSubscription(connection, (IHubConnectionObserver)receiver);
             }
 
             var binder = ReceiverBinderProvider.GetReceiverBinder<TReceiver>();
