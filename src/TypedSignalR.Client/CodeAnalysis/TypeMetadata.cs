@@ -27,12 +27,12 @@ public sealed class TypeMetadata : ITypeSymbolHolder
 
     private static IReadOnlyList<MethodMetadata> GetMethods(ITypeSymbol typeSymbol)
     {
-        var allInterfaces = typeSymbol.AllInterfaces;
-
         var methods = typeSymbol.GetMembers()
             .OfType<IMethodSymbol>()
             .Where(static x => x.MethodKind is MethodKind.Ordinary)
             .Select(static x => new MethodMetadata(x));
+
+        var allInterfaces = typeSymbol.AllInterfaces;
 
         if (allInterfaces.IsEmpty)
         {
