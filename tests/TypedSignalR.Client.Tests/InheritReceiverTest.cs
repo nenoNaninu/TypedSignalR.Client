@@ -78,14 +78,14 @@ public class InheritReceiverTest : IAsyncLifetime
     {
         await _receiverTestHub.Start();
 
-        _output.WriteLine($"_notifyCallCount: {_receiver.NotifyCallCount}");
+        _output.WriteLine($"_receiver.NotifyCallCount: {_receiver.NotifyCallCount}");
 
         Assert.Equal(17, _receiver.NotifyCallCount);
 
         for (int i = 0; i < _receiver.ReceiveMessages.Count; i++)
         {
-            _output.WriteLine($"_receiveMessage[{i}].Item1: {_receiver.ReceiveMessages[i].Item1}");
-            _output.WriteLine($"_receiveMessage[{i}].Item2: {_receiver.ReceiveMessages[i].Item2}");
+            _output.WriteLine($"_receiver.ReceiveMessages[{i}].Item1: {_receiver.ReceiveMessages[i].Item1}");
+            _output.WriteLine($"_receiver.ReceiveMessages[{i}].Item2: {_receiver.ReceiveMessages[i].Item2}");
 
             Assert.Equal(_receiver.ReceiveMessages[i].Item1, _answerMessages[i]);
             Assert.Equal(_receiver.ReceiveMessages[i].Item2, i);
@@ -93,14 +93,23 @@ public class InheritReceiverTest : IAsyncLifetime
 
         for (int i = 0; i < _receiver.UserDefinedList.Count; i++)
         {
-            _output.WriteLine($"_userDefinedList[{i}].Guid: {_receiver.UserDefinedList[i].Guid}");
-            _output.WriteLine($"_userDefinedList[{i}].DateTime: {_receiver.UserDefinedList[i].DateTime}");
+            _output.WriteLine($"_receiver.UserDefinedList[{i}].Guid: {_receiver.UserDefinedList[i].Guid}");
+            _output.WriteLine($"_receiver.UserDefinedList[{i}].DateTime: {_receiver.UserDefinedList[i].DateTime}");
 
             var guid = Guid.Parse(_guids[i]);
             var dateTime = DateTime.Parse(_dateTimes[i]);
 
             Assert.Equal(_receiver.UserDefinedList[i].Guid, guid);
             Assert.Equal(_receiver.UserDefinedList[i].DateTime, dateTime);
+        }
+
+        for (int i = 0; i < _receiver.ReceiveMessages2.Count; i++)
+        {
+            _output.WriteLine($"_receiver.ReceiveMessages2[{i}].Item1: {_receiver.ReceiveMessages2[i].Item1}");
+            _output.WriteLine($"_receiver.ReceiveMessages2[{i}].Item2: {_receiver.ReceiveMessages2[i].Item2}");
+
+            Assert.Equal(_receiver.ReceiveMessages2[i].Item1, _answerMessages[i]);
+            Assert.Equal(_receiver.ReceiveMessages2[i].Item2, i);
         }
     }
 }
@@ -109,6 +118,7 @@ class Receiver : IInheritReceiver
 {
     public int NotifyCallCount { get; private set; }
     public readonly List<(string, int)> ReceiveMessages = new();
+    public readonly List<(string, int)> ReceiveMessages2 = new();
     public readonly List<UserDefinedType> UserDefinedList = new();
 
     public Task ReceiveMessage(string message, int value)
@@ -134,6 +144,7 @@ class Receiver : IInheritReceiver
 
     public Task ReceiveMessage2(string message, int value)
     {
+        ReceiveMessages2.Add((message, value));
         return Task.CompletedTask;
     }
 }

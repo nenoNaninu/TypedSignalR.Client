@@ -58,5 +58,11 @@ public class InheritReceiverTestHub : Hub<IInheritReceiver>, IInheritReceiverTes
             await Task.Delay(TimeSpan.FromMilliseconds(15));
             await this.Clients.Caller.ReceiveCustomMessage(new UserDefinedType() { Guid = Guid.Parse(_guids[i]), DateTime = DateTime.Parse(_dateTimes[i]) });
         }
+
+        for (int i = 0; i < _message.Length; i++)
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(15));
+            await this.Clients.Caller.ReceiveMessage2(_message[i], i);
+        }
     }
 }
