@@ -25,5 +25,7 @@ app.MapHub<SideEffectHub>("/Hubs/SideEffectHub");
 app.MapHub<ReceiverTestHub>("/Hubs/ReceiverTestHub");
 app.MapHub<StreamingHub>("/Hubs/StreamingHub");
 app.MapHub<ClientResultsTestHub>("/Hubs/ClientResultsTestHub");
+app.MapHub<InheritTestHub>("/Hubs/InheritTestHub");
+app.MapHub<InheritReceiverTestHub>("/Hubs/InheritReceiverTestHub");
 
 app.Run();

@@ -18,14 +18,34 @@ public sealed class TypeMetadata : ITypeSymbolHolder
     {
         TypeSymbol = typeSymbol;
 
-        Methods = typeSymbol.GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(static x => x.MethodKind is MethodKind.Ordinary)
-            .Select(static x => new MethodMetadata(x))
-            .ToArray();
+        Methods = GetMethods(typeSymbol);
 
         InterfaceName = typeSymbol.Name;
         InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         CollisionFreeName = InterfaceFullName.Replace('.', '_').Replace(':', '_');
+    }
+
+    private static IReadOnlyList<MethodMetadata> GetMethods(ITypeSymbol typeSymbol)
+    {
+        var methods = typeSymbol.GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(static x => x.MethodKind is MethodKind.Ordinary)
+            .Select(static x => new MethodMetadata(x));
+
+        var allInterfaces = typeSymbol.AllInterfaces;
+
+        if (allInterfaces.IsEmpty)
+        {
+            return methods.ToArray();
+        }
+
+        var allMethods = allInterfaces
+            .SelectMany(static x => x.GetMembers())
+            .OfType<IMethodSymbol>()
+            .Where(static x => x.MethodKind is MethodKind.Ordinary)
+            .Select(static x => new MethodMetadata(x))
+            .Concat(methods);
+
+        return allMethods.ToArray();
     }
 }
