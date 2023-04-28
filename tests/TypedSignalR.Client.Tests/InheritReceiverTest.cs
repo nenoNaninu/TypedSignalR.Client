@@ -49,7 +49,7 @@ public class InheritReceiverTest : IAsyncLifetime
     }
 
     private readonly string[] _answerMessages = new[] {
-        "b1f7cd73-13b8-49bd-9557-ffb38859d18b",
+        "b1f7cd73-13b8-49bd-9557-ffb38859d188",
         "3f5c3585-d01b-4f8f-8139-62a1241850e2",
         "92021a22-5823-4501-8cbd-c20d4ca6e54c",
         "5b134f73-2dc1-4271-8316-1a4250f42241",

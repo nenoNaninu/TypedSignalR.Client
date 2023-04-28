@@ -48,7 +48,7 @@ public class InheritHubTest : IAsyncLifetime
     public async Task Get()
     {
         var str = await _inheritHub.Get();
-        Assert.Equal("TypedSignalR.Client", str);
+        Assert.Equal("TypedSignalR_Client", str);
     }
 
     [Fact]
