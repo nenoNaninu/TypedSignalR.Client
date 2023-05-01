@@ -28,11 +28,14 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="..\TypedSignalR.Client.Tests\ClientResultsTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\DisposeTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\InheritHubTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\InheritReceiverTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\PostTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\ReceiverTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\UnaryTest.cs" LinkBase="" />
         <Compile Include="..\TypedSignalR.Client.Tests\StreamingTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\UnaryTest.cs" LinkBase="" />
     </ItemGroup>
 
 </Project>
