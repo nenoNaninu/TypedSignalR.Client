@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.5" />
-        <PackageReference Include="TypedSignalR.Client" Version="3.3.0" PrivateAssets="all" />
+        <PackageReference Include="TypedSignalR.Client" Version="3.4.0" PrivateAssets="all" />
     </ItemGroup>
 
     <ItemGroup>
