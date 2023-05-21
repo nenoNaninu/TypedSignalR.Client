@@ -36,7 +36,8 @@ We also have to determine the return type manually.
 Moreover, registering client methods called from a server also requires specifying the method name as a string, and we must set parameter types manually.
 
 ```cs
-// ASP.NET Core SignalR Client
+// C# SignalR Client
+// without TypedSignalR.Client
 
 // Specify a hub method to invoke using string.
 await connection.InvokeAsync("HubMethod1");
@@ -58,7 +59,8 @@ Defining interfaces is helpful not only for the client-side but also for the ser
 See [Usage](#usage) section for details.
 
 ```cs
-// TypedSignalR.Client
+// C# SignalR Client
+// with TypedSignalR.Client
 
 // First, create a hub proxy.
 IHub hubProxy = connection.CreateHubProxy<IHub>();
