@@ -92,7 +92,6 @@ class Receiver : IReceiver
 {
     // implementation
 }
-
 ```
 
 ## API
@@ -163,7 +162,6 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 It's very easy to use. 
 
 ```cs
-
 HubConnection connection = ...;
 
 var hub = connection.CreateHubProxy<IHubContract>();
