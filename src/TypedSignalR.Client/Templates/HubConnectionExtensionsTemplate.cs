@@ -73,7 +73,7 @@ namespace TypedSignalR.Client.Templates
                     " HubInvokerFactoryProvider.GetHubInvokerFactory<THub>();\r\n\r\n            if (fact" +
                     "ory is null)\r\n            {\r\n                throw new global::System.InvalidOpe" +
                     "rationException($\"Failed to create a hub proxy. TypedSignalR.Client did not gene" +
-                    "rate source code to create a hub proxy, which type is {typeof(THub)}.\");\r\n      " +
+                    "rate source code to create a hub proxy, which is of type {typeof(THub)}.\");\r\n      " +
                     "      }\r\n\r\n            return factory.CreateHubInvoker(connection, cancellationT" +
                     "oken);\r\n        }\r\n\r\n        public static global::System.IDisposable Register<T" +
                     "Receiver>(this global::Microsoft.AspNetCore.SignalR.Client.HubConnection connect" +
@@ -85,7 +85,7 @@ namespace TypedSignalR.Client.Templates
                     "          var binder = ReceiverBinderProvider.GetReceiverBinder<TReceiver>();\r\n\r" +
                     "\n            if (binder is null)\r\n            {\r\n                throw new globa" +
                     "l::System.InvalidOperationException($\"Failed to register a receiver. TypedSignal" +
-                    "R.Client did not generate source code to register a receiver, which type is {typ" +
+                    "R.Client did not generate source code to register a receiver, which is of type {typ" +
                     "eof(TReceiver)}.\");\r\n            }\r\n\r\n            var subscription = binder.Bind" +
                     "(connection, receiver);\r\n\r\n            if (receiver is IHubConnectionObserver hu" +
                     "bConnectionObserver)\r\n            {\r\n                subscription = new Composit" +
