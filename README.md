@@ -162,6 +162,7 @@ class Receiver2 : IClientContract, IHubConnectionObserver
 It's very easy to use. 
 
 ```cs
+// Do not use 'var' for the HubConnection to allow the source generator to pick up the type
 HubConnection connection = ...;
 
 var hub = connection.CreateHubProxy<IHubContract>();
