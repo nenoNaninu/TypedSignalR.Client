@@ -11,8 +11,8 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  build-only:
-    name: build-only
+  build-only-test:
+    name: build-only-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
