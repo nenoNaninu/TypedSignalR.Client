@@ -1,0 +1,72 @@
+name: build-and-test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  DOTNET_VERSION: "7.0.x"
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-only:
+    name: build-only
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+  in-memory-server-test:
+    name: in-memory-server-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+      - name: Test (in-memory server)
+        run: dotnet test ./tests/TypedSignalR.Client.Tests.InMemoryServer/TypedSignalR.Client.Tests.InMemoryServer.csproj --no-restore
+
+  kestrel-server-test:
+    name: kestrel-server-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+      - name: Launch test server
+        run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
+
+      - name: Test (project reference)
+        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore
+
+      - name: Test (NuGet)
+        run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --no-restore
