@@ -24,11 +24,11 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build TypedSignalR.Client.csproj
-        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
-
       - name: Build TypedSignalR.Client.Attributes.csproj
         run: dotnet build ./src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj --no-restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
 
   test:
     name: test
