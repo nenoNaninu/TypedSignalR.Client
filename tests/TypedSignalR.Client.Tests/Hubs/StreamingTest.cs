@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-public class StreamingTest : IAsyncLifetime
+public class StreamingTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly IStreamingHub _streamingHub;
@@ -30,9 +31,7 @@ public class StreamingTest : IAsyncLifetime
 
     public StreamingTest()
     {
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/StreamingHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/StreamingHub", HttpTransportType.WebSockets);
 
         _streamingHub = _connection.CreateHubProxy<IStreamingHub>(_cancellationTokenSource.Token);
     }
