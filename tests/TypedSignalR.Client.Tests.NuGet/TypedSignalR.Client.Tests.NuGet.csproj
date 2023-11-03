@@ -28,14 +28,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="..\TypedSignalR.Client.Tests\ClientResultsTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\DisposeTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\InheritHubTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\InheritReceiverTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\PostTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\ReceiverTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\StreamingTest.cs" LinkBase="" />
-        <Compile Include="..\TypedSignalR.Client.Tests\UnaryTest.cs" LinkBase="" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\ClientResultsTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\DisposeTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\InheritHubTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\InheritReceiverTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\PostTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\ReceiverTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\StreamingTest.cs" LinkBase="Hubs" />
+        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\UnaryTest.cs" LinkBase="Hubs" />
     </ItemGroup>
 
 </Project>

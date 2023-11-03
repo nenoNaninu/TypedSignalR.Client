@@ -1,26 +1,24 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-// Lunch TypedSignalR.Client.Tests.Server.csproj before test!
-public class InheritHubTest : IAsyncLifetime
+public class UnaryTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
-    private readonly IInheritHub _inheritHub;
+    private readonly IUnaryHub _unaryHub;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public InheritHubTest()
+    public UnaryTest()
     {
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/InheritTestHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/UnaryHub", HttpTransportType.WebSockets);
 
-        _inheritHub = _connection.CreateHubProxy<IInheritHub>(_cancellationTokenSource.Token);
+        _unaryHub = _connection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
     }
 
     public async Task InitializeAsync()
@@ -47,7 +45,7 @@ public class InheritHubTest : IAsyncLifetime
     [Fact]
     public async Task Get()
     {
-        var str = await _inheritHub.Get();
+        var str = await _unaryHub.Get();
         Assert.Equal("TypedSignalR.Client", str);
     }
 
@@ -57,7 +55,7 @@ public class InheritHubTest : IAsyncLifetime
         var x = Random.Shared.Next();
         var y = Random.Shared.Next();
 
-        var added = await _inheritHub.Add(x, y);
+        var added = await _unaryHub.Add(x, y);
 
         Assert.Equal(added, x + y);
     }
@@ -68,7 +66,7 @@ public class InheritHubTest : IAsyncLifetime
         var x = "revue";
         var y = "starlight";
 
-        var cat = await _inheritHub.Cat(x, y);
+        var cat = await _unaryHub.Cat(x, y);
 
         Assert.Equal(cat, x + y);
     }
@@ -86,7 +84,7 @@ public class InheritHubTest : IAsyncLifetime
             DateTime = DateTime.Now,
         };
 
-        var ret = await _inheritHub.Echo(instance);
+        var ret = await _unaryHub.Echo(instance);
 
         Assert.Equal(ret.DateTime, instance.DateTime);
         Assert.Equal(ret.Guid, instance.Guid);

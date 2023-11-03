@@ -11,8 +11,43 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  build-and-test:
-    name: build-and-test
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build TypedSignalR.Client.csproj
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+
+      - name: Test TypedSignalR.Client.Tests.csproj
+        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore
+
+  nuget-test:
+    name: nuget-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,8 +65,9 @@ jobs:
       - name: Launch test server
         run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
 
-      - name: Test (project reference)
-        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore
+      - name: Sleep for 10 seconds
+        run: sleep 10s
+        shell: bash
 
       - name: Test (NuGet)
         run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --no-restore

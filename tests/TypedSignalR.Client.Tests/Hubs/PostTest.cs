@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-// Lunch TypedSignalR.Client.Tests.Server.csproj before test!
-public class PostTest : IAsyncLifetime
+public class PostTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly ISideEffectHub _sideEffectHub;
@@ -17,9 +17,7 @@ public class PostTest : IAsyncLifetime
 
     public PostTest()
     {
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/SideEffectHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/SideEffectHub", HttpTransportType.WebSockets);
 
         _sideEffectHub = _connection.CreateHubProxy<ISideEffectHub>(_cancellationTokenSource.Token);
     }

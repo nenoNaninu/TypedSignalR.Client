@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-// Lunch TypedSignalR.Client.Tests.Server.csproj before test!
-public class DisposeTest : IAsyncLifetime, IReceiver
+public class DisposeTest : IntegrationTestBase, IAsyncLifetime, IReceiver
 {
     private readonly HubConnection _connection;
     private readonly IReceiverTestHub _receiverTestHub;
@@ -24,9 +24,7 @@ public class DisposeTest : IAsyncLifetime, IReceiver
     {
         _output = output;
 
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/ReceiverTestHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/ReceiverTestHub", HttpTransportType.WebSockets);
 
         _receiverTestHub = _connection.CreateHubProxy<IReceiverTestHub>(_cancellationTokenSource.Token);
         var subscription = _connection.Register<IReceiver>(this);

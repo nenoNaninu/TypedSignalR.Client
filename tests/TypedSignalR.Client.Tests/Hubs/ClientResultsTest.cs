@@ -1,19 +1,19 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-public class ClientResultsTest : IAsyncLifetime, IClientResultsTestHubReceiver
+public class ClientResultsTest : IntegrationTestBase, IAsyncLifetime, IClientResultsTestHubReceiver
 {
     private readonly HubConnection _connection;
     private readonly IClientResultsTestHub _hubProxy;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-
 
     private readonly ITestOutputHelper _output;
 
@@ -21,9 +21,7 @@ public class ClientResultsTest : IAsyncLifetime, IClientResultsTestHubReceiver
     {
         _output = output;
 
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/ClientResultsTestHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/ClientResultsTestHub", HttpTransportType.WebSockets);
 
         _hubProxy = _connection.CreateHubProxy<IClientResultsTestHub>(_cancellationTokenSource.Token);
         _connection.Register<IClientResultsTestHubReceiver>(this);

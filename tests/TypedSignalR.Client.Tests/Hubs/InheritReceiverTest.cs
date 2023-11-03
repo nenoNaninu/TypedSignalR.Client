@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TypedSignalR.Client.Tests;
+namespace TypedSignalR.Client.Tests.Hubs;
 
-// Lunch TypedSignalR.Client.Tests.Server.csproj before test!
-public class InheritReceiverTest : IAsyncLifetime
+public class InheritReceiverTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly IInheritReceiverTestHub _receiverTestHub;
@@ -23,9 +23,7 @@ public class InheritReceiverTest : IAsyncLifetime
     {
         _output = output;
 
-        _connection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5105/Hubs/InheritReceiverTestHub")
-            .Build();
+        _connection = CreateHubConnection("/Hubs/InheritReceiverTestHub", HttpTransportType.WebSockets);
 
         _receiverTestHub = _connection.CreateHubProxy<IInheritReceiverTestHub>(_cancellationTokenSource.Token);
         _connection.Register<IInheritReceiver>(_receiver);
