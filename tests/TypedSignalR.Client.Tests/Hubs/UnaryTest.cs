@@ -2,91 +2,109 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 
 namespace TypedSignalR.Client.Tests.Hubs;
 
-public class UnaryTest : IntegrationTestBase, IAsyncLifetime
+public class UnaryTest : IntegrationTestBase, IDisposable
 {
-    private readonly HubConnection _connection;
-    private readonly IUnaryHub _unaryHub;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public UnaryTest()
+    public void Dispose()
     {
-        _connection = CreateHubConnection("/Hubs/UnaryHub", HttpTransportType.WebSockets);
-
-        _unaryHub = _connection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _connection.StartAsync(_cancellationTokenSource.Token);
-    }
-
-    public async Task DisposeAsync()
-    {
-        try
-        {
-            await _connection.StopAsync(_cancellationTokenSource.Token);
-        }
-        finally
-        {
-            _cancellationTokenSource.Cancel();
-        }
+        _cancellationTokenSource.Cancel();
     }
 
     /// <summary>
     /// no parameter test
     /// </summary>
     /// <returns></returns>
-    [Fact]
-    public async Task Get()
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling)]
+    public async Task Get(HttpTransportType httpTransportType)
     {
-        var str = await _unaryHub.Get();
+        var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
+        var str = await unaryHub.Get();
         Assert.Equal("TypedSignalR.Client", str);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
 
-    [Fact]
-    public async Task Add()
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling)]
+    public async Task Add(HttpTransportType httpTransportType)
     {
+        var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
         var x = Random.Shared.Next();
         var y = Random.Shared.Next();
 
-        var added = await _unaryHub.Add(x, y);
+        var added = await unaryHub.Add(x, y);
 
         Assert.Equal(added, x + y);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
 
-    [Fact]
-    public async Task Cat()
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling)]
+    public async Task Cat(HttpTransportType httpTransportType)
     {
+        var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
         var x = "revue";
         var y = "starlight";
 
-        var cat = await _unaryHub.Cat(x, y);
+        var cat = await unaryHub.Cat(x, y);
 
         Assert.Equal(cat, x + y);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
 
     /// <summary>
     /// User defined type test
     /// </summary>
     /// <returns></returns>
-    [Fact]
-    public async Task Echo()
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling)]
+    public async Task Echo(HttpTransportType httpTransportType)
     {
+        var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
         var instance = new UserDefinedType()
         {
             Guid = Guid.NewGuid(),
             DateTime = DateTime.Now,
         };
 
-        var ret = await _unaryHub.Echo(instance);
+        var ret = await unaryHub.Echo(instance);
 
         Assert.Equal(ret.DateTime, instance.DateTime);
         Assert.Equal(ret.Guid, instance.Guid);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
 }
