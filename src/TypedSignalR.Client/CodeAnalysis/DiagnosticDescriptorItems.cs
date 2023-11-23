@@ -47,12 +47,12 @@ public static class DiagnosticDescriptorItems
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "The return type of methods in the interface must be Task or Task<T>.");
+        description: "The return type of methods in the interface used for receiver must be Task or Task<T>.");
 
     public static readonly DiagnosticDescriptor HubMethodCancellationTokenParameterRule = new(
         id: "TSRC005",
         title: "CancellationToken can be used as a parameter only in the server-to-client streaming method",
-        messageFormat: "CancellationToken cannot be used as a parameter in the {0}.",
+        messageFormat: "CancellationToken cannot be used as a parameter in the {0}",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -61,7 +61,7 @@ public static class DiagnosticDescriptorItems
     public static readonly DiagnosticDescriptor HubMethodMultipleCancellationTokenParameterRule = new(
         id: "TSRC006",
         title: "Using multiple CancellationToken in method parameters is prohibited",
-        messageFormat: "Multiple CancellationToken cannot be used as a parameter in the {0}.",
+        messageFormat: "Multiple CancellationToken cannot be used as a parameter in the {0}",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -70,7 +70,7 @@ public static class DiagnosticDescriptorItems
     public static readonly DiagnosticDescriptor ServerStreamingMethodParameterRule = new(
         id: "TSRC007",
         title: "Using IAsyncEnumerable<T> or ChannelReader<T> as a parameter in a server-to-client streaming method is prohibited",
-        messageFormat: "Do not use IAsyncEnumerable<T> or ChannelReader<T> as a parameter because the {0} was analyzed as a server-to-client streaming method.",
+        messageFormat: "Do not use IAsyncEnumerable<T> or ChannelReader<T> as a parameter because the {0} was analyzed as a server-to-client streaming method",
         category: "Usage",
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
