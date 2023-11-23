@@ -212,10 +212,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         {
             var receiverTypes = ExtractReceiverTypesFromRegisterMethods(context, sourceSymbols, specialSymbols);
 
-            var template = new HubConnectionExtensionsBinderTemplate()
-            {
-                ReceiverTypes = receiverTypes
-            };
+            var template = new HubConnectionExtensionsBinderTemplate(receiverTypes);
 
             var source = NormalizeNewLines(template.TransformText());
 
