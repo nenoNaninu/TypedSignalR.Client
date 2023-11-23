@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -35,11 +35,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Templates\HubConnectionExtensionsTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
         <Compile Update="Templates\HubConnectionExtensionsHubInvokerTemplate.cs">
             <DependentUpon>HubConnectionExtensionsHubInvokerTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
@@ -53,10 +48,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Templates\HubConnectionExtensionsTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
         <None Update="Templates\HubConnectionExtensionsHubInvokerTemplate.tt">
             <LastGenOutput>HubConnectionExtensionsHubInvokerTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
