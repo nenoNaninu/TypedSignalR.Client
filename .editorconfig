@@ -240,3 +240,4 @@ csharp_preserve_single_line_statements = true
 csharp_style_namespace_declarations = file_scoped:error
 
 csharp_style_implicit_object_creation_when_type_is_apparent = false
+csharp_style_prefer_primary_constructors = false
