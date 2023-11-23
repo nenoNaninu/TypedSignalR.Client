@@ -35,11 +35,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Templates\ComponentsTemplate.cs">
-            <DependentUpon>ComponentsTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
         <Compile Update="Templates\HubConnectionExtensionsTemplate.cs">
             <DependentUpon>HubConnectionExtensionsTemplate.tt</DependentUpon>
             <DesignTime>True</DesignTime>
@@ -58,10 +53,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Templates\ComponentsTemplate.tt">
-            <LastGenOutput>ComponentsTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
         <None Update="Templates\HubConnectionExtensionsTemplate.tt">
             <LastGenOutput>HubConnectionExtensionsTemplate.cs</LastGenOutput>
             <Generator>TextTemplatingFilePreprocessor</Generator>
