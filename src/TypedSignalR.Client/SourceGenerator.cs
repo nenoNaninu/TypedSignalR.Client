@@ -182,11 +182,7 @@ public sealed class SourceGenerator : IIncrementalGenerator
         {
             var hubTypes = ExtractHubTypesFromCreateHubProxyMethods(context, sourceSymbols, specialSymbols);
 
-            var template = new HubConnectionExtensionsHubInvokerTemplate()
-            {
-                HubTypes = hubTypes,
-                SpecialSymbols = specialSymbols
-            };
+            var template = new HubConnectionExtensionsHubInvokerTemplate(hubTypes, specialSymbols);
 
             var source = NormalizeNewLines(template.TransformText());
 

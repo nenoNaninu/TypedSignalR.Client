@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -32,21 +32,6 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Update="Templates\HubConnectionExtensionsHubInvokerTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsHubInvokerTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="Templates\HubConnectionExtensionsHubInvokerTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsHubInvokerTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
     </ItemGroup>
 
     <ItemGroup>
