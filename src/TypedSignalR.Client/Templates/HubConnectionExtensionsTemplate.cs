@@ -224,7 +224,6 @@ namespace TypedSignalR.Client
     }
 }
 #pragma warning restore CS1591
-
 """;
 
     public string TransformText()

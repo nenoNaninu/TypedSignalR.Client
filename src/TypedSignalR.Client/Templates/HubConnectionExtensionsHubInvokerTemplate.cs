@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TypedSignalR.Client.CodeAnalysis;
@@ -62,6 +63,7 @@ namespace TypedSignalR.Client
         private static partial global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory> CreateFactories()
         {
             var factories = new global::System.Collections.Generic.Dictionary<global::System.Type, IHubInvokerFactory>();
+
 """);
 
 
@@ -79,7 +81,6 @@ namespace TypedSignalR.Client
     }
 }
 #pragma warning restore CS1591
-
 """);
 
         return sb.ToString();
@@ -87,12 +88,26 @@ namespace TypedSignalR.Client
 
     private string CreateMethodsString(TypeMetadata hubType)
     {
+        if (hubType.Methods.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        if (hubType.Methods.Count == 1)
+        {
+            return $"\n{hubType.Methods[0].CreateMethodString(_specialSymbols)}";
+        }
+
         var sb = new StringBuilder();
 
-        foreach (var method in hubType.Methods)
+        for (int i = 0; i < hubType.Methods.Count - 1; i++)
         {
-            sb.AppendLine(method.CreateMethodString(_specialSymbols));
+            sb.AppendLine();
+            sb.AppendLine(hubType.Methods[i].CreateMethodString(_specialSymbols));
         }
+
+        sb.AppendLine();
+        sb.Append(hubType.Methods[hubType.Methods.Count - 1].CreateMethodString(_specialSymbols));
 
         return sb.ToString();
     }

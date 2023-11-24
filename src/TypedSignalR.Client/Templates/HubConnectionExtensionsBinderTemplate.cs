@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TypedSignalR.Client.CodeAnalysis;
 
@@ -67,7 +68,6 @@ namespace TypedSignalR.Client
     }
 }
 #pragma warning restore CS1591
-
 """);
 
         return sb.ToString();
@@ -75,15 +75,33 @@ namespace TypedSignalR.Client
 
     private string CreateRegistrationString(TypeMetadata receiverType)
     {
+        if (receiverType.Methods.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        if (receiverType.Methods.Count == 1)
+        {
+            return CreateRegistrationStringCore(receiverType.Methods[0]);
+        }
+
         var sb = new StringBuilder();
 
-        foreach (var method in receiverType.Methods)
+        sb.Append(CreateRegistrationStringCore(receiverType.Methods[0]));
+
+        for (int i = 1; i < receiverType.Methods.Count; i++)
         {
-            sb.AppendLine($$"""
-                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.{{method.MethodName}}), {{method.CreateParameterTypeArrayString()}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter()}}(receiver.{{method.MethodName}})));
-""");
+            sb.AppendLine();
+            sb.Append(CreateRegistrationStringCore(receiverType.Methods[i]));
         }
 
         return sb.ToString();
+    }
+
+    private string CreateRegistrationStringCore(MethodMetadata method)
+    {
+        return $$"""
+                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.{{method.MethodName}}), {{method.CreateParameterTypeArrayString()}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter()}}(receiver.{{method.MethodName}})));
+""";
     }
 }
