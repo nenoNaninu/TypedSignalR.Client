@@ -255,57 +255,64 @@ public static class MethodMetadataExtensions
 
     private static string CreateUnaryMethodString(MethodMetadata method)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{method.CreateGenericReturnTypeArgumentString()}(_connection, nameof({method.MethodName}), {method.CreateArgumentsString()}, _cancellationToken);
-            }}";
+        return $$"""
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+            }
+""";
     }
 
     private static string CreateServerStreamingMethodAsAsyncEnumerableString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                return _connection.StreamAsyncCore{method.CreateGenericReturnTypeArgumentString()}(nameof({method.MethodName}), {method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}, {method.CreateCancellationTokenString("_cancellationToken", specialSymbols)});
-            }}";
+        return $$"""
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                return _connection.StreamAsyncCore{{method.CreateGenericReturnTypeArgumentString()}}(nameof({{method.MethodName}}), {{method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}}, {{method.CreateCancellationTokenString("_cancellationToken", specialSymbols)}});
+            }
+""";
     }
 
     private static string CreateServerStreamingMethodAsTaskAsyncEnumerableString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                var ret = _connection.StreamAsyncCore{method.CreateGenericReturnTypeArgumentStringForStreaming()}(nameof({method.MethodName}), {method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}, {method.CreateCancellationTokenString("_cancellationToken", specialSymbols)});
+        return $$"""
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                var ret = _connection.StreamAsyncCore{{method.CreateGenericReturnTypeArgumentStringForStreaming()}}(nameof({{method.MethodName}}), {{method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}}, {{method.CreateCancellationTokenString("_cancellationToken", specialSymbols)}});
                 return global::System.Threading.Tasks.Task.FromResult(ret);
-            }}";
+            }
+""";
     }
 
     private static string CreateServerStreamingMethodAsChannelString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.StreamAsChannelCoreAsync{method.CreateGenericReturnTypeArgumentStringForStreaming()}(_connection, nameof({method.MethodName}), {method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}, {method.CreateCancellationTokenString("_cancellationToken", specialSymbols)});
-            }}";
+        return $$"""
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.StreamAsChannelCoreAsync{{method.CreateGenericReturnTypeArgumentStringForStreaming()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}}, {{method.CreateCancellationTokenString("_cancellationToken", specialSymbols)}});
+            }
+""";
     }
 
     private static string CreateClientStreamingMethodAsAsyncEnumerableString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                return _connection.SendCoreAsync(nameof({method.MethodName}), {method.CreateArgumentsString()}, _cancellationToken);
-            }}";
+        return $$"""
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                return _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+            }
+""";
     }
 
     private static string CreateClientStreamingMethodAsChannelString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
-        return $@"
-            public {method.ReturnType} {method.MethodName}({method.CreateParametersString()})
-            {{
-                return _connection.SendCoreAsync(nameof({method.MethodName}), {method.CreateArgumentsString()}, _cancellationToken);
-            }}";
+        return $$"""
+
+            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            {
+                return _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+            }
+""";
     }
 
     /// <summary>

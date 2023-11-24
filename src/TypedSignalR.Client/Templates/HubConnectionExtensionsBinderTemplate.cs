@@ -37,7 +37,7 @@ namespace TypedSignalR.Client
             {
                 var compositeDisposable = new CompositeDisposable({{receiverType.Methods.Count}});
 
-                {{CreateRegistrationString(receiverType)}}
+{{CreateRegistrationString(receiverType)}}
 
                 return compositeDisposable;
             }

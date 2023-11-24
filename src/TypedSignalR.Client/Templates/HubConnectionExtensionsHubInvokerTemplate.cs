@@ -44,7 +44,7 @@ namespace TypedSignalR.Client
                 _connection = connection;
                 _cancellationToken = cancellationToken;
             }
-            {{CreateMethodsString(hubType)}}
+{{CreateMethodsString(hubType)}}
         }
 
         private sealed class HubInvokerFactoryFor_{{hubType.CollisionFreeName}} : IHubInvokerFactory<{{hubType.InterfaceFullName}}>
