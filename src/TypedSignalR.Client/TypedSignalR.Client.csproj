@@ -35,49 +35,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="Templates\HubConnectionExtensionsTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
-        <Compile Update="Templates\HubConnectionExtensionsHubInvokerTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsHubInvokerTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
-        <Compile Update="Templates\HubConnectionExtensionsBinderTemplate.cs">
-            <DependentUpon>HubConnectionExtensionsBinderTemplate.tt</DependentUpon>
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="Templates\HubConnectionExtensionsTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
-        <None Update="Templates\HubConnectionExtensionsHubInvokerTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsHubInvokerTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
-        <None Update="Templates\HubConnectionExtensionsBinderTemplate.tt">
-            <LastGenOutput>HubConnectionExtensionsBinderTemplate.cs</LastGenOutput>
-            <Generator>TextTemplatingFilePreprocessor</Generator>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
         <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
         <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
     </ItemGroup>
 
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
     </ItemGroup>
 
 </Project>
