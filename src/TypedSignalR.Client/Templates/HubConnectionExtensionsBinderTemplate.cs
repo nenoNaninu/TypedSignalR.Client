@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using TypedSignalR.Client.CodeAnalysis;
 
@@ -24,6 +23,7 @@ public sealed class HubConnectionExtensionsBinderTemplate
 // </auto-generated>
 #nullable enable
 #pragma warning disable CS1591
+#pragma warning disable CS8767
 namespace TypedSignalR.Client
 {
     internal static partial class HubConnectionExtensions
@@ -67,6 +67,7 @@ namespace TypedSignalR.Client
         }
     }
 }
+#pragma warning restore CS8767
 #pragma warning restore CS1591
 """);
 

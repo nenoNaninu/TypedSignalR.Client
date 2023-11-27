@@ -46,7 +46,7 @@ public static class MethodMetadataExtensions
 
         var sb = new StringBuilder();
 
-        sb.Append("new object[] { ");
+        sb.Append("new object?[] { ");
         sb.Append(methodMetadata.Parameters[0].Name);
 
         for (int i = 1; i < methodMetadata.Parameters.Count; i++)
@@ -63,7 +63,8 @@ public static class MethodMetadataExtensions
     public static string CreateArgumentsStringExceptCancellationToken(this MethodMetadata methodMetadata, SpecialSymbols specialSymbols)
     {
         var parameters = methodMetadata.Parameters
-            .Where(x => !SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.CancellationTokenSymbol)).ToArray();
+            .Where(x => !SymbolEqualityComparer.Default.Equals(x.Type, specialSymbols.CancellationTokenSymbol))
+            .ToArray();
 
         if (parameters.Length == 0)
         {
@@ -72,7 +73,7 @@ public static class MethodMetadataExtensions
 
         var sb = new StringBuilder();
 
-        sb.Append("new object[] { ");
+        sb.Append("new object?[] { ");
         sb.Append(parameters[0].Name);
 
         for (int i = 1; i < parameters.Length; i++)
@@ -183,8 +184,8 @@ public static class MethodMetadataExtensions
             HubMethodType.ServerStreamingAsAsyncEnumerable => CreateServerStreamingMethodAsAsyncEnumerableString(methodMetadata, specialSymbols),
             HubMethodType.ServerStreamingAsTaskAsyncEnumerable => CreateServerStreamingMethodAsTaskAsyncEnumerableString(methodMetadata, specialSymbols),
             HubMethodType.ServerStreamingAsChannel => CreateServerStreamingMethodAsChannelString(methodMetadata, specialSymbols),
-            HubMethodType.ClientStreamingAsAsyncEnumerable => CreateClientStreamingMethodAsAsyncEnumerableString(methodMetadata, specialSymbols),
-            HubMethodType.ClientStreamingAsChannel => CreateClientStreamingMethodAsChannelString(methodMetadata, specialSymbols),
+            HubMethodType.ClientStreamingAsAsyncEnumerable => CreateClientStreamingMethodAsAsyncEnumerableString(methodMetadata),
+            HubMethodType.ClientStreamingAsChannel => CreateClientStreamingMethodAsChannelString(methodMetadata),
             _ => string.Empty
         };
     }
@@ -294,7 +295,7 @@ public static class MethodMetadataExtensions
 """;
     }
 
-    private static string CreateClientStreamingMethodAsAsyncEnumerableString(MethodMetadata method, SpecialSymbols specialSymbols)
+    private static string CreateClientStreamingMethodAsAsyncEnumerableString(MethodMetadata method)
     {
         return $$"""
             public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
@@ -304,7 +305,7 @@ public static class MethodMetadataExtensions
 """;
     }
 
-    private static string CreateClientStreamingMethodAsChannelString(MethodMetadata method, SpecialSymbols specialSymbols)
+    private static string CreateClientStreamingMethodAsChannelString(MethodMetadata method)
     {
         return $$"""
 
