@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace TypedSignalR.Client.CodeAnalysis;
 
@@ -13,7 +14,11 @@ public readonly record struct ParameterMetadata
     public ParameterMetadata(IParameterSymbol parameterSymbol)
     {
         ParameterSymbol = parameterSymbol;
-        Name = parameterSymbol.Name;
+
+        Name = SyntaxFacts.IsReservedKeyword(SyntaxFacts.GetKeywordKind(parameterSymbol.Name))
+            ? $"@{parameterSymbol.Name}"
+            : parameterSymbol.Name;
+
         TypeName = parameterSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     }
 }
