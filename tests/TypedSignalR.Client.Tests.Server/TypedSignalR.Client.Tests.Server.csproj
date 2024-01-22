@@ -14,4 +14,8 @@
         <InternalsVisibleTo Include="TypedSignalR.Client.Tests" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="AspNetCore.SignalR.OpenTelemetry" />
+    </ItemGroup>
+
 </Project>
