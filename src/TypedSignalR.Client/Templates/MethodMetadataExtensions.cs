@@ -259,7 +259,7 @@ public static class MethodMetadataExtensions
         return $$"""
             public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return (System.Threading.Tasks.Task<SignalR.Shared.Status?>)global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+                return ({{method.ReturnType}})global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
             }
 """;
     }
