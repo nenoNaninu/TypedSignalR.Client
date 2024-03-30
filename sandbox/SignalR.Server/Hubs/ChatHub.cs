@@ -8,7 +8,7 @@ namespace SignalR.Server.Hubs;
 
 public class ChatHub : Hub<IClientContract>, IHubContract
 {
-    public async Task<Status> SendMessage(string user, string message)
+    public async Task<Status?> SendMessage(string user, string message)
     {
         var userDefine = new UserDefineClass() { Datetime = DateTime.Now, RandomId = Guid.NewGuid() };
         await Clients.All.ReceiveMessage(user, message, userDefine);

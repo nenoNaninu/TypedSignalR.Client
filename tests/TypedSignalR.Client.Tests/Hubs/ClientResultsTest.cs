@@ -57,7 +57,7 @@ public class ClientResultsTest : IntegrationTestBase, IAsyncLifetime, IClientRes
         return Task.FromResult(Guid.Parse("ba3088bb-e7ea-4924-b01b-695e879bb166"));
     }
 
-    public Task<Person> GetPersonFromClient()
+    public Task<Person?> GetPersonFromClient()
     {
         return Task.FromResult(new Person(Guid.Parse("c2368532-2f13-4079-9631-a38a048d84e1"), "Nana Daiba", 7));
     }

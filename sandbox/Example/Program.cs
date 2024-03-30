@@ -114,7 +114,7 @@ class Program
 
         //hub.Hoge();
         //{
-        var hub = connection.CreateHubProxy<IHubContract>();
+        //var hub = connection.CreateHubProxy<IHubContract>();
         //    var subscription = connection.Register<IClientContract>(new Receiver());
 
         //    hub.SomeHubMethod1("user", "message");

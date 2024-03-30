@@ -259,7 +259,7 @@ public static class MethodMetadataExtensions
         return $$"""
             public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+                return (System.Threading.Tasks.Task<SignalR.Shared.Status?>)global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
             }
 """;
     }
@@ -328,14 +328,7 @@ public static class MethodMetadataExtensions
 
         var returnType = methodMetadata.MethodSymbol.ReturnType as INamedTypeSymbol;
 
-        if (returnType is null)
-        {
-            return string.Empty;
-        }
-
-        var typeArgument = returnType.TypeArguments[0] as INamedTypeSymbol;
-
-        if (typeArgument is null)
+        if (returnType?.TypeArguments[0] is not INamedTypeSymbol typeArgument)
         {
             return string.Empty;
         }

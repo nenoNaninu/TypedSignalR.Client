@@ -25,11 +25,9 @@ public sealed class MethodMetadata
             .Select(x => new ParameterMetadata(x))
             .ToArray();
 
-        ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        ReturnType = methodSymbol.ReturnType.ToDisplayString();
 
-        INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
-
-        if (returnTypeSymbol is not null)
+        if (methodSymbol.ReturnType is INamedTypeSymbol returnTypeSymbol)
         {
             IsGenericReturnType = returnTypeSymbol.IsGenericType;
 

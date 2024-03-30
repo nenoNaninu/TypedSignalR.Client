@@ -75,13 +75,13 @@ class Program
             .WithUrl("https://~~~")
             .Build();
 
-        connection.CreateHubProxy<IErrorProxy>(); // error
-        connection.CreateHubProxy<IErrorProxy2>(); // error
-        connection.CreateHubProxy<IErrorProxy3>(); // error
-        connection.CreateHubProxy<IErrorProxy4>(); // error
-        connection.CreateHubProxy<IErrorProxy5>(); // error
-        connection.CreateHubProxy<IErrorProxy6>(); // error
-        connection.CreateHubProxy<IErrorProxy7>(); // error
+        // connection.CreateHubProxy<IErrorProxy>(); // error
+        // connection.CreateHubProxy<IErrorProxy2>(); // error
+        // connection.CreateHubProxy<IErrorProxy3>(); // error
+        // connection.CreateHubProxy<IErrorProxy4>(); // error
+        // connection.CreateHubProxy<IErrorProxy5>(); // error
+        // connection.CreateHubProxy<IErrorProxy6>(); // error
+        // connection.CreateHubProxy<IErrorProxy7>(); // error
 
 
         //var id = connection.ConnectionId;

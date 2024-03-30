@@ -1,8 +1,9 @@
 {
-  "profiles": {
-    "TypedSignalR.Client": {
-      "commandName": "DebugRoslynComponent",
-      "targetProject": "..\\..\\tests\\TypedSignalR.Client.Tests\\TypedSignalR.Client.Tests.csproj"
+    "$schema": "http://json.schemastore.org/launchsettings.json",
+    "profiles": {
+        "TypedSignalR.Client": {
+            "commandName": "DebugRoslynComponent",
+            "targetProject": "../../tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj"
+        }
     }
-  }
 }

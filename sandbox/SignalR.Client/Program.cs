@@ -184,7 +184,7 @@ class Program
             .Build();
 
 
-        //await Sample1(connection);
+        await Sample1(connection);
         await Sample2(connection);
     }
 }

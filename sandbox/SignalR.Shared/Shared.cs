@@ -22,7 +22,7 @@ public interface IClientContract
 
 public interface IHubContract
 {
-    Task<Status> SendMessage(string user, string message);
+    Task<Status?> SendMessage(string user, string message);
     Task SomeHubMethod();
 }
 
@@ -37,4 +37,5 @@ public class ErrorReceiver : IErrorReceiver
     {
         throw new NotImplementedException();
     }
+    
 }
