@@ -21,7 +21,7 @@ public sealed class TypeMetadata : ITypeSymbolHolder
         Methods = GetMethods(typeSymbol);
 
         InterfaceName = typeSymbol.Name;
-        InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormatRule.Default);
         CollisionFreeName = InterfaceFullName.Replace('.', '_').Replace(':', '_');
     }
 
