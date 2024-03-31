@@ -29,5 +29,6 @@ app.MapHub<StreamingHub>("/Hubs/StreamingHub");
 app.MapHub<ClientResultsTestHub>("/Hubs/ClientResultsTestHub");
 app.MapHub<InheritTestHub>("/Hubs/InheritTestHub");
 app.MapHub<InheritReceiverTestHub>("/Hubs/InheritReceiverTestHub");
+app.MapHub<NullableTestHub>("/Hubs/NullableTestHub");
 
 app.Run();
