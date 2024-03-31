@@ -2,7 +2,6 @@ namespace TypedSignalR.Client.Tests.Shared;
 
 public interface INullableTestHub
 {
-
     Task<int> GetStruct(int message);
     Task<int?> GetNullableStruct(int? message);
 
