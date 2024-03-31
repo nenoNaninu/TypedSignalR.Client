@@ -27,6 +27,7 @@ public sealed class HubConnectionExtensionsHubInvokerTemplate
 #nullable enable
 #pragma warning disable CS1591
 #pragma warning disable CS8767
+#pragma warning disable CS8613
 namespace TypedSignalR.Client
 {
     internal static partial class HubConnectionExtensions
@@ -81,6 +82,7 @@ namespace TypedSignalR.Client
         }
     }
 }
+#pragma warning restore CS8613
 #pragma warning restore CS8767
 #pragma warning restore CS1591
 """);
