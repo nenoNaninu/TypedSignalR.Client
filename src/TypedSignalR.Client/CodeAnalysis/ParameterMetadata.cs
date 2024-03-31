@@ -19,6 +19,6 @@ public readonly record struct ParameterMetadata
             ? $"@{parameterSymbol.Name}"
             : parameterSymbol.Name;
 
-        TypeName = parameterSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        TypeName = parameterSymbol.Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedNullableFormat);
     }
 }

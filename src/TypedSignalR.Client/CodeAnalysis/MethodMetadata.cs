@@ -25,7 +25,7 @@ public sealed class MethodMetadata
             .Select(x => new ParameterMetadata(x))
             .ToArray();
 
-        ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedNullableFormat);
 
         INamedTypeSymbol? returnTypeSymbol = methodSymbol.ReturnType as INamedTypeSymbol;
 
@@ -36,8 +36,8 @@ public sealed class MethodMetadata
             if (returnTypeSymbol.IsGenericType)
             {
                 GenericReturnTypeArgument = returnTypeSymbol.TypeArguments.Length == 1
-                    ? returnTypeSymbol.TypeArguments[0].ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                    : string.Join(", ", returnTypeSymbol.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)));
+                    ? returnTypeSymbol.TypeArguments[0].ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedNullableFormat)
+                    : string.Join(", ", returnTypeSymbol.TypeArguments.Select(x => x.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedNullableFormat)));
             }
         }
     }
