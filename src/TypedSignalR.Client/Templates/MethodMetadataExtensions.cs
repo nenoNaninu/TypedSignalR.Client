@@ -139,7 +139,7 @@ public static class MethodMetadataExtensions
 
         if (methodMetadata.Parameters.Count == 1)
         {
-            return $"new[] {{ typeof({methodMetadata.Parameters[0].TypeName}) }}";
+            return $"new[] {{ typeof({methodMetadata.Parameters[0].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)}) }}";
         }
 
         var sb = new StringBuilder();
