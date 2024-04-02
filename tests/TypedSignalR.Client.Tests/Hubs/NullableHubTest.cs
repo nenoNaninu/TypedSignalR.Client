@@ -122,4 +122,33 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
+
+    private void CompileTest()
+    {
+        var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
+        hubConnection.Register<INullableTestIReceiver>(new NullableTestIReceiver());
+    }
+
+    private class NullableTestIReceiver : INullableTestIReceiver
+    {
+        public Task<string?> GetNullableReferenceType(string? message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int?> GetNullableStruct(int? message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetReferenceType(string message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetStruct(int message)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
