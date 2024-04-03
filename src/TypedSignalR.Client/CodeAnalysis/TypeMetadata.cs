@@ -11,7 +11,7 @@ public sealed class TypeMetadata : ITypeSymbolHolder
     public IReadOnlyList<MethodMetadata> Methods { get; }
 
     public string InterfaceName { get; }
-    public string InterfaceFullName { get; }
+    public string FullyQualifiedInterfaceName { get; }
     public string CollisionFreeName { get; }
 
     public TypeMetadata(ITypeSymbol typeSymbol)
@@ -21,8 +21,8 @@ public sealed class TypeMetadata : ITypeSymbolHolder
         Methods = GetMethods(typeSymbol);
 
         InterfaceName = typeSymbol.Name;
-        InterfaceFullName = typeSymbol.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat);
-        CollisionFreeName = InterfaceFullName.Replace('.', '_').Replace(':', '_');
+        FullyQualifiedInterfaceName = typeSymbol.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat);
+        CollisionFreeName = FullyQualifiedInterfaceName.Replace('.', '_').Replace(':', '_');
     }
 
     private static IReadOnlyList<MethodMetadata> GetMethods(ITypeSymbol typeSymbol)

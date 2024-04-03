@@ -138,17 +138,17 @@ public static class MethodMetadataExtensions
 
         if (methodMetadata.Parameters.Count == 1)
         {
-            return $"new[] {{ typeof({methodMetadata.Parameters[0].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)}) }}";
+            return $"new[] {{ typeof({methodMetadata.Parameters[0].FullyQualifiedTypeName}) }}";
         }
 
         var sb = new StringBuilder();
 
         sb.Append("new[] { ");
-        sb.Append($"typeof({methodMetadata.Parameters[0].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)})");
+        sb.Append($"typeof({methodMetadata.Parameters[0].FullyQualifiedTypeName})");
 
         for (int i = 1; i < methodMetadata.Parameters.Count; i++)
         {
-            sb.Append($", typeof({methodMetadata.Parameters[i].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)})");
+            sb.Append($", typeof({methodMetadata.Parameters[i].FullyQualifiedTypeName})");
         }
 
         sb.Append(" }");
