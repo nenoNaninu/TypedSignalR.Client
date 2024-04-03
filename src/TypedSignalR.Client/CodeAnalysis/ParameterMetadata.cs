@@ -10,6 +10,7 @@ public readonly record struct ParameterMetadata
     public readonly string TypeName;
 
     public ITypeSymbol Type => ParameterSymbol.Type;
+    public string FullyQualifiedTypeName => ParameterSymbol.Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat);
 
     public ParameterMetadata(IParameterSymbol parameterSymbol)
     {
