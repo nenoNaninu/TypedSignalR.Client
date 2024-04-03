@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -145,11 +144,11 @@ public static class MethodMetadataExtensions
         var sb = new StringBuilder();
 
         sb.Append("new[] { ");
-        sb.Append($"typeof({methodMetadata.Parameters[0].TypeName})");
+        sb.Append($"typeof({methodMetadata.Parameters[0].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)})");
 
         for (int i = 1; i < methodMetadata.Parameters.Count; i++)
         {
-            sb.Append($", typeof({methodMetadata.Parameters[i].TypeName})");
+            sb.Append($", typeof({methodMetadata.Parameters[i].Type.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedFormat)})");
         }
 
         sb.Append(" }");
