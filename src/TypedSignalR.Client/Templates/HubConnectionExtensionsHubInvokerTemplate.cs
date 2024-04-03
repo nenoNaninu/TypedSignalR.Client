@@ -37,7 +37,7 @@ namespace TypedSignalR.Client
         foreach (var hubType in _hubTypes)
         {
             sb.AppendLine($$"""
-        private sealed class HubInvokerFor_{{hubType.CollisionFreeName}} : {{hubType.InterfaceFullName}}, IHubInvoker
+        private sealed class HubInvokerFor_{{hubType.CollisionFreeName}} : {{hubType.FullyQualifiedInterfaceName}}, IHubInvoker
         {
             private readonly global::Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
             private readonly global::System.Threading.CancellationToken _cancellationToken;
@@ -50,9 +50,9 @@ namespace TypedSignalR.Client
 {{CreateMethodsString(hubType)}}
         }
 
-        private sealed class HubInvokerFactoryFor_{{hubType.CollisionFreeName}} : IHubInvokerFactory<{{hubType.InterfaceFullName}}>
+        private sealed class HubInvokerFactoryFor_{{hubType.CollisionFreeName}} : IHubInvokerFactory<{{hubType.FullyQualifiedInterfaceName}}>
         {
-            public {{hubType.InterfaceFullName}} CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
+            public {{hubType.FullyQualifiedInterfaceName}} CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
             {
                 return new HubInvokerFor_{{hubType.CollisionFreeName}}(connection, cancellationToken);
             }
@@ -72,7 +72,7 @@ namespace TypedSignalR.Client
         foreach (var hubType in _hubTypes)
         {
             sb.AppendLine($$"""
-            factories.Add(typeof({{hubType.InterfaceFullName}}), new HubInvokerFactoryFor_{{hubType.CollisionFreeName}}());
+            factories.Add(typeof({{hubType.FullyQualifiedInterfaceName}}), new HubInvokerFactoryFor_{{hubType.CollisionFreeName}}());
 """);
         }
 

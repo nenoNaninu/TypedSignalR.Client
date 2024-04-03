@@ -33,9 +33,9 @@ namespace TypedSignalR.Client
         foreach (var receiverType in _receiverTypes)
         {
             sb.AppendLine($$"""
-        private sealed class BinderFor_{{receiverType.CollisionFreeName}} : IReceiverBinder<{{receiverType.InterfaceFullName}}>
+        private sealed class BinderFor_{{receiverType.CollisionFreeName}} : IReceiverBinder<{{receiverType.FullyQualifiedInterfaceName}}>
         {
-            public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, {{receiverType.InterfaceFullName}} receiver)
+            public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, {{receiverType.FullyQualifiedInterfaceName}} receiver)
             {
                 var compositeDisposable = new CompositeDisposable({{receiverType.Methods.Count}});
 
@@ -58,7 +58,7 @@ namespace TypedSignalR.Client
         foreach (var receiverType in _receiverTypes)
         {
             sb.AppendLine($$"""
-            binders.Add(typeof({{receiverType.InterfaceFullName}}), new BinderFor_{{receiverType.CollisionFreeName}}());
+            binders.Add(typeof({{receiverType.FullyQualifiedInterfaceName}}), new BinderFor_{{receiverType.CollisionFreeName}}());
 """);
         }
 
