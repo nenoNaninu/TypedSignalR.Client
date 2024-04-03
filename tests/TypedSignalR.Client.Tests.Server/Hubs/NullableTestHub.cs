@@ -34,4 +34,14 @@ public class NullableTestHub : Hub, INullableTestHub
 
         return Task.FromResult<string?>(message + "99");
     }
+
+    public Task<string?> GetNullableReferenceType2(string? message1, string? message2)
+    {
+        if (message1 is null && message2 is null)
+        {
+            return Task.FromResult<string?>(null);
+        }
+
+        return Task.FromResult<string?>(string.Concat(message1, message2));
+    }
 }
