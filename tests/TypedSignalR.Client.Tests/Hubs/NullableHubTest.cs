@@ -123,6 +123,41 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
         await hubConnection.StopAsync(_cancellationTokenSource.Token);
     }
 
+    [Fact]
+    public async Task GetNullableReferenceType3()
+    {
+        var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
+
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
+        var value = await hubProxy.GetNullableReferenceType2(null, null);
+
+        Assert.Null(value);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+    }
+
+    [Fact]
+    public async Task GetNullableReferenceType4()
+    {
+        var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
+
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+
+        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+
+        var message1 = Guid.NewGuid().ToString();
+        var message2 = Guid.NewGuid().ToString();
+
+        var value = await hubProxy.GetNullableReferenceType2(message1, message2);
+
+        Assert.Equal(message1 + message2, value);
+
+        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+    }
+
     private void CompileTest()
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
@@ -132,6 +167,21 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     private class NullableTestIReceiver : INullableTestIReceiver
     {
         public Task<string?> GetNullableReferenceType(string? message)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> GetNullableReferenceType2(string? message, int? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> GetNullableReferenceType3(string? message, string message2)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> GetNullableReferenceType4(string message, string? message2, int value)
         {
             throw new NotImplementedException();
         }
