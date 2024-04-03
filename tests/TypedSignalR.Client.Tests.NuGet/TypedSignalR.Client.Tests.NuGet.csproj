@@ -36,7 +36,7 @@
         <Compile Include="..\TypedSignalR.Client.Tests\Hubs\ReceiverTest.cs" LinkBase="Hubs" />
         <Compile Include="..\TypedSignalR.Client.Tests\Hubs\StreamingTest.cs" LinkBase="Hubs" />
         <Compile Include="..\TypedSignalR.Client.Tests\Hubs\UnaryTest.cs" LinkBase="Hubs" />
-        <Compile Include="..\TypedSignalR.Client.Tests\Hubs\NullableHubTest.cs" LinkBase="Hubs" />
+        <!--<Compile Include="..\TypedSignalR.Client.Tests\Hubs\NullableHubTest.cs" LinkBase="Hubs" />-->
     </ItemGroup>
 
 </Project>
