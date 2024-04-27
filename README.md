@@ -1,5 +1,8 @@
 # TypedSignalR.Client
 
+[![NuGet](https://img.shields.io/nuget/v/TypedSignalR.Client.svg)](https://www.nuget.org/packages/TypedSignalR.Client)
+[![build-and-test](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml/badge.svg?branch=master)](https://github.com/nenoNaninu/TypedSignalR.Client/actions/workflows/build-and-test.yaml)
+
 C# [Source Generator](https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) to create strongly typed SignalR clients.
 
 ## Table of Contents
