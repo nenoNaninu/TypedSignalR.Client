@@ -300,3 +300,5 @@ Generated source code can be seen in Visual Studio.
   - TypeScript source generator to provide strongly typed SignalR clients by analyzing C# type definitions.
 - [nenoNaninu/TypedSignalR.Client.DevTools](https://github.com/nenoNaninu/TypedSignalR.Client.DevTools)
   - SignalR development tools inspired by SwaggerUI.
+- [nenoNaninu/AspNetCore.SignalR.OpenTelemetry](https://github.com/nenoNaninu/AspNetCore.SignalR.OpenTelemetry)
+  - SignalR instrumentation library for OpenTelemetry.
