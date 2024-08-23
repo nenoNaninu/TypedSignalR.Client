@@ -29,7 +29,7 @@ jobs:
       - name: dotnet pack
         run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: Packages
           path: ${{ github.workspace }}/artifacts
