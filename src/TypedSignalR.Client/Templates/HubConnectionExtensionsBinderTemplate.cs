@@ -7,10 +7,12 @@ namespace TypedSignalR.Client.Templates;
 public sealed class HubConnectionExtensionsBinderTemplate
 {
     private readonly IReadOnlyList<TypeMetadata> _receiverTypes;
+    private readonly SpecialSymbols _specialSymbols;
 
-    public HubConnectionExtensionsBinderTemplate(IReadOnlyList<TypeMetadata> receiverTypes)
+    public HubConnectionExtensionsBinderTemplate(IReadOnlyList<TypeMetadata> receiverTypes, SpecialSymbols specialSymbols)
     {
         _receiverTypes = receiverTypes;
+        _specialSymbols = specialSymbols;
     }
 
     public string TransformText()
@@ -104,7 +106,7 @@ namespace TypedSignalR.Client
     private string CreateRegistrationStringCore(MethodMetadata method)
     {
         return $$"""
-                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.{{method.MethodName}}), {{method.CreateParameterTypeArrayString()}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter()}}(receiver.{{method.MethodName}})));
+                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.{{method.MethodName}}), {{method.CreateParameterTypeArrayString(_specialSymbols)}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter(_specialSymbols)}}(receiver.{{method.MethodName}})));
 """;
     }
 }

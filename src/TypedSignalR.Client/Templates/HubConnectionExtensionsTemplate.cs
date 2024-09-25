@@ -263,6 +263,25 @@ namespace TypedSignalR.Client
 
         stringBuilder.AppendLine("""
 
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task> Convert(global::System.Func<global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> handler)
+            {
+                return args => handler(default);
+            }
+""");
+
+        for (int i = 1; i <= 15; i++)
+        {
+            stringBuilder.AppendLine($$"""
+
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task> Convert<{{CreateTypeParametersString(i)}}>(global::System.Func<{{CreateTypeParametersString(i)}}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task> handler)
+            {
+                return args => handler({{CreateHandlerArgumentsString(i)}}, default);
+            }
+""");
+        }
+
+        stringBuilder.AppendLine("""
+
             public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<TResult>(global::System.Func<global::System.Threading.Tasks.Task<TResult>> handler)
             {
                 return async args =>
@@ -272,6 +291,7 @@ namespace TypedSignalR.Client
                 };
             }
 """);
+
         for (int i = 1; i <= 16; i++)
         {
             stringBuilder.AppendLine($$"""
@@ -281,6 +301,33 @@ namespace TypedSignalR.Client
                 return async args =>
                 {
                     var result = await handler({{CreateHandlerArgumentsString(i)}}).ConfigureAwait(false);
+                    return result;
+                };
+            }
+""");
+        }
+
+        stringBuilder.AppendLine("""
+
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<TResult>(global::System.Func<global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TResult>> handler)
+            {
+                return async args =>
+                {
+                    var result = await handler(default).ConfigureAwait(false);
+                    return result;
+                };
+            }
+""");
+
+        for (int i = 1; i <= 15; i++)
+        {
+            stringBuilder.AppendLine($$"""
+
+            public static global::System.Func<object?[], global::System.Threading.Tasks.Task<TResult>> Convert<{{CreateTypeParametersString(i)}}, TResult>(global::System.Func<{{CreateTypeParametersString(i)}}, global::System.Threading.CancellationToken, global::System.Threading.Tasks.Task<TResult>> handler)
+            {
+                return async args =>
+                {
+                    var result = await handler({{CreateHandlerArgumentsString(i)}}, default).ConfigureAwait(false);
                     return result;
                 };
             }

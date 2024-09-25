@@ -13,6 +13,14 @@ public interface IReceiver
     Task ReceiveCustomMessage(UserDefinedType userDefined);
 }
 
+
+public interface IReceiverWithCancellationToken
+{
+    Task ReceiveMessage(string message, int value, CancellationToken cancellationToken);
+    Task Notify(CancellationToken cancellationToken);
+    Task ReceiveCustomMessage(UserDefinedType userDefined, CancellationToken cancellationToken);
+}
+
 public interface IReceiverTestHub
 {
     Task Start();
