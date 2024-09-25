@@ -86,9 +86,13 @@ public static class MethodMetadataExtensions
         return sb.ToString();
     }
 
-    public static string CreateTypeArgumentsStringForHandlerConverter(this MethodMetadata methodMetadata)
+    public static string CreateTypeArgumentsStringForHandlerConverter(this MethodMetadata methodMetadata, SpecialSymbols specialSymbols)
     {
-        if (methodMetadata.Parameters.Count == 0)
+        var parameters = methodMetadata.LastParameterEqual(specialSymbols.CancellationTokenSymbol)
+            ? methodMetadata.Parameters.Take(methodMetadata.Parameters.Count - 1).ToArray()
+            : methodMetadata.Parameters;
+
+        if (parameters.Count == 0)
         {
             if (methodMetadata.IsGenericReturnType)
             {
@@ -98,25 +102,25 @@ public static class MethodMetadataExtensions
             return string.Empty;
         }
 
-        if (methodMetadata.Parameters.Count == 1)
+        if (parameters.Count == 1)
         {
             if (methodMetadata.IsGenericReturnType)
             {
-                return $"<{methodMetadata.Parameters[0].TypeName}, {methodMetadata.GenericReturnTypeArgument}>";
+                return $"<{parameters[0].TypeName}, {methodMetadata.GenericReturnTypeArgument}>";
             }
 
-            return $"<{methodMetadata.Parameters[0].TypeName}>";
+            return $"<{parameters[0].TypeName}>";
         }
 
         var sb = new StringBuilder();
 
         sb.Append('<');
-        sb.Append(methodMetadata.Parameters[0].TypeName);
+        sb.Append(parameters[0].TypeName);
 
-        for (int i = 1; i < methodMetadata.Parameters.Count; i++)
+        for (int i = 1; i < parameters.Count; i++)
         {
             sb.Append(", ");
-            sb.Append(methodMetadata.Parameters[i].TypeName);
+            sb.Append(parameters[i].TypeName);
         }
 
         if (methodMetadata.IsGenericReturnType)
@@ -129,9 +133,10 @@ public static class MethodMetadataExtensions
         return sb.ToString();
     }
 
-    public static string CreateParameterTypeArrayString(this MethodMetadata methodMetadata)
+    public static string CreateParameterTypeArrayString(this MethodMetadata methodMetadata, SpecialSymbols specialSymbols)
     {
-        if (methodMetadata.Parameters.Count == 0)
+        if (methodMetadata.Parameters.Count == 0
+            || (methodMetadata.Parameters.Count == 1 && methodMetadata.LastParameterEqual(specialSymbols.CancellationTokenSymbol)))
         {
             return "global::System.Type.EmptyTypes";
         }
@@ -148,6 +153,13 @@ public static class MethodMetadataExtensions
 
         for (int i = 1; i < methodMetadata.Parameters.Count; i++)
         {
+            if (IsLast(i, methodMetadata.Parameters.Count)
+                && methodMetadata.LastParameterEqual(specialSymbols.CancellationTokenSymbol))
+            {
+                // break if the last parameter is CancellationToken.
+                break;
+            }
+
             sb.Append($", typeof({methodMetadata.Parameters[i].FullyQualifiedTypeName})");
         }
 
@@ -187,6 +199,14 @@ public static class MethodMetadataExtensions
             HubMethodType.ClientStreamingAsChannel => CreateClientStreamingMethodAsChannelString(methodMetadata),
             _ => string.Empty
         };
+    }
+
+    private static bool IsLast(int index, int length) => index == length - 1;
+
+    private static bool LastParameterEqual(this MethodMetadata methodMetadata, ITypeSymbol typeSymbol)
+    {
+        return methodMetadata.Parameters.Count > 0
+            && SymbolEqualityComparer.Default.Equals(methodMetadata.Parameters[methodMetadata.Parameters.Count - 1].Type, typeSymbol);
     }
 
     private static HubMethodType GetHubMethodType(this MethodMetadata methodMetadata, SpecialSymbols specialSymbols)
