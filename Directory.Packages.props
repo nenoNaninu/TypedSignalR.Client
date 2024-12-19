@@ -5,7 +5,7 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.4.0" />
+        <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.5.0" />
         <PackageVersion Include="TypedSignalR.Client" Version="3.6.0" />
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" />
         <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
