@@ -9,6 +9,7 @@
         <IncludeBuildOutput>false</IncludeBuildOutput>
         <DevelopmentDependency>true</DevelopmentDependency>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 
         <!-- NuGet -->
         <PackageId>TypedSignalR.Client</PackageId>
