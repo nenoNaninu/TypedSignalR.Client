@@ -20,9 +20,9 @@ public class IntegrationTestBase
 
     protected static HubConnection CreateHubConnection(string path, HttpTransportType transportType)
     {
-        var client = CreateClient();
+        var options = WebApplicationFactory.ClientOptions;
 
-        var uri = new Uri(client.BaseAddress!, path);
+        var uri = new Uri(options.BaseAddress, path);
 
         if (transportType == HttpTransportType.WebSockets)
         {
