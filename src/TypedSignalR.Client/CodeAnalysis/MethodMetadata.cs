@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -12,6 +13,7 @@ public sealed class MethodMetadata
     public IReadOnlyList<ParameterMetadata> Parameters { get; }
 
     public string MethodName { get; }
+    public string SignalRMethodName { get; }
     public string ReturnType { get; }
     public bool IsGenericReturnType { get; }
     public string? GenericReturnTypeArgument { get; }
@@ -24,6 +26,15 @@ public sealed class MethodMetadata
         Parameters = methodSymbol.Parameters
             .Select(x => new ParameterMetadata(x))
             .ToArray();
+
+        SignalRMethodName =
+        (
+            methodSymbol.GetAttributes()
+                    .FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Microsoft.AspNetCore.SignalR.HubMethodNameAttribute")
+                    ?.ConstructorArguments.SingleOrDefault()
+            )
+            ?.Value?.ToString()
+            ?? MethodName;
 
         ReturnType = methodSymbol.ReturnType.ToDisplayString(SymbolDisplayFormatRule.FullyQualifiedNullableReferenceTypeFormat);
 
