@@ -106,7 +106,7 @@ namespace TypedSignalR.Client
     private string CreateRegistrationStringCore(MethodMetadata method)
     {
         return $$"""
-                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, nameof(receiver.{{method.MethodName}}), {{method.CreateParameterTypeArrayString(_specialSymbols)}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter(_specialSymbols)}}(receiver.{{method.MethodName}})));
+                compositeDisposable.Add(global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.On(connection, "{{method.SignalRMethodName}}", {{method.CreateParameterTypeArrayString(_specialSymbols)}}, HandlerConverter.Convert{{method.CreateTypeArgumentsStringForHandlerConverter(_specialSymbols)}}(receiver.{{method.MethodName}})));
 """;
     }
 }

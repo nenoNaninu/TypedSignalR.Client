@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypedSignalR.Client.SourceGeneratorTests", "tests\TypedSignalR.Client.SourceGeneratorTests\TypedSignalR.Client.SourceGeneratorTests.csproj", "{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{4AD46B59-DB78-465F-BF10-F0F74B34722D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AD46B59-DB78-465F-BF10-F0F74B34722D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AD46B59-DB78-465F-BF10-F0F74B34722D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +108,7 @@ Global
 		{0628FEE3-2C6E-4C02-A398-4E55781A5A85} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
 		{4D174400-02DF-4816-8CFC-A94DB3DBBBFA} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
 		{4AD46B59-DB78-465F-BF10-F0F74B34722D} = {196DB73F-4D3E-4A90-AE48-40925CB33560}
+		{547B45CB-8CAD-6B6B-5E80-88AE3B93A43F} = {2F614DC6-F5D9-4872-9B4E-70F39B02D6EC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3C64E712-2479-4BF8-9169-B21DC3E787EC}

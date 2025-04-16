@@ -1,19 +1,25 @@
 <Project>
-    <!-- https://learn.microsoft.com/nuget/consume-packages/central-package-management -->
-    <PropertyGroup>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    </PropertyGroup>
-    <ItemGroup>
-        <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.6.0" />
-        <PackageVersion Include="TypedSignalR.Client" Version="3.6.0" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
-        <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.13" />
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.14" />
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.14" />
-        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
-        <PackageVersion Include="xunit" Version="2.9.3" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
-        <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    </ItemGroup>
+  <!-- https://learn.microsoft.com/nuget/consume-packages/central-package-management -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.6.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
+    <PackageVersion Include="TypedSignalR.Client" Version="3.6.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.14" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+  </ItemGroup>
 </Project>
