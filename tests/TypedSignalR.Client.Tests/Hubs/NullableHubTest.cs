@@ -10,23 +10,16 @@ using Xunit;
 
 namespace TypedSignalR.Client.Tests.Hubs;
 
-public class NullableHubTest : IntegrationTestBase, IDisposable
+public class NullableHubTest : IntegrationTestBase
 {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-    public void Dispose()
-    {
-        _cancellationTokenSource.Cancel();
-    }
-
     [Fact]
     public async Task GetStruct()
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var x = Random.Shared.Next();
 
@@ -34,7 +27,7 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(x + 7, value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -42,9 +35,9 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var x = Random.Shared.Next();
 
@@ -52,7 +45,7 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(x + 99, value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -60,15 +53,15 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var value = await hubProxy.GetNullableStruct(null);
 
         Assert.Null(value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -76,9 +69,9 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var message = Guid.NewGuid().ToString();
 
@@ -86,7 +79,7 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(message + "7", value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -94,9 +87,9 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var message = Guid.NewGuid().ToString();
 
@@ -104,7 +97,7 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(message + "99", value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -112,15 +105,15 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var value = await hubProxy.GetNullableReferenceType(null);
 
         Assert.Null(value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -128,15 +121,15 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var value = await hubProxy.GetNullableReferenceType2(null, null);
 
         Assert.Null(value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]
@@ -144,9 +137,9 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/NullableTestHub", HttpTransportType.WebSockets);
 
-        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(_cancellationTokenSource.Token);
+        var hubProxy = hubConnection.CreateHubProxy<INullableTestHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var message1 = Guid.NewGuid().ToString();
         var message2 = Guid.NewGuid().ToString();
@@ -155,7 +148,7 @@ public class NullableHubTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(message1 + message2, value);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     private void CompileTest()

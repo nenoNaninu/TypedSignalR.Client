@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
 using TypedSignalR.Client.Tests.Shared;
@@ -7,15 +6,8 @@ using Xunit;
 
 namespace TypedSignalR.Client.Tests.Hubs;
 
-public class UnaryTest : IntegrationTestBase, IDisposable
+public class UnaryTest : IntegrationTestBase
 {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
-
-    public void Dispose()
-    {
-        _cancellationTokenSource.Cancel();
-    }
-
     /// <summary>
     /// no parameter test
     /// </summary>
@@ -27,14 +19,14 @@ public class UnaryTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
 
-        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var str = await unaryHub.Get();
         Assert.Equal("TypedSignalR.Client", str);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -44,9 +36,9 @@ public class UnaryTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
 
-        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var x = Random.Shared.Next();
         var y = Random.Shared.Next();
@@ -55,7 +47,7 @@ public class UnaryTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(added, x + y);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -65,9 +57,9 @@ public class UnaryTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
 
-        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var x = "revue";
         var y = "starlight";
@@ -76,7 +68,7 @@ public class UnaryTest : IntegrationTestBase, IDisposable
 
         Assert.Equal(cat, x + y);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     /// <summary>
@@ -90,9 +82,9 @@ public class UnaryTest : IntegrationTestBase, IDisposable
     {
         var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
 
-        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(_cancellationTokenSource.Token);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
 
-        await hubConnection.StartAsync(_cancellationTokenSource.Token);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
 
         var instance = new UserDefinedType()
         {
@@ -105,6 +97,6 @@ public class UnaryTest : IntegrationTestBase, IDisposable
         Assert.Equal(ret.DateTime, instance.DateTime);
         Assert.Equal(ret.Guid, instance.Guid);
 
-        await hubConnection.StopAsync(_cancellationTokenSource.Token);
+        await hubConnection.StopAsync(TestContext.Current.CancellationToken);
     }
 }

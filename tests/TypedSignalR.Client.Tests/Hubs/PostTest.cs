@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -13,31 +12,24 @@ public class PostTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly ISideEffectHub _sideEffectHub;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public PostTest()
     {
         _connection = CreateHubConnection("/Hubs/SideEffectHub", HttpTransportType.WebSockets);
 
-        _sideEffectHub = _connection.CreateHubProxy<ISideEffectHub>(_cancellationTokenSource.Token);
+        _sideEffectHub = _connection.CreateHubProxy<ISideEffectHub>(TestContext.Current.CancellationToken);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await _connection.StartAsync(_cancellationTokenSource.Token);
+        await _connection.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        try
-        {
-            await _connection.StopAsync(_cancellationTokenSource.Token);
-        }
-        finally
-        {
-            _cancellationTokenSource.Cancel();
-        }
+        await _connection.StopAsync(TestContext.Current.CancellationToken);
     }
+
     [Fact]
     public async Task NoParameter()
     {

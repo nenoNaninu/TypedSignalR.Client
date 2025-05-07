@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
@@ -14,7 +13,6 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly IStreamingHub _streamingHub;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     private readonly Person[] _persons = new Person[]
     {
@@ -33,15 +31,15 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
     {
         _connection = CreateHubConnection("/Hubs/StreamingHub", HttpTransportType.WebSockets);
 
-        _streamingHub = _connection.CreateHubProxy<IStreamingHub>(_cancellationTokenSource.Token);
+        _streamingHub = _connection.CreateHubProxy<IStreamingHub>(TestContext.Current.CancellationToken);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _connection.StartAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _connection.StopAsync();
     }
@@ -63,7 +61,7 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task CancellationTokenOnly()
     {
-        var stream = _streamingHub.CancellationTokenOnly(_cancellationTokenSource.Token);
+        var stream = _streamingHub.CancellationTokenOnly(TestContext.Current.CancellationToken);
 
         int idx = 0;
 
@@ -103,7 +101,7 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
         int value = 0;
         int step = 2;
 
-        var stream = _streamingHub.CancelableCounter(publisher, value, step, 10, _cancellationTokenSource.Token);
+        var stream = _streamingHub.CancelableCounter(publisher, value, step, 10, TestContext.Current.CancellationToken);
 
         await foreach (var it in stream)
         {
@@ -124,7 +122,7 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
         int value = 0;
         int step = 2;
 
-        var stream = await _streamingHub.TaskCancelableCounter(publisher, value, step, 10, _cancellationTokenSource.Token);
+        var stream = await _streamingHub.TaskCancelableCounter(publisher, value, step, 10, TestContext.Current.CancellationToken);
 
         await foreach (var it in stream)
         {
@@ -144,7 +142,7 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
 
         int idx = 0;
 
-        while (await stream.WaitToReadAsync(_cancellationTokenSource.Token))
+        while (await stream.WaitToReadAsync(TestContext.Current.CancellationToken))
         {
             while (stream.TryRead(out var it))
             {
@@ -157,11 +155,11 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
     [Fact]
     public async Task CancellationTokenOnlyChannel()
     {
-        var stream = await _streamingHub.CancellationTokenOnlyChannel(_cancellationTokenSource.Token);
+        var stream = await _streamingHub.CancellationTokenOnlyChannel(TestContext.Current.CancellationToken);
 
         int idx = 0;
 
-        while (await stream.WaitToReadAsync(_cancellationTokenSource.Token))
+        while (await stream.WaitToReadAsync(TestContext.Current.CancellationToken))
         {
             while (stream.TryRead(out var it))
             {
@@ -181,7 +179,7 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
 
         var stream = await _streamingHub.CounterChannel(publisher, value, step, 10);
 
-        while (await stream.WaitToReadAsync(_cancellationTokenSource.Token))
+        while (await stream.WaitToReadAsync(TestContext.Current.CancellationToken))
         {
             while (stream.TryRead(out var it))
             {
@@ -203,9 +201,9 @@ public class StreamingTest : IntegrationTestBase, IAsyncLifetime
         int value = 0;
         int step = 2;
 
-        var stream = await _streamingHub.CancelableCounterChannel(publisher, value, step, 10, _cancellationTokenSource.Token);
+        var stream = await _streamingHub.CancelableCounterChannel(publisher, value, step, 10, TestContext.Current.CancellationToken);
 
-        while (await stream.WaitToReadAsync(_cancellationTokenSource.Token))
+        while (await stream.WaitToReadAsync(TestContext.Current.CancellationToken))
         {
             while (stream.TryRead(out var it))
             {
