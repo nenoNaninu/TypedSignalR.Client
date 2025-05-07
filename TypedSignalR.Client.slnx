@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/sandbox/">
+    <Project Path="sandbox/ConsoleApp/ConsoleApp.csproj" />
+    <Project Path="sandbox/Example/Example.csproj" />
+    <Project Path="sandbox/SignalR.Client/SignalR.Client.csproj" />
+    <Project Path="sandbox/SignalR.Server/SignalR.Server.csproj" />
+    <Project Path="sandbox/SignalR.Shared/SignalR.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj" />
+    <Project Path="src/TypedSignalR.Client/TypedSignalR.Client.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj" />
+    <Project Path="tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj" />
+    <Project Path="tests/TypedSignalR.Client.Tests.Shared/TypedSignalR.Client.Tests.Shared.csproj" />
+    <Project Path="tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj" />
+  </Folder>
+</Solution>

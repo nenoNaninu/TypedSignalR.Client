@@ -6,7 +6,6 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 env:
-  DOTNET_VERSION: "8.0.x"
   DOTNET_NOLOGO: true
 
 jobs:
@@ -18,7 +17,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: |
+            8.0.x
+            9.0.x
 
       - name: Get version from git tag
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
