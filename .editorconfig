@@ -37,9 +37,6 @@ indent_size = 4
 
 # Dotnet code style settings:
 [*.{cs,vb}]
-# IDE0055: Fix formatting
-dotnet_diagnostic.IDE0055.severity = warning
-
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
@@ -145,8 +142,17 @@ dotnet_naming_symbols.all_members.applicable_kinds = *
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
-# error RS2008: Enable analyzer release tracking for the analyzer project containing rule '{0}'
+# CA1816: Call GC.SuppressFinalize correctly
+dotnet_diagnostic.CA1816.severity = none
+
+# RS2008: Enable analyzer release tracking for the analyzer project containing rule '{0}'
 dotnet_diagnostic.RS2008.severity = none
+
+# IDE0051: Remove unused private member
+dotnet_diagnostic.IDE0051.severity = none
+
+# IDE0055: Fix formatting
+dotnet_diagnostic.IDE0055.severity = warning
 
 # IDE0035: Remove unreachable code
 dotnet_diagnostic.IDE0035.severity = warning
