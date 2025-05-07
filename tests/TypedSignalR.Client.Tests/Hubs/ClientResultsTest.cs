@@ -1,11 +1,9 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace TypedSignalR.Client.Tests.Hubs;
 
@@ -13,7 +11,6 @@ public class ClientResultsTest : IntegrationTestBase, IAsyncLifetime, IClientRes
 {
     private readonly HubConnection _connection;
     private readonly IClientResultsTestHub _hubProxy;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     private readonly ITestOutputHelper _output;
 
@@ -23,25 +20,18 @@ public class ClientResultsTest : IntegrationTestBase, IAsyncLifetime, IClientRes
 
         _connection = CreateHubConnection("/Hubs/ClientResultsTestHub", HttpTransportType.WebSockets);
 
-        _hubProxy = _connection.CreateHubProxy<IClientResultsTestHub>(_cancellationTokenSource.Token);
+        _hubProxy = _connection.CreateHubProxy<IClientResultsTestHub>(TestContext.Current.CancellationToken);
         _connection.Register<IClientResultsTestHubReceiver>(this);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await _connection.StartAsync(_cancellationTokenSource.Token);
+        await _connection.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        try
-        {
-            await _connection.StopAsync(_cancellationTokenSource.Token);
-        }
-        finally
-        {
-            _cancellationTokenSource.Cancel();
-        }
+        await _connection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Fact]

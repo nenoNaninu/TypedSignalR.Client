@@ -12,30 +12,22 @@ public class InheritHubTest : IntegrationTestBase, IAsyncLifetime
 {
     private readonly HubConnection _connection;
     private readonly IInheritHub _inheritHub;
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     public InheritHubTest()
     {
         _connection = CreateHubConnection("/Hubs/InheritTestHub", HttpTransportType.WebSockets);
 
-        _inheritHub = _connection.CreateHubProxy<IInheritHub>(_cancellationTokenSource.Token);
+        _inheritHub = _connection.CreateHubProxy<IInheritHub>(TestContext.Current.CancellationToken);
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await _connection.StartAsync(_cancellationTokenSource.Token);
+        await _connection.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        try
-        {
-            await _connection.StopAsync(_cancellationTokenSource.Token);
-        }
-        finally
-        {
-            _cancellationTokenSource.Cancel();
-        }
+        await _connection.StopAsync(TestContext.Current.CancellationToken);
     }
 
     /// <summary>
