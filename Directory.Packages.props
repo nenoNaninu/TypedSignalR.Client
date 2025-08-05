@@ -5,14 +5,14 @@
         <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
     </PropertyGroup>
     <ItemGroup>
-        <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.6.0" />
+        <PackageVersion Include="AspNetCore.SignalR.OpenTelemetry" Version="1.7.0" />
         <PackageVersion Include="TypedSignalR.Client" Version="3.6.0" />
-        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
-        <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.13" />
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.15" />
-        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.15" />
-        <PackageVersion Include="xunit.v3" Version="2.0.2" />
-        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />
+        <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+        <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
+        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.19" />
+        <PackageVersion Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.19" />
+        <PackageVersion Include="xunit.v3" Version="3.0.0" />
+        <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.3" />
         <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     </ItemGroup>
 </Project>
