@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
+</Project>
