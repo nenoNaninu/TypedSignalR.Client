@@ -55,7 +55,7 @@ jobs:
         run: dotnet restore
 
       - name: Build TypedSignalR.Client.csproj
-        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
 
       - name: Test TypedSignalR.Client.Tests.csproj
         run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
