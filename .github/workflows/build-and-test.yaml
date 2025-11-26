@@ -18,9 +18,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore dependencies
         run: dotnet restore
@@ -34,6 +32,10 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        DOTNET_VERSION: ["10.0.x", "8.0.x"]
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
@@ -41,20 +43,30 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            9.0.x
+            10.0.x
+
+      - if: matrix.DOTNET_VERSION == '8.0.x'
+        run: echo "DOTNET_TFM=net8.0" >> $GITHUB_ENV
+
+      - if: matrix.DOTNET_VERSION == '10.0.x'
+        run: echo "DOTNET_TFM=net10.0" >> $GITHUB_ENV
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build TypedSignalR.Client.csproj
-        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
+        run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
 
       - name: Test TypedSignalR.Client.Tests.csproj
-        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --no-restore
+        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
 
   nuget-test:
     name: nuget-test
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        DOTNET_VERSION: ["10.0.x", "8.0.x"]
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
@@ -62,7 +74,13 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-            9.0.x
+            10.0.x
+
+      - if: matrix.DOTNET_VERSION == '8.0.x'
+        run: echo "DOTNET_TFM=net8.0" >> $GITHUB_ENV
+
+      - if: matrix.DOTNET_VERSION == '10.0.x'
+        run: echo "DOTNET_TFM=net10.0" >> $GITHUB_ENV
 
       - name: Restore dependencies
         run: dotnet restore
@@ -71,11 +89,11 @@ jobs:
         run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
 
       - name: Launch test server
-        run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --no-restore &
+        run: dotnet run --project ./tests/TypedSignalR.Client.Tests.Server/TypedSignalR.Client.Tests.Server.csproj --framework ${{ env.DOTNET_TFM }} --no-restore &
 
       - name: Sleep for 10 seconds
         run: sleep 10s
         shell: bash
 
       - name: Test (NuGet)
-        run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --no-restore
+        run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
