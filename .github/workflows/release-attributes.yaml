@@ -11,6 +11,9 @@ env:
 jobs:
   release:
     name: release-attributes
+    permissions:
+      contents: read
+      id-token: write # for OIDC token
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
@@ -18,6 +21,12 @@ jobs:
         uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
+
+      - name: NuGet Login
+        uses: NuGet/login@v1.2.0
+        id: login
+        with:
+          user: nenoNaninu
 
       - name: Get version from git tag
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/attributes-v}" >> $GITHUB_ENV
@@ -34,4 +43,4 @@ jobs:
           path: ${{ github.workspace }}/artifacts
 
       - name: dotnet nuget push
-        run: dotnet nuget push ${{ github.workspace }}/artifacts/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+        run: dotnet nuget push ${{ github.workspace }}/artifacts/*.nupkg --skip-duplicate -k ${{ steps.login.outputs.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
