@@ -17,6 +17,7 @@ public readonly record struct ParameterMetadata
         ParameterSymbol = parameterSymbol;
 
         Name = SyntaxFacts.IsReservedKeyword(SyntaxFacts.GetKeywordKind(parameterSymbol.Name))
+            || SyntaxFacts.GetContextualKeywordKind(parameterSymbol.Name) != SyntaxKind.None
             ? $"@{parameterSymbol.Name}"
             : parameterSymbol.Name;
 
