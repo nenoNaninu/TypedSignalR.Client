@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj" />

@@ -58,7 +58,7 @@ jobs:
         run: dotnet build ./src/TypedSignalR.Client/TypedSignalR.Client.csproj --no-restore
 
       - name: Test TypedSignalR.Client.Tests.csproj
-        run: dotnet test ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
+        run: dotnet test --project ./tests/TypedSignalR.Client.Tests/TypedSignalR.Client.Tests.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
 
   nuget-test:
     name: nuget-test
@@ -96,4 +96,4 @@ jobs:
         shell: bash
 
       - name: Test (NuGet)
-        run: dotnet test ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
+        run: dotnet test --project ./tests/TypedSignalR.Client.Tests.NuGet/TypedSignalR.Client.Tests.NuGet.csproj --framework ${{ env.DOTNET_TFM }} --no-restore
