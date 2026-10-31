@@ -94,13 +94,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        Func<string> f = () => Guid.NewGuid().ToString();
-        object o = f;
-
-        var f2 = o as Func<string>;
-        Console.WriteLine(f2.Invoke());
-
-
         var connection = new HubConnectionBuilder()
            .WithUrl("https://~~~")
            .Build();

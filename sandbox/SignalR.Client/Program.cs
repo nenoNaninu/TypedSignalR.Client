@@ -22,19 +22,19 @@ class Receiver : IClientContract, IHubConnectionObserver
         return Task.CompletedTask;
     }
 
-    public Task OnClosed(Exception e)
+    public Task OnClosed(Exception? e)
     {
         Console.WriteLine($"[On Closed!]");
         return Task.CompletedTask;
     }
 
-    public Task OnReconnected(string connectionId)
+    public Task OnReconnected(string? connectionId)
     {
         Console.WriteLine($"[On Reconnected!]");
         return Task.CompletedTask;
     }
 
-    public Task OnReconnecting(Exception e)
+    public Task OnReconnecting(Exception? e)
     {
         Console.WriteLine($"[On Reconnecting!]");
         return Task.CompletedTask;
@@ -65,19 +65,19 @@ class Client : IClientContract, IHubConnectionObserver, IDisposable
         return Task.CompletedTask;
     }
 
-    public Task OnClosed(Exception e)
+    public Task OnClosed(Exception? e)
     {
         Console.WriteLine($"[On Closed!]");
         return Task.CompletedTask;
     }
 
-    public Task OnReconnected(string connectionId)
+    public Task OnReconnected(string? connectionId)
     {
         Console.WriteLine($"[On Reconnected!]");
         return Task.CompletedTask;
     }
 
-    public Task OnReconnecting(Exception exception)
+    public Task OnReconnecting(Exception? exception)
     {
         Console.WriteLine($"[On Reconnecting!]");
         return Task.CompletedTask;
