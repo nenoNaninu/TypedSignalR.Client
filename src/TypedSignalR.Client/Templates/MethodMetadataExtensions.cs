@@ -174,6 +174,8 @@ public static class MethodMetadataExtensions
 
     public static string CreateReturnStatementString(this MethodMetadata methodMetadata)
     {
+        // Task -> string.Empty
+        // Task<T> -> return
         return methodMetadata.IsGenericReturnType ? "return " : string.Empty;
     }
 
