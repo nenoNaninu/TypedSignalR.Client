@@ -118,10 +118,14 @@ public sealed class StreamingHub : Hub, IStreamingHub
 
     public async Task UploadStream(Person publisher, IAsyncEnumerable<Person> stream)
     {
+        _logger.Log(LogLevel.Information, "UploadStream: publisher {publisher}", publisher);
+        await UploadStreamWithoutPublisher(stream);
+    }
+
+    public async Task UploadStreamWithoutPublisher(IAsyncEnumerable<Person> stream)
+    {
         try
         {
-            _logger.Log(LogLevel.Information, "UploadStream: publisher {publisher}", publisher);
-
             int idx = 0;
 
             await foreach (var it in stream)
@@ -144,10 +148,14 @@ public sealed class StreamingHub : Hub, IStreamingHub
 
     public async Task UploadStreamAsChannel(Person publisher, ChannelReader<Person> stream)
     {
+        _logger.Log(LogLevel.Information, "UploadStreamAsChannel: publisher {publisher}", publisher);
+        await UploadStreamAsChannelWithoutPublisher(stream);
+    }
+
+    public async Task UploadStreamAsChannelWithoutPublisher(ChannelReader<Person> stream)
+    {
         try
         {
-            _logger.Log(LogLevel.Information, "UploadStreamAsChannel: publisher {publisher}", publisher);
-
             int idx = 0;
 
             while (await stream.WaitToReadAsync())

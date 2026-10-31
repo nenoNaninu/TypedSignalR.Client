@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using TypedSignalR.Client.Tests.Shared;
 using Xunit;
 
@@ -8,6 +9,38 @@ namespace TypedSignalR.Client.Tests.Hubs;
 
 public class UnaryTest : IntegrationTestBase
 {
+    private readonly ITestOutputHelper _output;
+
+    public UnaryTest(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets, false)]
+    [InlineData(HttpTransportType.WebSockets, true)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling, false)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling, true)]
+    public async Task HubExceptionStackTrace(HttpTransportType httpTransportType, bool withResult)
+    {
+        await using var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
+
+        var exception = await Assert.ThrowsAsync<HubException>(() => withResult
+            ? unaryHub.ThrowHubExceptionWithResult()
+            : unaryHub.ThrowHubException());
+
+        _output.WriteLine(exception.ToString());
+
+        var methodName = withResult ? nameof(IUnaryHub.ThrowHubExceptionWithResult) : nameof(IUnaryHub.ThrowHubException);
+        Assert.Equal($"An unexpected error occurred invoking '{methodName}' on the server. HubException: Server-side HubException for stack trace inspection.", exception.Message);
+        Assert.Null(exception.InnerException);
+        Assert.NotNull(exception.StackTrace);
+        Assert.Contains($"{unaryHub.GetType().Name}.{methodName}(", exception.StackTrace);
+        Assert.DoesNotContain("TypedSignalR.Client.Tests.Server.Hubs.UnaryHub", exception.StackTrace);
+    }
+
     /// <summary>
     /// no parameter test
     /// </summary>

@@ -12,4 +12,6 @@ public interface IUnaryHub
     Task<int> Add(int x, int y);
     Task<string> Cat(string x, string y);
     Task<UserDefinedType> Echo(UserDefinedType instance);
+    Task ThrowHubException();
+    Task<string> ThrowHubExceptionWithResult();
 }

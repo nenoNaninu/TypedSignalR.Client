@@ -172,6 +172,11 @@ public static class MethodMetadataExtensions
         return methodMetadata.IsGenericReturnType ? $"<{methodMetadata.GenericReturnTypeArgument}>" : string.Empty;
     }
 
+    public static string CreateReturnStatementString(this MethodMetadata methodMetadata)
+    {
+        return methodMetadata.IsGenericReturnType ? "return " : string.Empty;
+    }
+
     public static string CreateCancellationTokenString(this MethodMetadata methodMetadata, string cancellationTokenString, SpecialSymbols specialSymbols)
     {
         var parameter = methodMetadata.Parameters
@@ -276,9 +281,9 @@ public static class MethodMetadataExtensions
     private static string CreateUnaryMethodString(MethodMetadata method)
     {
         return $$"""
-            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            public async {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+                {{method.CreateReturnStatementString()}}await global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.InvokeCoreAsync{{method.CreateGenericReturnTypeArgumentString()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken).ConfigureAwait(false);
             }
 """;
     }
@@ -307,9 +312,9 @@ public static class MethodMetadataExtensions
     private static string CreateServerStreamingMethodAsChannelString(MethodMetadata method, SpecialSymbols specialSymbols)
     {
         return $$"""
-            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            public async {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.StreamAsChannelCoreAsync{{method.CreateGenericReturnTypeArgumentStringForStreaming()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}}, {{method.CreateCancellationTokenString("_cancellationToken", specialSymbols)}});
+                return await global::Microsoft.AspNetCore.SignalR.Client.HubConnectionExtensions.StreamAsChannelCoreAsync{{method.CreateGenericReturnTypeArgumentStringForStreaming()}}(_connection, nameof({{method.MethodName}}), {{method.CreateArgumentsStringExceptCancellationToken(specialSymbols)}}, {{method.CreateCancellationTokenString("_cancellationToken", specialSymbols)}}).ConfigureAwait(false);
             }
 """;
     }
@@ -317,9 +322,9 @@ public static class MethodMetadataExtensions
     private static string CreateClientStreamingMethodAsAsyncEnumerableString(MethodMetadata method)
     {
         return $$"""
-            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            public async {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+                await _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken).ConfigureAwait(false);
             }
 """;
     }
@@ -328,9 +333,9 @@ public static class MethodMetadataExtensions
     {
         return $$"""
 
-            public {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
+            public async {{method.ReturnType}} {{method.MethodName}}({{method.CreateParametersString()}})
             {
-                return _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken);
+                await _connection.SendCoreAsync(nameof({{method.MethodName}}), {{method.CreateArgumentsString()}}, _cancellationToken).ConfigureAwait(false);
             }
 """;
     }
