@@ -13,9 +13,9 @@ jobs:
     name: release-attributes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
 
@@ -28,7 +28,7 @@ jobs:
       - name: dotnet pack
         run: dotnet pack -c Release --no-build --output ${{ github.workspace }}/artifacts -p:Version=${{ env.RELEASE_VERSION }} ./src/TypedSignalR.Client.Attributes/TypedSignalR.Client.Attributes.csproj
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: Packages
           path: ${{ github.workspace }}/artifacts
