@@ -39,4 +39,14 @@ public class UnaryHub : Hub, IUnaryHub
 
         return Task.FromResult("TypedSignalR.Client");
     }
+
+    public Task ThrowHubException()
+    {
+        throw new HubException("Server-side HubException for stack trace inspection.");
+    }
+
+    public Task<string> ThrowHubExceptionWithResult()
+    {
+        throw new HubException("Server-side HubException for stack trace inspection.");
+    }
 }

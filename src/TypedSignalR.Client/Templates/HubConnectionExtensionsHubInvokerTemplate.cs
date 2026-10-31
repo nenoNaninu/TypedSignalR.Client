@@ -37,12 +37,12 @@ namespace TypedSignalR.Client
         foreach (var hubType in _hubTypes)
         {
             sb.AppendLine($$"""
-        private sealed class HubInvokerFor_{{hubType.CollisionFreeName}} : {{hubType.FullyQualifiedInterfaceName}}, IHubInvoker
+        private sealed class __GeneratedHubInvoker__{{hubType.CollisionFreeName}} : {{hubType.FullyQualifiedInterfaceName}}, IHubInvoker
         {
             private readonly global::Microsoft.AspNetCore.SignalR.Client.HubConnection _connection;
             private readonly global::System.Threading.CancellationToken _cancellationToken;
 
-            public HubInvokerFor_{{hubType.CollisionFreeName}}(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
+            public __GeneratedHubInvoker__{{hubType.CollisionFreeName}}(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
             {
                 _connection = connection;
                 _cancellationToken = cancellationToken;
@@ -50,11 +50,11 @@ namespace TypedSignalR.Client
 {{CreateMethodsString(hubType)}}
         }
 
-        private sealed class HubInvokerFactoryFor_{{hubType.CollisionFreeName}} : IHubInvokerFactory<{{hubType.FullyQualifiedInterfaceName}}>
+        private sealed class __GeneratedHubInvokerFactory__{{hubType.CollisionFreeName}} : IHubInvokerFactory<{{hubType.FullyQualifiedInterfaceName}}>
         {
             public {{hubType.FullyQualifiedInterfaceName}} CreateHubInvoker(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, global::System.Threading.CancellationToken cancellationToken)
             {
-                return new HubInvokerFor_{{hubType.CollisionFreeName}}(connection, cancellationToken);
+                return new __GeneratedHubInvoker__{{hubType.CollisionFreeName}}(connection, cancellationToken);
             }
         }
 
@@ -72,7 +72,7 @@ namespace TypedSignalR.Client
         foreach (var hubType in _hubTypes)
         {
             sb.AppendLine($$"""
-            factories.Add(typeof({{hubType.FullyQualifiedInterfaceName}}), new HubInvokerFactoryFor_{{hubType.CollisionFreeName}}());
+            factories.Add(typeof({{hubType.FullyQualifiedInterfaceName}}), new __GeneratedHubInvokerFactory__{{hubType.CollisionFreeName}}());
 """);
         }
 

@@ -35,7 +35,7 @@ namespace TypedSignalR.Client
         foreach (var receiverType in _receiverTypes)
         {
             sb.AppendLine($$"""
-        private sealed class BinderFor_{{receiverType.CollisionFreeName}} : IReceiverBinder<{{receiverType.FullyQualifiedInterfaceName}}>
+        private sealed class __GeneratedReceiverBinder__{{receiverType.CollisionFreeName}} : IReceiverBinder<{{receiverType.FullyQualifiedInterfaceName}}>
         {
             public global::System.IDisposable Bind(global::Microsoft.AspNetCore.SignalR.Client.HubConnection connection, {{receiverType.FullyQualifiedInterfaceName}} receiver)
             {
@@ -60,7 +60,7 @@ namespace TypedSignalR.Client
         foreach (var receiverType in _receiverTypes)
         {
             sb.AppendLine($$"""
-            binders.Add(typeof({{receiverType.FullyQualifiedInterfaceName}}), new BinderFor_{{receiverType.CollisionFreeName}}());
+            binders.Add(typeof({{receiverType.FullyQualifiedInterfaceName}}), new __GeneratedReceiverBinder__{{receiverType.CollisionFreeName}}());
 """);
         }
 

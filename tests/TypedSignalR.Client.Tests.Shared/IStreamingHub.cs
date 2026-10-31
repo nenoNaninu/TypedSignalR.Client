@@ -21,6 +21,8 @@ public interface IStreamingHub
     // TODO: HOW TO TEST?
     Task UploadStream(Person publisher, IAsyncEnumerable<Person> stream);
     Task UploadStreamAsChannel(Person publisher, ChannelReader<Person> stream);
+    Task UploadStreamWithoutPublisher(IAsyncEnumerable<Person> stream);
+    Task UploadStreamAsChannelWithoutPublisher(ChannelReader<Person> stream);
 }
 
 public record Person(Guid Id, string Name, int Number);
