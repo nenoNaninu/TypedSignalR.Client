@@ -41,6 +41,20 @@ public class UnaryTest : IntegrationTestBase
         Assert.DoesNotContain("TypedSignalR.Client.Tests.Server.Hubs.UnaryHub", exception.StackTrace);
     }
 
+    [Theory]
+    [InlineData(HttpTransportType.WebSockets)]
+    [InlineData(HttpTransportType.ServerSentEvents | HttpTransportType.LongPolling)]
+    public async Task KeywordParameterNames(HttpTransportType httpTransportType)
+    {
+        await using var hubConnection = CreateHubConnection("/Hubs/UnaryHub", httpTransportType);
+        var unaryHub = hubConnection.CreateHubProxy<IUnaryHub>(TestContext.Current.CancellationToken);
+        await hubConnection.StartAsync(TestContext.Current.CancellationToken);
+
+        var result = await unaryHub.EchoKeywords("reserved", "awaited", "contextual");
+
+        Assert.Equal("reserved:awaited:contextual", result);
+    }
+
     /// <summary>
     /// no parameter test
     /// </summary>

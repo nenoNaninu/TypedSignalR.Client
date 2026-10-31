@@ -33,6 +33,11 @@ public class UnaryHub : Hub, IUnaryHub
         return Task.FromResult(instance);
     }
 
+    public Task<string> EchoKeywords(string @class, string @await, string record)
+    {
+        return Task.FromResult($"{@class}:{@await}:{record}");
+    }
+
     public Task<string> Get()
     {
         _logger.Log(LogLevel.Information, "UnaryHub.Get");
