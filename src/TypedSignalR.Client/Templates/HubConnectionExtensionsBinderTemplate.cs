@@ -27,6 +27,8 @@ public sealed class HubConnectionExtensionsBinderTemplate
 #pragma warning disable CS1591
 #pragma warning disable CS8767
 #pragma warning disable CS8613
+#pragma warning disable CS0612
+#pragma warning disable CS0618
 namespace TypedSignalR.Client
 {
     internal static partial class HubConnectionExtensions
@@ -70,6 +72,8 @@ namespace TypedSignalR.Client
         }
     }
 }
+#pragma warning restore CS0618
+#pragma warning restore CS0612
 #pragma warning restore CS8613
 #pragma warning restore CS8767
 #pragma warning restore CS1591
