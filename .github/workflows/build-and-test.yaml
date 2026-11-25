@@ -18,7 +18,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6.0.0
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: 11.0.x
 
       - name: Restore dependencies
         run: dotnet restore
@@ -35,21 +35,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        DOTNET_VERSION: ["10.0.x", "8.0.x"]
+        DOTNET_VERSION: ["11.0.x", "10.0.x"]
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup .NET
         uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: |
-            8.0.x
             10.0.x
-
-      - if: matrix.DOTNET_VERSION == '8.0.x'
-        run: echo "DOTNET_TFM=net8.0" >> $GITHUB_ENV
+            11.0.x
 
       - if: matrix.DOTNET_VERSION == '10.0.x'
         run: echo "DOTNET_TFM=net10.0" >> $GITHUB_ENV
+
+      - if: matrix.DOTNET_VERSION == '11.0.x'
+        run: echo "DOTNET_TFM=net11.0" >> $GITHUB_ENV
 
       - name: Restore dependencies
         run: dotnet restore
@@ -66,21 +66,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        DOTNET_VERSION: ["10.0.x", "8.0.x"]
+        DOTNET_VERSION: ["11.0.x", "10.0.x"]
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Setup .NET
         uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: |
-            8.0.x
             10.0.x
-
-      - if: matrix.DOTNET_VERSION == '8.0.x'
-        run: echo "DOTNET_TFM=net8.0" >> $GITHUB_ENV
+            11.0.x
 
       - if: matrix.DOTNET_VERSION == '10.0.x'
         run: echo "DOTNET_TFM=net10.0" >> $GITHUB_ENV
+
+      - if: matrix.DOTNET_VERSION == '11.0.x'
+        run: echo "DOTNET_TFM=net11.0" >> $GITHUB_ENV
 
       - name: Restore dependencies
         run: dotnet restore
